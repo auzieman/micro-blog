@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Micro Blog Admin Login</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Georgia, "Times New Roman", serif;
+      background: linear-gradient(rgba(10, 24, 31, 0.45), rgba(10, 24, 31, 0.58)),
+        url("https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1600&q=80") center center / cover fixed;
+      color: #11212b;
+    }
+    .card {
+      width: min(94vw, 460px);
+      padding: 1.4rem;
+      border-radius: 20px;
+      background: rgba(248, 249, 247, 0.92);
+      border: 1px solid rgba(20, 40, 51, 0.14);
+      box-shadow: 0 24px 60px rgba(8, 18, 27, 0.28);
+      backdrop-filter: blur(8px);
+    }
+    h1 { margin: 0 0 0.4rem; font-size: 2rem; }
+    p { color: #41505a; line-height: 1.5; }
+    label { display: block; font-weight: 700; margin: 0.85rem 0 0.3rem; }
+    input, button {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+      border: 1px solid rgba(21, 44, 56, 0.16);
+      font: inherit;
+    }
+    button {
+      margin-top: 1rem;
+      border: none;
+      background: #28667f;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .message {
+      margin-top: 1rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 12px;
+      background: rgba(16, 31, 40, 0.92);
+      color: #ecf7fb;
+      white-space: pre-wrap;
+    }
+    .meta-link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #28667f;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <section class="card">
+    <h1>Author Access</h1>
+    <p>The public site stays open at <strong>/blog</strong>. Authoring lives here under <strong>/admin</strong>. For now this build uses a local admin challenge. Google sign-in can replace it once the deployment auth path is wired.</p>
+    <p>Allowed admin identity: <strong>{{ admin_email }}</strong></p>
+
+    <form method="post" action="/admin/login">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" value="{{ admin_email }}" required />
+
+      <label for="access_code">Admin access code</label>
+      <input id="access_code" name="access_code" type="password" placeholder="Set ADMIN_ACCESS_CODE in .env" required />
+
+      <button type="submit">Enter Admin Console</button>
+    </form>
+
+    {% if auth_mode == "google" %}
+    <p>Google auth variables are present, but OAuth is not wired into the local UI yet. This screen is intentionally explicit about that.</p>
+    {% endif %}
+
+    {% if message %}
+    <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <a class="meta-link" href="/blog">Back to public blog</a>
+  </section>
+</body>
+</html>

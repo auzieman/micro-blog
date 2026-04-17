@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Micro Blog Admin</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #edf3f5;
+      color: #15232c;
+    }
+    .shell {
+      width: min(100%, 1180px);
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .hero, .panel {
+      background: white;
+      border: 1px solid rgba(20, 40, 51, 0.1);
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(13, 27, 35, 0.08);
+    }
+    .hero {
+      padding: 1.15rem 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: start;
+      flex-wrap: wrap;
+    }
+    .hero h1 { margin: 0 0 0.3rem; font-size: 1.9rem; }
+    .hero p { margin: 0; color: #52616a; max-width: 760px; }
+    .actions {
+      display: flex;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+    }
+    .actions a, .actions button {
+      border-radius: 12px;
+      padding: 0.75rem 0.95rem;
+      font: inherit;
+      border: none;
+      cursor: pointer;
+      background: #2a647d;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .actions form { margin: 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 1rem;
+    }
+    .stack {
+      display: grid;
+      gap: 1rem;
+    }
+    .panel { padding: 1rem; }
+    h2 {
+      margin: 0 0 0.75rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #5d6970;
+    }
+    label { display: block; font-weight: 700; margin: 0.8rem 0 0.3rem; }
+    input, textarea, select, button[type="submit"] {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 12px;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid rgba(18, 40, 51, 0.16);
+      font: inherit;
+    }
+    textarea { min-height: 160px; resize: vertical; }
+    button[type="submit"] {
+      margin-top: 0.8rem;
+      border: none;
+      background: #2a647d;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .secondary { background: #4c626e; }
+    .message {
+      margin-bottom: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      background: #13222b;
+      color: #eaf6fb;
+      white-space: pre-wrap;
+    }
+    .post-list {
+      display: grid;
+      gap: 0.75rem;
+      max-height: 70vh;
+      overflow: auto;
+    }
+    .post-card {
+      border: 1px solid rgba(18, 40, 51, 0.1);
+      border-radius: 14px;
+      padding: 0.85rem 0.95rem;
+      background: #f7fafb;
+    }
+    .post-card h3 { margin: 0 0 0.3rem; font-size: 1.05rem; }
+    .post-card p { margin: 0; color: #57656d; line-height: 1.45; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.55rem;
+      font-size: 0.82rem;
+      color: #627079;
+    }
+    .pill {
+      border-radius: 999px;
+      background: #dce9ef;
+      color: #245064;
+      padding: 0.18rem 0.45rem;
+    }
+    .preview-list {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 0.9rem;
+      max-height: 32rem;
+      overflow: auto;
+    }
+    .preview-card {
+      border: 1px solid rgba(18, 40, 51, 0.12);
+      border-radius: 14px;
+      padding: 0.9rem;
+      background: #f8fbfc;
+    }
+    .preview-card header {
+      display: flex;
+      gap: 0.75rem;
+      align-items: start;
+    }
+    .preview-card input[type="checkbox"] {
+      width: auto;
+      margin-top: 0.25rem;
+    }
+    .preview-card h3 {
+      margin: 0 0 0.25rem;
+      font-size: 1rem;
+    }
+    .preview-card a {
+      color: #245064;
+      font-weight: 700;
+      word-break: break-all;
+    }
+    .subtle {
+      color: #61707a;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    @media (max-width: 920px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    {% if message %}
+    <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <section class="hero">
+      <div>
+        <h1>Author Console</h1>
+        <p>Public reading stays at <strong>/blog</strong>. This route stays operational: import seed content, draft posts, and publish finished articles.</p>
+      </div>
+      <div class="actions">
+        <a href="/blog">View Public Site</a>
+        <form method="post" action="/admin/logout">
+          <button type="submit" class="secondary">Sign Out</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <div class="panel">
+          <h2>Drupal Import</h2>
+          <p class="subtle">Preview a Drupal JSON:API endpoint first, then select only the items you want to queue as drafts. This keeps imports controlled and reviewable.</p>
+
+          <form method="post" action="/admin/import/drupal/preview">
+            <label for="endpoint_url">Drupal endpoint URL</label>
+            <input id="endpoint_url" name="endpoint_url" value="{{ drupal_form.get('endpoint_url', '') }}" placeholder="https://example.com or https://example.com/jsonapi/node/article" required />
+
+            <label for="source_base_url">Source base URL</label>
+            <input id="source_base_url" name="source_base_url" value="{{ drupal_form.get('source_base_url', '') }}" placeholder="https://example.com" />
+
+            <label><input type="checkbox" name="allow_insecure_tls" {% if drupal_form.get('allow_insecure_tls') %}checked{% endif %} style="width:auto; margin-right:0.5rem;" />Allow insecure TLS for source fetch</label>
+
+            <label for="keyword_filter">Keyword filter</label>
+            <input id="keyword_filter" name="keyword_filter" value="{{ drupal_form.get('keyword_filter', '') }}" placeholder="linux, docker, kubernetes" />
+
+            <label for="include_value">Include relationships</label>
+            <input id="include_value" name="include_value" value="{{ drupal_form.get('include_value', 'field_tags,field_image') }}" placeholder="field_tags,field_image" />
+
+            <label for="page_limit">Page limit</label>
+            <input id="page_limit" name="page_limit" value="{{ drupal_form.get('page_limit', '10') }}" placeholder="10" />
+
+            <label for="drupal_status">Imported status</label>
+            <select id="drupal_status" name="status">
+              <option value="draft" {% if drupal_form.get('status', 'draft') == 'draft' %}selected{% endif %}>draft</option>
+              <option value="published" {% if drupal_form.get('status') == 'published' %}selected{% endif %}>published</option>
+            </select>
+
+            <label for="drupal_body_format">Force body format</label>
+            <select id="drupal_body_format" name="body_format">
+              <option value="" {% if not drupal_form.get('body_format') %}selected{% endif %}>auto</option>
+              <option value="html" {% if drupal_form.get('body_format') == 'html' %}selected{% endif %}>html</option>
+              <option value="markdown" {% if drupal_form.get('body_format') == 'markdown' %}selected{% endif %}>markdown</option>
+            </select>
+
+            <label for="drupal_theme_variant">Imported theme variant</label>
+            <select id="drupal_theme_variant" name="theme_variant">
+              {% for theme_name in theme_variants %}
+              <option value="{{ theme_name }}" {% if drupal_form.get('theme_variant', 'aurora') == theme_name %}selected{% endif %}>{{ theme_name }}</option>
+              {% endfor %}
+            </select>
+
+            <button type="submit" class="secondary">Preview Remote Items</button>
+          </form>
+
+          {% if drupal_endpoints %}
+          <div class="preview-list">
+            {% for endpoint in drupal_endpoints %}
+            <article class="preview-card">
+              <h3>{{ endpoint.name }}</h3>
+              <a href="{{ endpoint.href }}" target="_blank" rel="noreferrer">{{ endpoint.href }}</a>
+              <p class="subtle">Use this endpoint URL in the preview form if it matches the content type you want to import.</p>
+            </article>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if drupal_preview %}
+          <form method="post" action="/admin/import/drupal">
+            <div class="preview-list">
+              {% for item in drupal_preview %}
+              <article class="preview-card">
+                <header>
+                  <input type="checkbox" name="selected_source_ids" value="{{ item.source_id }}" checked />
+                  <div>
+                    <h3>{{ item.title }}</h3>
+                    <div class="subtle">{{ item.summary }}</div>
+                    <div class="meta">
+                      <span>{{ item.slug }}</span>
+                      <span class="pill">{{ item.body_format }}</span>
+                      <span class="pill">{{ item.theme_variant }}</span>
+                      {% if item.hero_image_url %}
+                      <span class="pill">hero image</span>
+                      {% endif %}
+                      {% if item.image_urls %}
+                      <span class="pill">{{ item.image_urls|length }} images</span>
+                      {% endif %}
+                      {% for tag_name in item.tags %}
+                      <span class="pill">{{ tag_name }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </header>
+              </article>
+              {% endfor %}
+            </div>
+            <button type="submit">Import Selected Drupal Items</button>
+          </form>
+          {% endif %}
+        </div>
+
+        <div class="panel">
+          <h2>Draft and Publish</h2>
+          <p>Signed in as <strong>{{ admin_email }}</strong>. Current published post count visible to the read model: <strong>{{ total }}</strong>.</p>
+
+          <form method="post" action="/admin/import-sample">
+            <button type="submit" class="secondary">Import Linux Sample Posts</button>
+          </form>
+
+          <form method="post" action="/admin/create">
+            <label for="title">Title</label>
+            <input id="title" name="title" required />
+
+            <label for="summary">Summary</label>
+            <textarea id="summary" name="summary" style="min-height: 90px;" required></textarea>
+
+            <label for="tags">Tags</label>
+            <input id="tags" name="tags" placeholder="linux, bash, containers" />
+
+            <label for="hero_image_url">Hero image URL</label>
+            <input id="hero_image_url" name="hero_image_url" placeholder="https://example.com/image.jpg" />
+
+            <label for="body_format">Body format</label>
+            <select id="body_format" name="body_format">
+              <option value="markdown">markdown</option>
+              <option value="html">html</option>
+            </select>
+
+            <label for="theme_variant">Theme variant</label>
+            <select id="theme_variant" name="theme_variant">
+              {% for theme_name in theme_variants %}
+              <option value="{{ theme_name }}">{{ theme_name }}</option>
+              {% endfor %}
+            </select>
+
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="draft">draft</option>
+              <option value="published">published</option>
+            </select>
+
+            <label for="markdown_body">Markdown Body</label>
+            <textarea id="markdown_body" name="markdown_body" required># New Post</textarea>
+
+            <button type="submit">Create Article</button>
+          </form>
+
+          <form method="post" action="/admin/publish">
+            <label for="article_id">Publish Existing Article by ID</label>
+            <input id="article_id" name="article_id" placeholder="ART-12345678" required />
+            <button type="submit" class="secondary">Publish Article</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Published Feed Snapshot</h2>
+        <div class="post-list">
+          {% for post in posts %}
+          <div class="post-card">
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.summary }}</p>
+            <div class="meta">
+              <span>{{ post.slug }}</span>
+              {% if post.theme_variant %}<span class="pill">{{ post.theme_variant }}</span>{% endif %}
+              {% if post.body_format %}<span class="pill">{{ post.body_format }}</span>{% endif %}
+              {% for tag_name in post.tags %}
+              <span class="pill">{{ tag_name }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

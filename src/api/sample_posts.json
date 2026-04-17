@@ -1,0 +1,35 @@
+[
+  {
+    "title": "linux find regex the golden goose of find",
+    "summary": "A practical note on using find with regex so you can match several archive types without turning one shell command into a wall of conditions.",
+    "body_format": "markdown",
+    "markdown_body": "# linux find regex the golden goose of find\n\nWhen `find` turns into a long pile of `-name` clauses, it usually means the command is fighting the problem instead of describing it. This article leans into `-regex` and `-iregex` so a Linux admin can search for families of files in one readable line.\n\n## Why it matters\n\n- cleaner shell history\n- easier copy and paste into runbooks\n- less chance of missing one extension in a hurry\n\n## Example\n\n```bash\nfind ./ -regextype egrep -iregex \".*\\.(gz|zip|tar|rar|7z)\"\n```\n\nThat pattern is easier to teach, easier to review, and easier to extend than a chain of `-name` flags.",
+    "hero_image_url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80",
+    "theme_variant": "aurora",
+    "tags": ["linux", "shell", "find", "regex"],
+    "status": "published",
+    "source_url": "https://www.auzietek.com/node/15"
+  },
+  {
+    "title": "Bash's corner expansion",
+    "summary": "A short Linux productivity post on brace expansion and related shell shortcuts that save time when creating paths and repeating common patterns.",
+    "body_format": "markdown",
+    "markdown_body": "# Bash's corner expansion\n\nBrace expansion is one of those Linux shell features that stays invisible until you need it three times in a row. Then it becomes the obvious way to create directories, fan out file paths, or sketch a quick structure for a script test.\n\n## Useful examples\n\n```bash\nmkdir -p project/{bin,etc,logs,tmp}\ncp /etc/{hosts,resolv.conf} ./backup/\n```\n\nThe point is not cleverness. The point is reducing repeated typing without making the command unreadable to the next person.",
+    "hero_image_url": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1600&q=80",
+    "theme_variant": "paper",
+    "tags": ["linux", "bash", "shell"],
+    "status": "published",
+    "source_url": "https://www.auzietek.com/taxonomy/term/41"
+  },
+  {
+    "title": "A few notes around some less documented Dynatrace Managed requirements",
+    "summary": "Linux and platform notes around Dynatrace Managed prerequisites, especially where SELinux and environment assumptions can surprise an operator.",
+    "body_format": "markdown",
+    "markdown_body": "# Dynatrace Managed notes that matter in real environments\n\nSome deployment guides tell the happy path and stop there. Real systems usually have SELinux policies, network controls, and package-level assumptions that do not show up until late in a rollout.\n\n## What to verify early\n\n- SELinux mode and related policy expectations\n- required open ports\n- service account and file path assumptions\n- whether an install guide quietly assumes a more permissive lab than your production estate\n\nThis kind of article exists to save the second install, not the first one.",
+    "hero_image_url": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80",
+    "theme_variant": "midnight",
+    "tags": ["linux", "dynatrace", "operations"],
+    "status": "published",
+    "source_url": "https://www.auzietek.com/node/28"
+  }
+]

@@ -1,0 +1,296 @@
+networks:
+  app_net:
+    driver: bridge
+
+volumes:
+  rabbitmq-data:
+  redis-data:
+  postgres-data:
+  grafana-data:
+  loki-data:
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER:-guest}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS:-guest}"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: "microblog"
+      POSTGRES_USER: "blog"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-Str0ngP@ssword!}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blog -d microblog"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.103.0
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./collector/otel-collector-local.yaml:/etc/otel-collector.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "9464:9464"
+    restart: unless-stopped
+    networks:
+      app_net:
+        aliases:
+          - otel-collector
+
+  otel-collector-dynatrace:
+    profiles: ["dynatrace"]
+    image: otel/opentelemetry-collector-contrib:0.103.0
+    command: ["--config=/etc/otel-collector.yaml"]
+    env_file: .env
+    volumes:
+      - ./collector/otel-collector.yaml:/etc/otel-collector.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    restart: unless-stopped
+    networks:
+      app_net:
+        aliases:
+          - otel-collector
+
+  prometheus:
+    profiles: ["local-observability"]
+    image: prom/prometheus:v2.53.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    volumes:
+      - ./collector/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  loki:
+    profiles: ["local-observability"]
+    image: grafana/loki:3.1.1
+    command: ["-config.file=/etc/loki/config.yml"]
+    volumes:
+      - ./collector/loki-config.yml:/etc/loki/config.yml:ro
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  promtail:
+    profiles: ["local-observability"]
+    image: grafana/promtail:3.1.1
+    command: ["-config.file=/etc/promtail/config.yml"]
+    volumes:
+      - ./collector/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      loki:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  grafana:
+    profiles: ["local-observability"]
+    image: grafana/grafana:11.1.4
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./collector/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./collector/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./collector/microblog-overview-dashboard.json:/etc/grafana/provisioning/dashboards/json/microblog-overview-dashboard.json:ro
+      - ./collector/microblog-service-flow-dashboard.json:/etc/grafana/provisioning/dashboards/json/microblog-service-flow-dashboard.json:ro
+    depends_on:
+      loki:
+        condition: service_started
+      prometheus:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  blog-api:
+    build:
+      context: .
+      dockerfile: src/api/Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: "postgresql://blog:${POSTGRES_PASSWORD:-Str0ngP@ssword!}@postgres:5432/microblog"
+      REDIS_URL: "redis://redis:6379/0"
+      RABBITMQ_URL: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2F"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://${OTEL_COLLECTOR_SERVICE:-otel-collector}:4318"
+      OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-dev}"
+      SERVICE_NAMESPACE: "microblog"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-auzieman@gmail.com}"
+    ports:
+      - "8080:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  blog-worker:
+    build:
+      context: .
+      dockerfile: src/worker/Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: "postgresql://blog:${POSTGRES_PASSWORD:-Str0ngP@ssword!}@postgres:5432/microblog"
+      RABBITMQ_URL: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2F"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://${OTEL_COLLECTOR_SERVICE:-otel-collector}:4318"
+      OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-dev}"
+      SERVICE_NAMESPACE: "microblog"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  blog-projection:
+    build:
+      context: .
+      dockerfile: src/projection/Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: "redis://redis:6379/0"
+      RABBITMQ_URL: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2F"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://${OTEL_COLLECTOR_SERVICE:-otel-collector}:4318"
+      OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-dev}"
+      SERVICE_NAMESPACE: "microblog"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  blog-ui:
+    build:
+      context: .
+      dockerfile: src/ui/Dockerfile
+    env_file: .env
+    environment:
+      BLOG_API_BASE_URL: "http://blog-api:8080"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://${OTEL_COLLECTOR_SERVICE:-otel-collector}:4318"
+      OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-dev}"
+      SERVICE_NAMESPACE: "microblog"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-auzieman@gmail.com}"
+      ADMIN_ACCESS_CODE: "${ADMIN_ACCESS_CODE:-local-admin}"
+      FLASK_SECRET_KEY: "${FLASK_SECRET_KEY:-change-me-before-deploy}"
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
+    ports:
+      - "8081:8080"
+    depends_on:
+      blog-api:
+        condition: service_started
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}
+
+  loadgen:
+    profiles: ["load"]
+    build:
+      context: .
+      dockerfile: src/loadgen/Dockerfile
+    environment:
+      BASE_URL: "http://blog-api:8080"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://${OTEL_COLLECTOR_SERVICE:-otel-collector}:4318"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+      SERVICE_NAME: "microblog-loadgen"
+      SERVICE_NAMESPACE: "microblog"
+      OTEL_ENVIRONMENT: "${OTEL_ENVIRONMENT:-dev}"
+      RPS: "${LOADGEN_RPS:-2}"
+      DURATION_SECONDS: "${LOADGEN_DURATION_SECONDS:-0}"
+      MIX_READ: "${LOADGEN_MIX_READ:-0.50}"
+      MIX_CREATE: "${LOADGEN_MIX_CREATE:-0.20}"
+      MIX_PUBLISH: "${LOADGEN_MIX_PUBLISH:-0.20}"
+      MIX_LIST: "${LOADGEN_MIX_LIST:-0.10}"
+      FAULT_RATE: "${LOADGEN_FAULT_RATE:-0.00}"
+      WORKERS: "${LOADGEN_WORKERS:-4}"
+      PROGRESS_INTERVAL_SECONDS: "${LOADGEN_PROGRESS_INTERVAL_SECONDS:-30}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-auzieman@gmail.com}"
+    depends_on:
+      blog-api:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      app_net: {}

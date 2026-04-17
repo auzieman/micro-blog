@@ -1,0 +1,60 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+  metricstransform/labels:
+    transforms:
+      - include: "^hotel\\..*"
+        match_type: regexp
+        action: update
+        operations:
+          - action: update_label
+            label: queue
+            new_label: destination
+      - include: "^blog\\..*"
+        match_type: regexp
+        action: update
+        operations:
+          - action: update_label
+            label: queue
+            new_label: destination
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100000
+    policies:
+      - name: keep-errors
+        type: status_code
+        status_code:
+          status_codes: [ERROR]
+      - name: sample-10
+        type: probabilistic
+        probabilistic:
+          sampling_percentage: 10
+
+exporters:
+  otlphttp:
+    endpoint: "${DT_ENDPOINT}"
+    headers:
+      Authorization: "Api-Token ${DT_TOKEN}"
+    compression: gzip
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, tail_sampling]
+      exporters: [otlphttp]
+    metrics:
+      receivers: [otlp]
+      processors: [batch, metricstransform/labels]
+      exporters: [otlphttp]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlphttp]

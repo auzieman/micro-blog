@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linux Tricks | Micro Blog</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #15232c;
+      --muted: #5d6970;
+      --glass: rgba(244, 246, 245, 0.88);
+      --glass-strong: rgba(252, 252, 249, 0.93);
+      --line: rgba(31, 49, 58, 0.14);
+      --accent: #2a647d;
+      --accent-soft: #dbe7ed;
+      --shadow: 0 24px 60px rgba(8, 18, 27, 0.22);
+    }
+    body.theme-paper {
+      --glass: rgba(247, 243, 235, 0.9);
+      --glass-strong: rgba(252, 249, 244, 0.95);
+      --accent: #8a5a34;
+      --accent-soft: rgba(225, 209, 188, 0.76);
+      --ink: #241b16;
+      --muted: #6f6057;
+    }
+    body.theme-midnight {
+      --glass: rgba(16, 22, 29, 0.84);
+      --glass-strong: rgba(22, 30, 40, 0.9);
+      --accent: #6ab0d8;
+      --accent-hot: #70f0ff;
+      --accent-pink: #ff4fd8;
+      --accent-soft: rgba(54, 88, 110, 0.62);
+      --ink: #edf5fb;
+      --muted: #a7c0d0;
+      --line: rgba(172, 205, 224, 0.14);
+      --shadow: 0 26px 70px rgba(2, 8, 14, 0.48);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(8, 20, 27, 0.22), rgba(8, 20, 27, 0.35)),
+        url("{{ selected.hero_image_url if selected and selected.hero_image_url else 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1600&q=80' }}") center center / cover fixed;
+      min-height: 100vh;
+    }
+    body.theme-midnight::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(112, 240, 255, 0.05), transparent 28%, transparent 72%, rgba(255, 79, 216, 0.06)),
+        repeating-linear-gradient(180deg, rgba(111, 202, 235, 0.07) 0 1px, transparent 1px 4px),
+        linear-gradient(135deg, rgba(8, 14, 19, 0.2), rgba(8, 14, 19, 0.5));
+      mix-blend-mode: screen;
+      opacity: 0.9;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    .frame {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
+    .masthead,
+    .content-shell {
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+    }
+    .masthead {
+      padding: 1rem 1.25rem 1.1rem;
+      margin-bottom: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    body.theme-midnight .masthead::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(112, 240, 255, 0.18), transparent 24%),
+        radial-gradient(circle at 82% 22%, rgba(255, 79, 216, 0.15), transparent 18%),
+        linear-gradient(115deg, rgba(112, 240, 255, 0.05), transparent 40%, rgba(255, 79, 216, 0.08) 70%, transparent 100%);
+      pointer-events: none;
+    }
+    body.theme-midnight .masthead::after {
+      content: "";
+      position: absolute;
+      right: -3rem;
+      top: -2.5rem;
+      width: 21rem;
+      height: 21rem;
+      border-radius: 40% 60% 60% 40%;
+      border: 1px solid rgba(112, 240, 255, 0.22);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 79, 216, 0.08),
+        0 0 50px rgba(112, 240, 255, 0.08);
+      transform: rotate(18deg);
+      pointer-events: none;
+    }
+    .masthead-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: start;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .site-mark {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      line-height: 0.96;
+    }
+    .tagline {
+      margin: 0.7rem 0 0;
+      max-width: 740px;
+      color: #24333c;
+      font-size: 1.02rem;
+      line-height: 1.55;
+    }
+    body.theme-midnight .site-mark {
+      color: var(--accent-hot);
+      text-shadow: 0 0 12px rgba(112, 240, 255, 0.26);
+    }
+    body.theme-midnight .tagline {
+      color: #c6d6de;
+    }
+    .mast-actions {
+      display: flex;
+      gap: 0.55rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(23, 45, 56, 0.14);
+      background: var(--glass-strong);
+      color: var(--ink);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .button-link.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: transparent;
+    }
+    body.theme-midnight .button-link {
+      background: rgba(16, 24, 32, 0.78);
+      border-color: rgba(106, 176, 216, 0.22);
+      box-shadow: inset 0 0 0 1px rgba(112, 240, 255, 0.06);
+    }
+    body.theme-midnight .button-link.primary {
+      background: linear-gradient(135deg, rgba(44, 132, 173, 0.94), rgba(133, 59, 190, 0.92));
+      box-shadow: 0 0 24px rgba(106, 176, 216, 0.2);
+    }
+    .content-shell {
+      padding: 1rem;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+      gap: 1rem;
+      align-items: start;
+    }
+    .sidebar,
+    .article-panel {
+      background: var(--glass-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    .sidebar {
+      padding: 0.95rem;
+      position: sticky;
+      top: 1rem;
+    }
+    .sidebar h2,
+    .article-panel h2 {
+      margin: 0 0 0.75rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.65rem;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+    .toolbar label {
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    select,
+    button {
+      width: 100%;
+      font: inherit;
+      border-radius: 12px;
+      padding: 0.7rem 0.8rem;
+      border: 1px solid rgba(23, 45, 56, 0.16);
+    }
+    button {
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      border-color: transparent;
+      font-weight: 700;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+    .stat {
+      padding: 0.75rem 0.8rem;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(29, 63, 81, 0.09);
+    }
+    .stat span {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+    .stat strong { font-size: 1.35rem; }
+    .post-list { display: grid; gap: 0.75rem; }
+    .post-card {
+      display: block;
+      padding: 0.9rem;
+      border-radius: 15px;
+      border: 1px solid transparent;
+      background: rgba(231, 239, 240, 0.62);
+      color: inherit;
+    }
+    .post-card.active {
+      border-color: rgba(36, 89, 110, 0.3);
+      background: rgba(219, 231, 237, 0.88);
+    }
+    .post-card h3 {
+      margin: 0;
+      font-size: 1.04rem;
+      color: #11212b;
+    }
+    .post-card p {
+      margin: 0.45rem 0 0;
+      color: #46535b;
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .pill {
+      padding: 0.18rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(24, 69, 88, 0.1);
+      color: #1c4f64;
+    }
+    .pager {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .pager a {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: 12px;
+      background: #edf3f5;
+      border: 1px solid rgba(23, 45, 56, 0.12);
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .article-panel {
+      padding: 1.4rem 1.5rem 1.8rem;
+      min-height: 72vh;
+    }
+    .article-title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.02;
+    }
+    .summary {
+      color: #33424c;
+      font-size: 1.12rem;
+      line-height: 1.55;
+      margin: 0.85rem 0 1rem;
+      max-width: 52rem;
+    }
+    .article-body {
+      font-size: 1.05rem;
+      line-height: 1.74;
+      color: #17262f;
+    }
+    .article-body pre {
+      overflow: auto;
+      padding: 0.95rem 1rem;
+      background: #11212c;
+      color: #e4f0f5;
+      border-radius: 14px;
+    }
+    body.theme-midnight .sidebar,
+    body.theme-midnight .article-panel,
+    body.theme-midnight .masthead,
+    body.theme-midnight .content-shell {
+      box-shadow:
+        0 0 0 1px rgba(106, 176, 216, 0.08),
+        0 30px 70px rgba(2, 8, 14, 0.52);
+    }
+    body.theme-midnight .post-card {
+      background:
+        linear-gradient(135deg, rgba(22, 32, 42, 0.88), rgba(17, 26, 36, 0.82)),
+        linear-gradient(90deg, rgba(112, 240, 255, 0.04), transparent 30%, transparent 70%, rgba(255, 79, 216, 0.05));
+    }
+    body.theme-midnight .post-card.active {
+      border-color: rgba(112, 240, 255, 0.3);
+      box-shadow: inset 0 0 0 1px rgba(255, 79, 216, 0.12), 0 0 24px rgba(112, 240, 255, 0.08);
+    }
+    body.theme-midnight .post-card h3,
+    body.theme-midnight .article-title {
+      text-shadow: 0 0 18px rgba(112, 240, 255, 0.08);
+    }
+    body.theme-midnight .pill {
+      background: rgba(106, 176, 216, 0.1);
+      color: #aee7ff;
+      border: 1px solid rgba(112, 240, 255, 0.12);
+    }
+    body.theme-midnight .article-panel {
+      position: relative;
+    }
+    body.theme-midnight .article-panel::before {
+      content: "MIDNIGHT NODE";
+      position: absolute;
+      right: 1.25rem;
+      top: 1rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      color: rgba(112, 240, 255, 0.56);
+    }
+    .message {
+      margin-bottom: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 14px;
+      background: rgba(15, 28, 36, 0.92);
+      color: #e5f3f9;
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 860px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .toolbar { grid-template-columns: 1fr; }
+      .frame { padding: 0.75rem 0.75rem 1.5rem; }
+      .masthead, .content-shell { border-radius: 18px; }
+      .article-panel { min-height: auto; }
+    }
+  </style>
+</head>
+<body class="theme-{{ active_theme }}">
+  <main class="frame">
+    {% if message %}
+    <div class="message">{{ message }}</div>
+    {% endif %}
+
+    <section class="masthead">
+      <div class="masthead-top">
+        <div>
+          <div class="site-mark">AuzieTek Linux Notes</div>
+          <h1>Linux tricks, break-fix notes, and practical systems articles.</h1>
+          <p class="tagline">A deliberately simple single-topic micro blog. Public reading stays clean and centered. Authoring stays off to the side under a separate route, so the site reads like a real publication instead of an admin console.</p>
+        </div>
+        <div class="mast-actions">
+          <form method="get" action="/blog">
+            {% if selected %}<input type="hidden" name="slug" value="{{ selected.slug }}" />{% endif %}
+            <input type="hidden" name="page" value="{{ page }}" />
+            <input type="hidden" name="page_size" value="{{ page_size }}" />
+            <select name="theme" onchange="this.form.submit()">
+              {% for theme_name in theme_variants %}
+              <option value="{{ theme_name }}" {% if theme_name == active_theme %}selected{% endif %}>Theme: {{ theme_name }}</option>
+              {% endfor %}
+            </select>
+          </form>
+          <a class="button-link" href="/blog">Latest Posts</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-shell">
+      <div class="content-grid">
+        <aside class="sidebar">
+          <h2>Recent Articles</h2>
+          <div class="toolbar">
+            <div>
+              <label for="page_size">Posts per page</label>
+              <form method="get" action="/blog">
+                <select id="page_size" name="page_size">
+                  {% for option in page_sizes %}
+                  <option value="{{ option }}" {% if option == page_size %}selected{% endif %}>{{ option }}</option>
+                  {% endfor %}
+                </select>
+                {% if tag %}<input type="hidden" name="tag" value="{{ tag }}" />{% endif %}
+                <button type="submit">Refresh</button>
+              </form>
+            </div>
+            <div class="stats">
+              <div class="stat"><span>Total</span><strong>{{ total }}</strong></div>
+              <div class="stat"><span>Page</span><strong>{{ page }}</strong></div>
+            </div>
+          </div>
+
+          <div class="post-list">
+            {% for post in posts %}
+            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/blog?slug={{ post.slug }}&page={{ page }}&page_size={{ page_size }}">
+              <h3>{{ post.title }}</h3>
+              <p>{{ post.summary }}</p>
+              <div class="meta">
+                {% for tag_name in post.tags %}
+                <span class="pill">{{ tag_name }}</span>
+                {% endfor %}
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+
+          <div class="pager">
+            <a href="/blog?page={{ 1 if page <= 1 else page - 1 }}&page_size={{ page_size }}">Previous</a>
+            <a href="/blog?page={{ total_pages if page >= total_pages else page + 1 }}&page_size={{ page_size }}">Next</a>
+          </div>
+        </aside>
+
+        <article class="article-panel">
+          {% if selected %}
+          <h2>Feature Article</h2>
+          <h1 class="article-title">{{ selected.title }}</h1>
+          <p class="summary">{{ selected.summary }}</p>
+          <div class="meta">
+            <span>{{ selected.author_email }}</span>
+            <span>{{ selected.updated_at }}</span>
+            <span class="pill">{{ selected.body_format }}</span>
+            {% for tag_name in selected.tags %}
+            <span class="pill">{{ tag_name }}</span>
+            {% endfor %}
+          </div>
+          <div class="article-body">{{ selected.html_body|safe }}</div>
+          {% else %}
+          <h2>Feature Article</h2>
+          <p class="summary">No article is available yet. Load sample content from the admin route, then publish a post and the public view will start to fill out.</p>
+          {% endif %}
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
