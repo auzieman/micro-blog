@@ -22,13 +22,13 @@ https://your-drupal-site.example/jsonapi/node/article
 
 Useful query additions:
 
-- `include=field_tags`
+- `include=field_tags` only if that relationship actually exists on the bundle
 - `page[limit]=25`
 
 Example:
 
 ```text
-https://your-drupal-site.example/jsonapi/node/article?include=field_tags&page[limit]=25
+https://your-drupal-site.example/jsonapi/node/article?page[limit]=25
 ```
 
 ## Expected default field mapping
@@ -59,7 +59,6 @@ curl -X POST http://localhost:8080/admin/import/drupal \
     "admin_email": "auzieman@gmail.com",
     "endpoint_url": "https://your-drupal-site.example/jsonapi/node/article",
     "params": {
-      "include": "field_tags",
       "page[limit]": "10"
     },
     "source_base_url": "https://your-drupal-site.example",
@@ -81,7 +80,6 @@ curl -X POST http://localhost:8080/admin/import/drupal \
       "Authorization": "Bearer YOUR_TOKEN"
     },
     "params": {
-      "include": "field_tags",
       "page[limit]": "10"
     },
     "source_base_url": "https://your-drupal-site.example",

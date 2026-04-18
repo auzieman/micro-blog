@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Terminal Rig</title>
+  <desc id="desc">Low-detail cyberdeck style terminal illustration for local content import testing.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060b12"/>
+      <stop offset="100%" stop-color="#111a24"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#70f0ff"/>
+      <stop offset="100%" stop-color="#ff4fd8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <g opacity="0.18">
+    <path d="M0 120h1280M0 240h1280M0 360h1280M0 480h1280M0 600h1280" stroke="#7cdfff"/>
+    <path d="M160 0v720M320 0v720M480 0v720M640 0v720M800 0v720M960 0v720M1120 0v720" stroke="#ff4fd8"/>
+  </g>
+  <rect x="170" y="110" width="940" height="500" rx="28" fill="#0c131c" stroke="url(#glow)" stroke-width="3"/>
+  <rect x="210" y="160" width="860" height="330" rx="18" fill="#081018" stroke="#1d3440"/>
+  <path d="M240 210h240" stroke="#70f0ff" stroke-width="10" stroke-linecap="round"/>
+  <path d="M240 255h560" stroke="#3bd0f7" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
+  <path d="M240 290h500" stroke="#7de3ff" stroke-width="6" stroke-linecap="round" opacity="0.72"/>
+  <path d="M240 345h380" stroke="#ff4fd8" stroke-width="6" stroke-linecap="round" opacity="0.75"/>
+  <path d="M240 380h430" stroke="#70f0ff" stroke-width="6" stroke-linecap="round" opacity="0.75"/>
+  <rect x="250" y="530" width="220" height="34" rx="10" fill="#131f2b" stroke="#70f0ff"/>
+  <rect x="500" y="530" width="220" height="34" rx="10" fill="#131f2b" stroke="#ff4fd8"/>
+  <rect x="750" y="530" width="220" height="34" rx="10" fill="#131f2b" stroke="#70f0ff"/>
+  <circle cx="1030" cy="150" r="10" fill="#70f0ff"/>
+  <circle cx="1060" cy="150" r="10" fill="#ff4fd8"/>
+  <circle cx="1090" cy="150" r="10" fill="#7fffd4"/>
+</svg>

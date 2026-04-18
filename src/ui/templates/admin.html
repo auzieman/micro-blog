@@ -186,11 +186,24 @@
       <div class="stack">
         <div class="panel">
           <h2>Drupal Import</h2>
-          <p class="subtle">Preview a Drupal JSON:API endpoint first, then select only the items you want to queue as drafts. This keeps imports controlled and reviewable.</p>
+          <p class="subtle">Preview Drupal posts by source type first, then select only the items you want to queue as drafts. This keeps imports controlled and reviewable.</p>
 
           <form method="post" action="/admin/import/drupal/preview">
-            <label for="endpoint_url">Drupal endpoint URL</label>
-            <input id="endpoint_url" name="endpoint_url" value="{{ drupal_form.get('endpoint_url', '') }}" placeholder="https://example.com or https://example.com/jsonapi/node/article" required />
+            <label for="site_url">Drupal site URL</label>
+            <input id="site_url" name="site_url" value="{{ drupal_form.get('site_url', 'https://auzietek.com') }}" placeholder="https://example.com" required />
+
+            <label for="source_type">Content source type</label>
+            <select id="source_type" name="source_type">
+              {% for source_name, source_path in drupal_source_types.items() %}
+              <option value="{{ source_name }}" {% if drupal_form.get('source_type', 'blog_post') == source_name %}selected{% endif %}>{{ source_name }}</option>
+              {% endfor %}
+            </select>
+
+            <label for="nid_filter">Node ID filter</label>
+            <input id="nid_filter" name="nid_filter" value="{{ drupal_form.get('nid_filter', '') }}" placeholder="40" />
+
+            <label for="endpoint_url">Advanced endpoint override</label>
+            <input id="endpoint_url" name="endpoint_url" value="{{ drupal_form.get('endpoint_url', '') }}" placeholder="https://example.com/jsonapi/node/blog_post" />
 
             <label for="source_base_url">Source base URL</label>
             <input id="source_base_url" name="source_base_url" value="{{ drupal_form.get('source_base_url', '') }}" placeholder="https://example.com" />
@@ -201,7 +214,7 @@
             <input id="keyword_filter" name="keyword_filter" value="{{ drupal_form.get('keyword_filter', '') }}" placeholder="linux, docker, kubernetes" />
 
             <label for="include_value">Include relationships</label>
-            <input id="include_value" name="include_value" value="{{ drupal_form.get('include_value', 'field_tags,field_image') }}" placeholder="field_tags,field_image" />
+            <input id="include_value" name="include_value" value="{{ drupal_form.get('include_value', '') }}" placeholder="optional: field_tags" />
 
             <label for="page_limit">Page limit</label>
             <input id="page_limit" name="page_limit" value="{{ drupal_form.get('page_limit', '10') }}" placeholder="10" />
@@ -222,7 +235,7 @@
             <label for="drupal_theme_variant">Imported theme variant</label>
             <select id="drupal_theme_variant" name="theme_variant">
               {% for theme_name in theme_variants %}
-              <option value="{{ theme_name }}" {% if drupal_form.get('theme_variant', 'aurora') == theme_name %}selected{% endif %}>{{ theme_name }}</option>
+              <option value="{{ theme_name }}" {% if drupal_form.get('theme_variant', 'midnight') == theme_name %}selected{% endif %}>{{ theme_name }}</option>
               {% endfor %}
             </select>
 
@@ -235,7 +248,7 @@
             <article class="preview-card">
               <h3>{{ endpoint.name }}</h3>
               <a href="{{ endpoint.href }}" target="_blank" rel="noreferrer">{{ endpoint.href }}</a>
-              <p class="subtle">Use this endpoint URL in the preview form if it matches the content type you want to import.</p>
+              <p class="subtle">Advanced reference only. For normal imports, use the source type selector above so the form targets posts instead of raw Drupal entity metadata.</p>
             </article>
             {% endfor %}
           </div>
@@ -251,6 +264,144 @@
                   <div>
                     <h3>{{ item.title }}</h3>
                     <div class="subtle">{{ item.summary }}</div>
+                    <div class="meta">
+                      <span>{{ item.slug }}</span>
+                      {% if item.source_nid %}<span class="pill">node/{{ item.source_nid }}</span>{% endif %}
+                      <span class="pill">{{ item.body_format }}</span>
+                      <span class="pill">{{ item.theme_variant }}</span>
+                      {% if item.hero_image_url %}
+                      <span class="pill">hero image</span>
+                      {% endif %}
+                      {% if item.image_urls %}
+                      <span class="pill">{{ item.image_urls|length }} images</span>
+                      {% endif %}
+                      {% for tag_name in item.tags %}
+                      <span class="pill">{{ tag_name }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </header>
+              </article>
+              {% endfor %}
+            </div>
+            <button type="submit">Import Selected Drupal Items</button>
+          </form>
+          {% endif %}
+        </div>
+
+        <div class="panel">
+          <h2>Public Crawl Import</h2>
+          <p class="subtle">Use the public site when Drupal JSON:API is too awkward. This crawls the listing page, resolves `node/##` links, and then pulls the actual article page body and images.</p>
+
+          <form method="post" action="/admin/import/public-crawl/preview">
+            <label for="crawl_site_url">Site URL</label>
+            <input id="crawl_site_url" name="site_url" value="{{ public_crawl_form.get('site_url', 'https://auzietek.com') }}" placeholder="https://example.com" required />
+
+            <label for="crawl_listing_url">Listing URL</label>
+            <input id="crawl_listing_url" name="listing_url" value="{{ public_crawl_form.get('listing_url', 'https://auzietek.com/blogs') }}" placeholder="https://example.com/blogs" />
+
+            <label for="crawl_nid_filter">Node ID filter</label>
+            <input id="crawl_nid_filter" name="nid_filter" value="{{ public_crawl_form.get('nid_filter', '') }}" placeholder="40" />
+
+            <label><input type="checkbox" name="allow_insecure_tls" {% if public_crawl_form.get('allow_insecure_tls') %}checked{% endif %} style="width:auto; margin-right:0.5rem;" />Allow insecure TLS for source fetch</label>
+
+            <label for="crawl_keyword_filter">Keyword filter</label>
+            <input id="crawl_keyword_filter" name="keyword_filter" value="{{ public_crawl_form.get('keyword_filter', '') }}" placeholder="linux, docker, monitoring" />
+
+            <label for="crawl_page_limit">Preview limit</label>
+            <input id="crawl_page_limit" name="page_limit" value="{{ public_crawl_form.get('page_limit', '10') }}" placeholder="10" />
+
+            <label for="crawl_status">Imported status</label>
+            <select id="crawl_status" name="status">
+              <option value="draft" {% if public_crawl_form.get('status', 'draft') == 'draft' %}selected{% endif %}>draft</option>
+              <option value="published" {% if public_crawl_form.get('status') == 'published' %}selected{% endif %}>published</option>
+            </select>
+
+            <label for="crawl_theme_variant">Imported theme variant</label>
+            <select id="crawl_theme_variant" name="theme_variant">
+              {% for theme_name in theme_variants %}
+              <option value="{{ theme_name }}" {% if public_crawl_form.get('theme_variant', 'midnight') == theme_name %}selected{% endif %}>{{ theme_name }}</option>
+              {% endfor %}
+            </select>
+
+            <button type="submit" class="secondary">Preview Public Site Content</button>
+          </form>
+
+          {% if public_crawl_preview %}
+          <form method="post" action="/admin/import/public-crawl">
+            <div class="preview-list">
+              {% for item in public_crawl_preview %}
+              <article class="preview-card">
+                <header>
+                  <input type="checkbox" name="selected_source_ids" value="{{ item.source_id }}" checked />
+                  <div>
+                    <h3>{{ item.title }}</h3>
+                    <div class="subtle">{{ item.summary }}</div>
+                    <div class="meta">
+                      <span>{{ item.slug }}</span>
+                      {% if item.source_nid %}<span class="pill">node/{{ item.source_nid }}</span>{% endif %}
+                      <span class="pill">{{ item.body_format }}</span>
+                      <span class="pill">{{ item.theme_variant }}</span>
+                      {% if item.hero_image_url %}
+                      <span class="pill">hero image</span>
+                      {% endif %}
+                      {% if item.image_urls %}
+                      <span class="pill">{{ item.image_urls|length }} images</span>
+                      {% endif %}
+                      {% for tag_name in item.tags %}
+                      <span class="pill">{{ tag_name }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </header>
+              </article>
+              {% endfor %}
+            </div>
+            <button type="submit">Import Selected Public Articles</button>
+          </form>
+          {% endif %}
+        </div>
+
+        <div class="panel">
+          <h2>Filesystem Import</h2>
+          <p class="subtle">Scan a mounted markdown folder, preview matching files, and import selected posts as drafts. This stays blog-oriented: markdown plus adjacent images, not a wiki or docs tree.</p>
+
+          <form method="post" action="/admin/import/filesystem/preview">
+            <label for="content_subdir">Content subdirectory</label>
+            <input id="content_subdir" name="content_subdir" value="{{ filesystem_form.get('content_subdir', '') }}" placeholder="posts/linux" />
+
+            <label for="filesystem_keyword_filter">Keyword filter</label>
+            <input id="filesystem_keyword_filter" name="keyword_filter" value="{{ filesystem_form.get('keyword_filter', '') }}" placeholder="linux, bash, docker" />
+
+            <label for="filesystem_page_limit">Preview limit</label>
+            <input id="filesystem_page_limit" name="page_limit" value="{{ filesystem_form.get('page_limit', '10') }}" placeholder="10" />
+
+            <label for="filesystem_status">Imported status</label>
+            <select id="filesystem_status" name="status">
+              <option value="draft" {% if filesystem_form.get('status', 'draft') == 'draft' %}selected{% endif %}>draft</option>
+              <option value="published" {% if filesystem_form.get('status') == 'published' %}selected{% endif %}>published</option>
+            </select>
+
+            <label for="filesystem_theme_variant">Imported theme variant</label>
+            <select id="filesystem_theme_variant" name="theme_variant">
+              {% for theme_name in theme_variants %}
+              <option value="{{ theme_name }}" {% if filesystem_form.get('theme_variant', 'midnight') == theme_name %}selected{% endif %}>{{ theme_name }}</option>
+              {% endfor %}
+            </select>
+
+            <button type="submit" class="secondary">Preview Markdown Folder</button>
+          </form>
+
+          {% if filesystem_preview %}
+          <form method="post" action="/admin/import/filesystem">
+            <div class="preview-list">
+              {% for item in filesystem_preview %}
+              <article class="preview-card">
+                <header>
+                  <input type="checkbox" name="selected_source_ids" value="{{ item.source_id }}" checked />
+                  <div>
+                    <h3>{{ item.title }}</h3>
+                    <div class="subtle">{{ item.summary or item.source_id }}</div>
                     <div class="meta">
                       <span>{{ item.slug }}</span>
                       <span class="pill">{{ item.body_format }}</span>
@@ -270,7 +421,7 @@
               </article>
               {% endfor %}
             </div>
-            <button type="submit">Import Selected Drupal Items</button>
+            <button type="submit">Import Selected Markdown Files</button>
           </form>
           {% endif %}
         </div>
@@ -305,7 +456,7 @@
             <label for="theme_variant">Theme variant</label>
             <select id="theme_variant" name="theme_variant">
               {% for theme_name in theme_variants %}
-              <option value="{{ theme_name }}">{{ theme_name }}</option>
+              <option value="{{ theme_name }}" {% if theme_name == 'midnight' %}selected{% endif %}>{{ theme_name }}</option>
               {% endfor %}
             </select>
 
@@ -330,20 +481,28 @@
       </div>
 
       <div class="panel">
-        <h2>Published Feed Snapshot</h2>
+        <h2>Authoring Snapshot</h2>
         <div class="post-list">
           {% for post in posts %}
           <div class="post-card">
             <h3>{{ post.title }}</h3>
             <p>{{ post.summary }}</p>
             <div class="meta">
+              <span class="pill">{{ post.article_id }}</span>
               <span>{{ post.slug }}</span>
+              {% if post.status %}<span class="pill">{{ post.status }}</span>{% endif %}
               {% if post.theme_variant %}<span class="pill">{{ post.theme_variant }}</span>{% endif %}
               {% if post.body_format %}<span class="pill">{{ post.body_format }}</span>{% endif %}
               {% for tag_name in post.tags %}
               <span class="pill">{{ tag_name }}</span>
               {% endfor %}
             </div>
+            {% if post.status != 'published' %}
+            <form method="post" action="/admin/publish" style="margin-top: 0.75rem;">
+              <input type="hidden" name="article_id" value="{{ post.article_id }}" />
+              <button type="submit" class="secondary">Publish {{ post.article_id }}</button>
+            </form>
+            {% endif %}
           </div>
           {% endfor %}
         </div>

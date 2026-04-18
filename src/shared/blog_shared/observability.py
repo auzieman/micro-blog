@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from typing import Any
 
 from opentelemetry import metrics, trace
+from opentelemetry.metrics import Observation
 from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
@@ -79,6 +80,7 @@ class BlogTelemetry:
         meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
         metrics.set_meter_provider(meter_provider)
         meter = metrics.get_meter(service_name, "1.0.0")
+        self.meter = meter
 
         self.api_requests = meter.create_counter("blog.api.requests_total")
         self.api_duration = meter.create_histogram("blog.api.duration_ms", unit="ms")
@@ -142,4 +144,3 @@ class BlogTelemetry:
 def event_scope(logger: logging.Logger, event_name: str, **fields: Any):
     adapter = logging.LoggerAdapter(logger, {"event.domain": "microblog", "event.name": event_name, **fields})
     yield adapter
-

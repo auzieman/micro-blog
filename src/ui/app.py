@@ -4,7 +4,7 @@ import time
 import uuid
 
 import requests
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, abort, redirect, render_template, request, send_from_directory, session, url_for
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
 from blog_shared.observability import BlogTelemetry, configure_logging, event_scope
@@ -24,7 +24,13 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "auzieman@gmail.com")
 ADMIN_ACCESS_CODE = os.getenv("ADMIN_ACCESS_CODE", "local-admin")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
 THEME_VARIANTS = ["aurora", "paper", "midnight"]
+DEFAULT_THEME_VARIANT = os.getenv("DEFAULT_THEME_VARIANT", "midnight")
+DRUPAL_SOURCE_TYPES = {
+    "blog_post": "jsonapi/node/blog_post",
+    "article": "jsonapi/node/article",
+}
 ADMIN_PREVIEW_TTL_SECONDS = int(os.getenv("ADMIN_PREVIEW_TTL_SECONDS", "1800"))
+CONTENT_IMPORT_ROOT = os.getenv("CONTENT_IMPORT_ROOT", "/content")
 _ADMIN_PREVIEW_CACHE: dict[str, dict] = {}
 
 
@@ -40,6 +46,14 @@ def api_post(path: str, payload: dict):
 def api_put(path: str, payload: dict):
     payload.setdefault("admin_email", ADMIN_EMAIL)
     return requests.put(f"{API_BASE_URL}{path}", json=payload, timeout=10)
+
+
+def build_drupal_endpoint(site_url: str, source_type: str, explicit_endpoint: str) -> str:
+    if explicit_endpoint:
+        return explicit_endpoint
+    base = site_url.rstrip("/")
+    suffix = DRUPAL_SOURCE_TYPES.get(source_type, "")
+    return f"{base}/{suffix}" if suffix else base
 
 
 def is_admin_authenticated() -> bool:
@@ -88,6 +102,11 @@ def admin_context(message=None):
         "drupal_preview": preview_state.get("drupal_preview", []),
         "drupal_endpoints": preview_state.get("drupal_endpoints", []),
         "drupal_form": preview_state.get("drupal_form", {}),
+        "filesystem_preview": preview_state.get("filesystem_preview", []),
+        "filesystem_form": preview_state.get("filesystem_form", {}),
+        "public_crawl_preview": preview_state.get("public_crawl_preview", []),
+        "public_crawl_form": preview_state.get("public_crawl_form", {}),
+        "drupal_source_types": DRUPAL_SOURCE_TYPES,
     }
 
 
@@ -108,6 +127,12 @@ def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str |
         selected_response.raise_for_status()
         selected = selected_response.json()
     return payload, posts, selected
+
+
+def fetch_admin_payload(page: int, page_size: int):
+    response = api_get("/admin/posts", page=page, page_size=page_size, admin_email=ADMIN_EMAIL)
+    response.raise_for_status()
+    return response.json()
 
 
 @app.after_request
@@ -151,7 +176,7 @@ def public_index():
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
 
     total_pages = max(1, (payload["total"] + payload["page_size"] - 1) // payload["page_size"])
-    active_theme = theme or (selected.get("theme_variant") if selected else "aurora")
+    active_theme = theme or (selected.get("theme_variant") if selected else DEFAULT_THEME_VARIANT)
     return render_template(
         "public_index.html",
         posts=posts,
@@ -188,7 +213,8 @@ def admin_index():
     payload = {"items": [], "total": 0, "page": page, "page_size": page_size}
     with event_scope(logger, "ui.admin_index", page=page) as log:
         try:
-            payload, posts, _selected = fetch_public_payload(page, page_size, None, None)
+            payload = fetch_admin_payload(page, page_size)
+            posts = payload["items"]
         except Exception as exc:
             result = "error"
             log.exception("UI admin failed")
@@ -258,7 +284,7 @@ def create_post():
         "markdown_body": request.form["markdown_body"],
         "body_format": request.form.get("body_format", "markdown"),
         "hero_image_url": request.form.get("hero_image_url") or None,
-        "theme_variant": request.form.get("theme_variant", "aurora"),
+        "theme_variant": request.form.get("theme_variant", DEFAULT_THEME_VARIANT),
         "tags": [part.strip() for part in request.form["tags"].split(",") if part.strip()],
         "status": request.form.get("status", "draft"),
     }
@@ -323,16 +349,21 @@ def preview_drupal_import():
         return redirect(url_for("admin_login", message="Admin authentication required."))
     started = time.perf_counter()
     result = "success"
+    site_url = request.form.get("site_url", "").strip() or request.form["endpoint_url"]
+    source_type = request.form.get("source_type", "blog_post")
+    explicit_endpoint = request.form.get("endpoint_url", "").strip()
     payload = {
-        "endpoint_url": request.form["endpoint_url"],
-        "source_base_url": request.form.get("source_base_url") or "",
+        "endpoint_url": build_drupal_endpoint(site_url, source_type, explicit_endpoint),
+        "source_base_url": request.form.get("source_base_url") or site_url,
         "status": request.form.get("status", "draft"),
         "body_format": request.form.get("body_format") or None,
-        "theme_variant": request.form.get("theme_variant", "aurora"),
+        "theme_variant": request.form.get("theme_variant", DEFAULT_THEME_VARIANT),
         "allow_insecure_tls": request.form.get("allow_insecure_tls") == "on",
         "params": {},
         "dry_run": True,
     }
+    if request.form.get("nid_filter"):
+        payload["nid_filter"] = request.form["nid_filter"]
     if request.form.get("keyword_filter"):
         payload["keyword_filter"] = request.form["keyword_filter"]
     if request.form.get("include_value"):
@@ -350,9 +381,12 @@ def preview_drupal_import():
                 preview_payload.get("endpoints", []),
                 {
                 "endpoint_url": preview_payload.get("endpoint_url", payload["endpoint_url"]),
+                "site_url": site_url,
+                "source_type": source_type,
                 "source_base_url": payload["source_base_url"],
                 "include_value": request.form.get("include_value", ""),
                 "page_limit": request.form.get("page_limit", ""),
+                "nid_filter": request.form.get("nid_filter", ""),
                 "keyword_filter": request.form.get("keyword_filter", ""),
                 "status": payload["status"],
                 "body_format": request.form.get("body_format", ""),
@@ -368,10 +402,206 @@ def preview_drupal_import():
             result = "error"
             log.exception("Drupal preview failed")
             telemetry.error("blog-ui", type(exc).__name__)
-            message = str(exc)
+            message = response.text if "response" in locals() and response is not None and response.text else str(exc)
         finally:
             telemetry.api("/admin/import/drupal/preview", "POST", result, (time.perf_counter() - started) * 1000.0)
     return redirect(url_for("admin_index", message=message))
+
+
+@app.post("/admin/import/filesystem/preview")
+def preview_filesystem_import():
+    if not is_admin_authenticated():
+        return redirect(url_for("admin_login", message="Admin authentication required."))
+    started = time.perf_counter()
+    result = "success"
+    payload = {
+        "root_path": CONTENT_IMPORT_ROOT,
+        "content_subdir": request.form.get("content_subdir", "").strip(),
+        "status": request.form.get("status", "draft"),
+        "theme_variant": request.form.get("theme_variant", DEFAULT_THEME_VARIANT),
+        "keyword_filter": request.form.get("keyword_filter", "").strip(),
+        "dry_run": True,
+    }
+    if request.form.get("page_limit"):
+        payload["limit"] = request.form["page_limit"]
+
+    with event_scope(logger, "ui.filesystem_preview", content_subdir=payload["content_subdir"]) as log:
+        try:
+            response = api_post("/admin/import/filesystem", payload)
+            response.raise_for_status()
+            preview_payload = response.json()
+            preview_state = _load_preview_state()
+            _store_preview_state(
+                preview_state.get("drupal_preview", []),
+                preview_state.get("drupal_endpoints", []),
+                preview_state.get("drupal_form", {}),
+            )
+            token = session.get("admin_preview_token")
+            if token and token in _ADMIN_PREVIEW_CACHE:
+                _ADMIN_PREVIEW_CACHE[token]["filesystem_preview"] = preview_payload.get("items", [])
+                _ADMIN_PREVIEW_CACHE[token]["filesystem_form"] = {
+                    "content_subdir": payload["content_subdir"],
+                    "keyword_filter": payload["keyword_filter"],
+                    "page_limit": request.form.get("page_limit", ""),
+                    "status": payload["status"],
+                    "theme_variant": payload["theme_variant"],
+                }
+            message = f"Filesystem preview loaded: {preview_payload.get('count', 0)} candidate articles."
+        except Exception as exc:
+            result = "error"
+            log.exception("Filesystem preview failed")
+            telemetry.error("blog-ui", type(exc).__name__)
+            message = str(exc)
+        finally:
+            telemetry.api("/admin/import/filesystem/preview", "POST", result, (time.perf_counter() - started) * 1000.0)
+    return redirect(url_for("admin_index", message=message))
+
+
+@app.post("/admin/import/public-crawl/preview")
+def preview_public_crawl_import():
+    if not is_admin_authenticated():
+        return redirect(url_for("admin_login", message="Admin authentication required."))
+    started = time.perf_counter()
+    result = "success"
+    site_url = request.form.get("site_url", "").strip()
+    payload = {
+        "site_url": site_url,
+        "listing_url": request.form.get("listing_url", "").strip(),
+        "nid_filter": request.form.get("nid_filter", "").strip(),
+        "keyword_filter": request.form.get("keyword_filter", "").strip(),
+        "status": request.form.get("status", "draft"),
+        "theme_variant": request.form.get("theme_variant", DEFAULT_THEME_VARIANT),
+        "allow_insecure_tls": request.form.get("allow_insecure_tls") == "on",
+        "dry_run": True,
+    }
+    if request.form.get("page_limit"):
+        payload["limit"] = request.form["page_limit"]
+    with event_scope(logger, "ui.public_crawl_preview", site_url=site_url, listing_url=payload["listing_url"]) as log:
+        try:
+            response = api_post("/admin/import/public-crawl", payload)
+            response.raise_for_status()
+            preview_payload = response.json()
+            preview_state = _load_preview_state()
+            _store_preview_state(
+                preview_state.get("drupal_preview", []),
+                preview_state.get("drupal_endpoints", []),
+                preview_state.get("drupal_form", {}),
+            )
+            token = session.get("admin_preview_token")
+            if token and token in _ADMIN_PREVIEW_CACHE:
+                _ADMIN_PREVIEW_CACHE[token]["public_crawl_preview"] = preview_payload.get("items", [])
+                _ADMIN_PREVIEW_CACHE[token]["public_crawl_form"] = {
+                    "site_url": site_url,
+                    "listing_url": payload["listing_url"],
+                    "nid_filter": payload["nid_filter"],
+                    "keyword_filter": payload["keyword_filter"],
+                    "page_limit": request.form.get("page_limit", ""),
+                    "status": payload["status"],
+                    "theme_variant": payload["theme_variant"],
+                    "allow_insecure_tls": payload["allow_insecure_tls"],
+                }
+            message = f"Public crawl preview loaded: {preview_payload.get('count', 0)} candidate articles."
+        except Exception as exc:
+            result = "error"
+            log.exception("Public crawl preview failed")
+            telemetry.error("blog-ui", type(exc).__name__)
+            message = response.text if "response" in locals() and response is not None and response.text else str(exc)
+        finally:
+            telemetry.api("/admin/import/public-crawl/preview", "POST", result, (time.perf_counter() - started) * 1000.0)
+    return redirect(url_for("admin_index", message=message))
+
+
+@app.post("/admin/import/public-crawl")
+def import_public_crawl_selection():
+    if not is_admin_authenticated():
+        return redirect(url_for("admin_login", message="Admin authentication required."))
+    started = time.perf_counter()
+    result = "success"
+    selected_ids = request.form.getlist("selected_source_ids")
+    preview_state = _load_preview_state()
+    crawl_form = preview_state.get("public_crawl_form", {})
+    payload = {
+        "site_url": crawl_form.get("site_url", ""),
+        "listing_url": crawl_form.get("listing_url", ""),
+        "nid_filter": crawl_form.get("nid_filter", ""),
+        "keyword_filter": crawl_form.get("keyword_filter", ""),
+        "status": crawl_form.get("status", "draft"),
+        "theme_variant": crawl_form.get("theme_variant", DEFAULT_THEME_VARIANT),
+        "allow_insecure_tls": crawl_form.get("allow_insecure_tls", False),
+        "selected_source_ids": selected_ids,
+    }
+    if crawl_form.get("page_limit"):
+        payload["limit"] = crawl_form["page_limit"]
+    with event_scope(logger, "ui.public_crawl_import", selected_count=len(selected_ids)) as log:
+        try:
+            response = api_post("/admin/import/public-crawl", payload)
+            response.raise_for_status()
+            import_payload = response.json()
+            token = session.get("admin_preview_token")
+            if token and token in _ADMIN_PREVIEW_CACHE:
+                _ADMIN_PREVIEW_CACHE[token]["public_crawl_preview"] = []
+                _ADMIN_PREVIEW_CACHE[token]["public_crawl_form"] = {}
+            message = f"Public crawl import queued: {import_payload.get('count', 0)} selected articles."
+        except Exception as exc:
+            result = "error"
+            log.exception("Public crawl import failed")
+            telemetry.error("blog-ui", type(exc).__name__)
+            message = response.text if "response" in locals() and response is not None and response.text else str(exc)
+        finally:
+            telemetry.api("/admin/import/public-crawl", "POST", result, (time.perf_counter() - started) * 1000.0)
+    return redirect(url_for("admin_index", message=message))
+
+
+@app.post("/admin/import/filesystem")
+def import_filesystem_selection():
+    if not is_admin_authenticated():
+        return redirect(url_for("admin_login", message="Admin authentication required."))
+    started = time.perf_counter()
+    result = "success"
+    selected_ids = request.form.getlist("selected_source_ids")
+    preview_state = _load_preview_state()
+    filesystem_form = preview_state.get("filesystem_form", {})
+    payload = {
+        "root_path": CONTENT_IMPORT_ROOT,
+        "content_subdir": filesystem_form.get("content_subdir", ""),
+        "status": filesystem_form.get("status", "draft"),
+        "theme_variant": filesystem_form.get("theme_variant", DEFAULT_THEME_VARIANT),
+        "selected_source_ids": selected_ids,
+    }
+    if filesystem_form.get("keyword_filter"):
+        payload["keyword_filter"] = filesystem_form["keyword_filter"]
+    if filesystem_form.get("page_limit"):
+        payload["limit"] = filesystem_form["page_limit"]
+
+    with event_scope(logger, "ui.filesystem_import", selected_count=len(selected_ids)) as log:
+        try:
+            response = api_post("/admin/import/filesystem", payload)
+            response.raise_for_status()
+            import_payload = response.json()
+            token = session.get("admin_preview_token")
+            if token and token in _ADMIN_PREVIEW_CACHE:
+                _ADMIN_PREVIEW_CACHE[token]["filesystem_preview"] = []
+                _ADMIN_PREVIEW_CACHE[token]["filesystem_form"] = {}
+            message = f"Filesystem import queued: {import_payload.get('count', 0)} selected articles."
+        except Exception as exc:
+            result = "error"
+            log.exception("Filesystem import failed")
+            telemetry.error("blog-ui", type(exc).__name__)
+            message = str(exc)
+        finally:
+            telemetry.api("/admin/import/filesystem", "POST", result, (time.perf_counter() - started) * 1000.0)
+    return redirect(url_for("admin_index", message=message))
+
+
+@app.get("/content-files/<path:relative_path>")
+def content_files(relative_path: str):
+    root = os.path.realpath(CONTENT_IMPORT_ROOT)
+    target = os.path.realpath(os.path.join(root, relative_path))
+    if not (target == root or target.startswith(f"{root}{os.sep}")):
+        abort(404)
+    if not os.path.exists(target):
+        abort(404)
+    return send_from_directory(os.path.dirname(target), os.path.basename(target))
 
 
 @app.post("/admin/import/drupal")
@@ -391,6 +621,8 @@ def import_drupal_selection():
         "allow_insecure_tls": drupal_form.get("allow_insecure_tls", False),
         "params": {},
     }
+    if drupal_form.get("nid_filter"):
+        payload["nid_filter"] = drupal_form["nid_filter"]
     if drupal_form.get("keyword_filter"):
         payload["keyword_filter"] = drupal_form["keyword_filter"]
     if drupal_form.get("body_format"):

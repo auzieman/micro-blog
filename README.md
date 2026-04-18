@@ -18,6 +18,8 @@ The project is intentionally narrow:
 - import-friendly article pipeline for Drupal, WordPress, or other sources
 - light presentation choices instead of a heavy theme engine
 
+The default public theme is `midnight`.
+
 ## Services
 
 - `blog-api`
@@ -65,6 +67,7 @@ The current scaffold uses a simple API/email gate, not full Google OAuth yet. Th
 - `POST /admin/posts/<article_id>/publish`
 - `POST /admin/import-sample`
 - `POST /admin/import/drupal`
+- `POST /admin/import/filesystem`
 
 Article payloads support a small publishing-oriented model:
 
@@ -82,6 +85,7 @@ Article payloads support a small publishing-oriented model:
 The scaffold includes a few Linux-focused sample posts in:
 
 - [sample_posts.json](./src/api/sample_posts.json)
+- [content/posts/linux](./content/posts/linux)
 
 These are paraphrased seed articles inspired by AuzieTek Linux article titles and snippets so you have realistic starting content without copying the original posts verbatim.
 
@@ -107,6 +111,32 @@ The default parser expects Drupal JSON:API-style responses and will try these co
 - hero image resolution from `relationships.field_image`
 
 Imported Drupal posts should usually be queued as `draft` first, reviewed, then published.
+
+## Filesystem import
+
+The admin UI also supports previewing and importing local markdown content from the mounted [`content`](./content) directory.
+
+Expected format:
+
+- optional front matter delimited by `---`
+- markdown body below it
+- adjacent relative images such as `images/banner.svg`
+
+Supported front matter keys:
+
+- `title`
+- `summary`
+- `tags`
+- `slug`
+- `hero_image`
+- `theme_variant`
+- `status`
+
+Relative image paths are rewritten to `/content-files/...` so imported markdown can keep working images without adding a full media library.
+
+If you want this to auto-import on local startup, set:
+
+- `AUTO_IMPORT_FILESYSTEM_ON_BOOT=true`
 
 ## Scope guardrails
 
