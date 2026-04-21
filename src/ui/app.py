@@ -12,12 +12,28 @@ from blog_shared.observability import BlogTelemetry, configure_logging, event_sc
 configure_logging()
 logger = logging.getLogger("microblog.ui")
 telemetry = BlogTelemetry("blog-ui")
+
+
+def coerce_bool(value, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    normalized = str(value).strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    return default
+
+
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "change-me-for-real-deployments")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
+app.config["SESSION_COOKIE_SECURE"] = coerce_bool(os.getenv("SESSION_COOKIE_SECURE"), False)
 app.config["PERMANENT_SESSION_LIFETIME"] = int(os.getenv("ADMIN_SESSION_SECONDS", "3600"))
+app.config["MAX_CONTENT_LENGTH"] = int(os.getenv("MAX_CONTENT_LENGTH_BYTES", str(2 * 1024 * 1024)))
 FlaskInstrumentor().instrument_app(app)
 API_BASE_URL = os.getenv("BLOG_API_BASE_URL", "http://localhost:8080")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "auzieman@gmail.com")
@@ -32,6 +48,12 @@ DRUPAL_SOURCE_TYPES = {
 ADMIN_PREVIEW_TTL_SECONDS = int(os.getenv("ADMIN_PREVIEW_TTL_SECONDS", "1800"))
 CONTENT_IMPORT_ROOT = os.getenv("CONTENT_IMPORT_ROOT", "/content")
 _ADMIN_PREVIEW_CACHE: dict[str, dict] = {}
+ADMIN_LOGIN_WINDOW_SECONDS = int(os.getenv("ADMIN_LOGIN_WINDOW_SECONDS", "900"))
+ADMIN_LOGIN_MAX_ATTEMPTS = int(os.getenv("ADMIN_LOGIN_MAX_ATTEMPTS", "5"))
+_ADMIN_LOGIN_ATTEMPTS: dict[str, list[float]] = {}
+
+
+ENABLE_HSTS = coerce_bool(os.getenv("ENABLE_HSTS"), False)
 
 
 def api_get(path: str, **params):
@@ -93,6 +115,32 @@ def _clear_preview_state() -> None:
         _ADMIN_PREVIEW_CACHE.pop(token, None)
 
 
+def _client_identifier() -> str:
+    forwarded_for = request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+    if forwarded_for:
+        return forwarded_for
+    return request.remote_addr or "unknown"
+
+
+def _is_login_rate_limited() -> bool:
+    now = time.time()
+    client_id = _client_identifier()
+    attempts = [stamp for stamp in _ADMIN_LOGIN_ATTEMPTS.get(client_id, []) if now - stamp <= ADMIN_LOGIN_WINDOW_SECONDS]
+    _ADMIN_LOGIN_ATTEMPTS[client_id] = attempts
+    return len(attempts) >= ADMIN_LOGIN_MAX_ATTEMPTS
+
+
+def _record_login_attempt(success: bool) -> None:
+    client_id = _client_identifier()
+    if success:
+        _ADMIN_LOGIN_ATTEMPTS.pop(client_id, None)
+        return
+    now = time.time()
+    attempts = [stamp for stamp in _ADMIN_LOGIN_ATTEMPTS.get(client_id, []) if now - stamp <= ADMIN_LOGIN_WINDOW_SECONDS]
+    attempts.append(now)
+    _ADMIN_LOGIN_ATTEMPTS[client_id] = attempts
+
+
 def admin_context(message=None):
     preview_state = _load_preview_state()
     return {
@@ -141,6 +189,19 @@ def apply_security_headers(response):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "img-src 'self' data: https:; "
+        "style-src 'self' 'unsafe-inline' https:; "
+        "script-src 'self' 'unsafe-inline' https:; "
+        "font-src 'self' https: data:; "
+        "connect-src 'self' http: https:; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    )
+    if ENABLE_HSTS:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Cache-Control"] = "no-store" if request.path.startswith("/admin") else "public, max-age=60"
     return response
 
@@ -246,19 +307,25 @@ def admin_login_post():
     email = request.form.get("email", "").strip().lower()
     access_code = request.form.get("access_code", "")
     with event_scope(logger, "ui.admin_login", email=email) as log:
-        if GOOGLE_CLIENT_ID:
+        if _is_login_rate_limited():
+            result = "rate_limited"
+            message = "Too many failed admin login attempts. Wait and try again."
+            log.warning("Admin login rate limited", client_id=_client_identifier())
+        elif GOOGLE_CLIENT_ID:
             result = "error"
             message = "Google auth is configured for deployment work but not wired into this local build yet."
         elif email == ADMIN_EMAIL.lower() and access_code == ADMIN_ACCESS_CODE:
             session.clear()
             session.permanent = True
             session["admin_email"] = ADMIN_EMAIL
+            _record_login_attempt(success=True)
             message = "Admin session established."
             telemetry.api("/admin/login", "POST", result, (time.perf_counter() - started) * 1000.0)
             return redirect(url_for("admin_index", message=message))
         else:
             result = "denied"
             message = "Admin access denied."
+            _record_login_attempt(success=False)
             log.warning("Admin login denied")
 
         telemetry.api("/admin/login", "POST", result, (time.perf_counter() - started) * 1000.0)

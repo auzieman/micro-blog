@@ -20,6 +20,36 @@ The project is intentionally narrow:
 
 The default public theme is `midnight`.
 
+## Release snapshot
+
+This beta release is focused on proving the end-to-end publishing loop:
+
+- crawler, Drupal JSON:API, and filesystem imports can stage drafts
+- drafts can be promoted into the public Redis read model
+- imported HTML formatting is preserved well enough for real Linux notes
+- multiple imported screenshots and local content assets are supported
+- Grafana/Prometheus/Loki remain available for local service monitoring
+
+Current public UI:
+
+![Micro Blog public UI](./docs/images/main-ui.png)
+
+Monitoring option:
+
+![Micro Blog monitoring option](./docs/images/monitoring-option.png)
+
+Recent local progress view:
+
+![Micro Blog UI progress](./docs/images/ui-progress.png)
+
+Known next work:
+
+- admin edit, delete, and re-mirror actions
+- tighter crawler body selection for pages with extra chrome
+- stronger imported image clone/repair workflow
+- code-block syntax highlighting
+- another monitoring pass for article/import/job status panels
+
 ## Services
 
 - `blog-api`
@@ -47,6 +77,15 @@ Endpoints:
 - Prometheus: `http://localhost:9090`
 - Loki: `http://localhost:3100`
 
+For local public-network style testing, set in `.env` before exposing anything beyond your laptop:
+
+- `FLASK_SECRET_KEY` to a real secret
+- `ADMIN_ACCESS_CODE` to a non-default value
+- `SESSION_COOKIE_SECURE=true` when HTTPS is in front
+- `ENABLE_HSTS=true` only when HTTPS termination is in place
+- `MAX_CONTENT_LENGTH_BYTES` to a sane limit for admin form submissions
+- `ADMIN_LOGIN_MAX_ATTEMPTS` and `ADMIN_LOGIN_WINDOW_SECONDS` as needed
+
 ## Admin model
 
 Current admin identity is configured by `ADMIN_EMAIL` and defaults to:
@@ -67,7 +106,9 @@ The current scaffold uses a simple API/email gate, not full Google OAuth yet. Th
 - `POST /admin/posts/<article_id>/publish`
 - `POST /admin/import-sample`
 - `POST /admin/import/drupal`
+- `POST /admin/import/public-crawl`
 - `POST /admin/import/filesystem`
+- `GET /admin/posts`
 
 Article payloads support a small publishing-oriented model:
 
@@ -112,9 +153,31 @@ The default parser expects Drupal JSON:API-style responses and will try these co
 
 Imported Drupal posts should usually be queued as `draft` first, reviewed, then published.
 
+## Public crawl import
+
+The crawler import is the pragmatic fallback for legacy sites where the public content URLs are easier to reason about than backend APIs.
+
+The admin form accepts:
+
+- site URL, such as `https://auzietek.com`
+- listing URL, such as `https://auzietek.com/blogs`
+- optional `node/##` filter
+- optional keyword filter
+- insecure TLS override for legacy certificate chains
+
+The crawler previews public `node/##` pages, stages selected articles as drafts, and can localize remote image references into the mounted [`content`](./content) tree during import. Imported article HTML is rewritten toward `/content-files/...` paths so future public rendering does not depend on the original source FQDN.
+
 ## Filesystem import
 
 The admin UI also supports previewing and importing local markdown content from the mounted [`content`](./content) directory.
+
+Included fixtures now cover:
+
+- simple front matter
+- multiline tag lists
+- hero image rewriting
+- linked image rewriting
+- keyword filtering for preview selection
 
 Expected format:
 
@@ -137,6 +200,30 @@ Relative image paths are rewritten to `/content-files/...` so imported markdown 
 If you want this to auto-import on local startup, set:
 
 - `AUTO_IMPORT_FILESYSTEM_ON_BOOT=true`
+
+## Tests
+
+Focused parser/import tests live under [`tests`](./tests).
+
+Run them with:
+
+```bash
+cd /home/auzieman/Projects/micro-blog
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
+
+## Public hardening
+
+Before deploying an internet-facing copy:
+
+- replace the default admin access code and Flask secret
+- front it with HTTPS and set `SESSION_COOKIE_SECURE=true`
+- enable `ENABLE_HSTS=true` only once HTTPS is verified end-to-end
+- keep `MAX_CONTENT_LENGTH_BYTES` small enough to avoid oversized admin submissions
+- prefer real Google auth over the local code challenge
+- keep `/admin` off public navigation
+- keep load generation disabled
+- review imported HTML before publishing it publicly
 
 ## Scope guardrails
 

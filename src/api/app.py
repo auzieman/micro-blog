@@ -1,5 +1,6 @@
 import json
 import logging
+import mimetypes
 import os
 import re
 import time
@@ -19,12 +20,22 @@ from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
 from blog_shared.observability import BlogTelemetry, configure_logging, event_scope
 from blog_shared.read_model import BlogReadModelStore
+from import_utils import coerce_bool, filesystem_preview_items as build_filesystem_preview_items
+from import_utils import (
+    collect_asset_urls_from_html,
+    parse_public_article_page,
+    parse_front_matter,
+    rewrite_html_asset_urls,
+    rewrite_markdown_asset_paths,
+    stable_import_article_id,
+)
 
 configure_logging()
 logger = logging.getLogger("microblog.api")
 telemetry = BlogTelemetry("blog-api")
 app = Flask(__name__)
 FlaskInstrumentor().instrument_app(app)
+app.config["MAX_CONTENT_LENGTH"] = int(os.getenv("MAX_CONTENT_LENGTH_BYTES", str(2 * 1024 * 1024)))
 
 store = BlogReadModelStore(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://blog:Str0ngP@ssword!@localhost:5432/microblog")
@@ -34,8 +45,10 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "auzieman@gmail.com")
 SAMPLE_POSTS_PATH = Path(__file__).with_name("sample_posts.json")
 CONTENT_IMPORT_ROOT = Path(os.getenv("CONTENT_IMPORT_ROOT", "/content"))
 CONTENT_PUBLIC_BASE = os.getenv("CONTENT_PUBLIC_BASE", "/content-files").rstrip("/")
+IMPORTED_ASSET_DIR = os.getenv("IMPORTED_ASSET_DIR", "imports/assets").strip("/")
 AUTO_IMPORT_FILESYSTEM_ON_BOOT = os.getenv("AUTO_IMPORT_FILESYSTEM_ON_BOOT", "false").lower() == "true"
 DEFAULT_PUBLIC_BLOG_LISTING_PATH = os.getenv("DEFAULT_PUBLIC_BLOG_LISTING_PATH", "/blogs")
+ENABLE_HSTS = coerce_bool(os.getenv("ENABLE_HSTS"), False)
 DEFAULT_DRUPAL_FIELD_MAP = {
     "source_id": "id",
     "source_nid": "attributes.drupal_internal__nid",
@@ -64,146 +77,8 @@ class ImageSrcParser(HTMLParser):
                 self.sources.append(value)
 
 
-def parse_front_matter(document: str) -> tuple[dict, str]:
-    if not document.startswith("---\n"):
-        return {}, document
-    end = document.find("\n---\n", 4)
-    if end == -1:
-        return {}, document
-    metadata = {}
-    front_matter = document[4:end]
-    body = document[end + 5 :]
-    current_key = None
-    list_accumulator: list[str] = []
-    for raw_line in front_matter.splitlines():
-        line = raw_line.rstrip()
-        if not line.strip():
-            continue
-        if line.startswith("  - ") or line.startswith("- "):
-            if current_key:
-                list_accumulator.append(line.split("- ", 1)[1].strip())
-            continue
-        if current_key and list_accumulator:
-            metadata[current_key] = list_accumulator[:]
-            list_accumulator = []
-        current_key = None
-        if ":" not in line:
-            continue
-        key, value = line.split(":", 1)
-        key = key.strip()
-        value = value.strip().strip("\"'")
-        if value:
-            if value.startswith("[") and value.endswith("]"):
-                metadata[key] = [part.strip().strip("\"'") for part in value[1:-1].split(",") if part.strip()]
-            else:
-                metadata[key] = value
-        else:
-            current_key = key
-            list_accumulator = []
-    if current_key and list_accumulator:
-        metadata[current_key] = list_accumulator
-    return metadata, body
-
-
-def filesystem_public_url(relative_path: str) -> str:
-    normalized = relative_path.strip().replace("\\", "/").lstrip("/")
-    return f"{CONTENT_PUBLIC_BASE}/{normalized}"
-
-
-def rewrite_markdown_asset_paths(body: str, asset_root: str) -> str:
-    if not asset_root:
-        return body
-
-    def replace_image(match):
-        alt_text = match.group(1)
-        target = match.group(2).strip()
-        if target.startswith(("http://", "https://", "data:", "/", "#")):
-            return match.group(0)
-        return f"![{alt_text}]({filesystem_public_url(f'{asset_root}/{target}')})"
-
-    def replace_link(match):
-        label = match.group(1)
-        target = match.group(2).strip()
-        if target.startswith(("http://", "https://", "mailto:", "/", "#")):
-            return match.group(0)
-        lowered = target.lower()
-        if not lowered.endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".avif")):
-            return match.group(0)
-        return f"[{label}]({filesystem_public_url(f'{asset_root}/{target}')})"
-
-    body = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", replace_image, body)
-    body = re.sub(r"(?<!!)\[([^\]]+)\]\(([^)]+)\)", replace_link, body)
-    return body
-
-
 def filesystem_preview_items(payload: dict) -> list[dict]:
-    root_path = Path(payload.get("root_path") or CONTENT_IMPORT_ROOT).resolve()
-    content_subdir = (payload.get("content_subdir") or "").strip().strip("/")
-    scan_root = (root_path / content_subdir).resolve() if content_subdir else root_path
-    keyword_filter = (payload.get("keyword_filter") or "").strip().lower()
-    selected_source_ids = {str(value) for value in (payload.get("selected_source_ids") or [])}
-    status = payload.get("status", "draft")
-    default_theme_variant = payload.get("theme_variant", "midnight")
-    limit = int(payload.get("limit") or 0)
-    preview = []
-
-    if not scan_root.exists():
-        raise FileNotFoundError(f"Filesystem import root does not exist: {scan_root}")
-    if not scan_root.is_dir():
-        raise ValueError(f"Filesystem import root is not a directory: {scan_root}")
-    if root_path not in [scan_root, *scan_root.parents]:
-        raise ValueError("Filesystem import path must stay under the configured content root.")
-
-    files = sorted(scan_root.rglob("*.md"))
-    for file_path in files:
-        relative_path = file_path.relative_to(root_path).as_posix()
-        if selected_source_ids and relative_path not in selected_source_ids:
-            continue
-        metadata, body = parse_front_matter(file_path.read_text(encoding="utf-8"))
-        title = str(metadata.get("title") or file_path.stem.replace("-", " ").title())
-        tags = metadata.get("tags") or []
-        if isinstance(tags, str):
-            tags = [part.strip() for part in tags.split(",") if part.strip()]
-        hero_image = metadata.get("hero_image") or metadata.get("hero_image_url")
-        asset_root = Path(relative_path).parent.as_posix()
-        if asset_root == ".":
-            asset_root = ""
-        if isinstance(hero_image, str) and hero_image and not hero_image.startswith(("http://", "https://", "/")):
-            hero_image = filesystem_public_url(f"{asset_root}/{hero_image}" if asset_root else hero_image)
-        rewritten_body = rewrite_markdown_asset_paths(body, asset_root)
-        image_paths = re.findall(r"!\[[^\]]*\]\(([^)]+)\)", rewritten_body)
-        preview_item = {
-            "source_id": relative_path,
-            "source_nid": None,
-            "title": title,
-            "slug": str(metadata.get("slug") or slugify(title)),
-            "summary": str(metadata.get("summary") or ""),
-            "tags": tags,
-            "body_format": str(metadata.get("body_format") or "markdown"),
-            "hero_image_url": hero_image or (image_paths[0] if image_paths else None),
-            "image_urls": image_paths,
-            "theme_variant": str(metadata.get("theme_variant") or metadata.get("theme") or default_theme_variant),
-            "source_url": filesystem_public_url(relative_path),
-            "markdown_body": rewritten_body,
-            "status": str(metadata.get("status") or status),
-            "source_path": relative_path,
-        }
-        if keyword_filter:
-            haystack = " ".join(
-                [
-                    preview_item["title"],
-                    preview_item["summary"],
-                    preview_item["slug"],
-                    " ".join(preview_item["tags"]),
-                    preview_item["source_path"],
-                ]
-            ).lower()
-            if keyword_filter not in haystack:
-                continue
-        preview.append(preview_item)
-        if limit and len(preview) >= limit:
-            break
-    return preview
+    return build_filesystem_preview_items(payload, slugify, CONTENT_IMPORT_ROOT, CONTENT_PUBLIC_BASE)
 
 
 def filesystem_import_commands(payload: dict) -> list[dict]:
@@ -213,7 +88,7 @@ def filesystem_import_commands(payload: dict) -> list[dict]:
         commands.append(
             {
                 "command_type": "UpsertArticleCommand",
-                "article_id": f"ART-{uuid.uuid4().hex[:8].upper()}",
+                "article_id": stable_import_article_id("filesystem", item["source_id"], item["slug"]),
                 "source_id": item["source_id"],
                 "source_nid": item["source_nid"],
                 "title": item["title"],
@@ -262,20 +137,23 @@ def list_admin_posts(page: int = 1, page_size: int = 20) -> dict:
     safe_page = max(page, 1)
     safe_size = max(1, min(page_size, 100))
     offset = (safe_page - 1) * safe_size
-    with psycopg.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute("select count(*) from articles")
-            total = cur.fetchone()[0]
-            cur.execute(
-                """
-                select article_id, slug, title, summary, body_format, hero_image_url, theme_variant, tags, status, source_url, updated_at, published_at
-                from articles
-                order by updated_at desc
-                limit %s offset %s
-                """,
-                (safe_size, offset),
-            )
-            rows = cur.fetchall()
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute("select count(*) from articles")
+                total = cur.fetchone()[0]
+                cur.execute(
+                    """
+                    select article_id, slug, title, summary, body_format, hero_image_url, theme_variant, tags, status, source_url, updated_at, published_at
+                    from articles
+                    order by updated_at desc
+                    limit %s offset %s
+                    """,
+                    (safe_size, offset),
+                )
+                rows = cur.fetchall()
+    except psycopg.errors.UndefinedTable:
+        return {"items": [], "total": 0, "page": safe_page, "page_size": safe_size}
     items = []
     for row in rows:
         items.append(
@@ -298,16 +176,19 @@ def list_admin_posts(page: int = 1, page_size: int = 20) -> dict:
 
 
 def admin_post_status_counts() -> list[dict]:
-    with psycopg.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                select status, count(*)
-                from articles
-                group by status
-                """
-            )
-            rows = cur.fetchall()
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    select status, count(*)
+                    from articles
+                    group by status
+                    """
+                )
+                rows = cur.fetchall()
+    except psycopg.errors.UndefinedTable:
+        return []
     return [{"status": row[0] or "unknown", "count": row[1]} for row in rows]
 
 
@@ -334,10 +215,100 @@ telemetry.meter.create_observable_gauge(
 )
 
 
+@app.after_request
+def apply_security_headers(response):
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "img-src 'self' data: https:; "
+        "style-src 'self' 'unsafe-inline' https:; "
+        "script-src 'self' 'unsafe-inline' https:; "
+        "font-src 'self' https: data:; "
+        "connect-src 'self' http: https:; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    )
+    if ENABLE_HSTS:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
+
 def fetch_html_document(url: str, allow_insecure_tls: bool, timeout: int = 20) -> str:
     response = requests.get(url, timeout=timeout, verify=not allow_insecure_tls)
     response.raise_for_status()
     return response.text
+
+
+def content_public_url(relative_path: Path) -> str:
+    return f"{CONTENT_PUBLIC_BASE}/{relative_path.as_posix().lstrip('/')}"
+
+
+def guess_asset_extension(asset_url: str, content_type: str) -> str:
+    path = urlparse(asset_url).path
+    suffix = Path(path).suffix.lower()
+    if suffix:
+        return suffix
+    normalized = (content_type or "").split(";", 1)[0].strip().lower()
+    guessed = mimetypes.guess_extension(normalized) if normalized else None
+    return guessed or ".bin"
+
+
+def download_remote_asset(asset_url: str, source_kind: str, source_id: str, allow_insecure_tls: bool) -> str:
+    if not asset_url or asset_url.startswith(("data:", CONTENT_PUBLIC_BASE)):
+        return asset_url
+    parsed = urlparse(asset_url)
+    if parsed.scheme not in {"http", "https"}:
+        return asset_url
+
+    source_segment = slugify(source_id) or "import"
+    digest = uuid.uuid5(uuid.NAMESPACE_URL, asset_url).hex
+    response = requests.get(asset_url, timeout=20, verify=not allow_insecure_tls)
+    response.raise_for_status()
+    extension = guess_asset_extension(asset_url, response.headers.get("Content-Type", ""))
+    relative_path = Path(IMPORTED_ASSET_DIR) / slugify(source_kind) / source_segment / f"{digest}{extension}"
+    target_path = CONTENT_IMPORT_ROOT / relative_path
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_bytes(response.content)
+    return content_public_url(relative_path)
+
+
+def localize_import_assets(
+    body_html: str,
+    hero_image_url: str | None,
+    source_kind: str,
+    source_id: str,
+    allow_insecure_tls: bool,
+) -> tuple[str, str | None, list[str]]:
+    replacements: dict[str, str] = {}
+    localized_urls: list[str] = []
+    for asset_url in collect_asset_urls_from_html(body_html):
+        try:
+            local_url = download_remote_asset(asset_url, source_kind, source_id, allow_insecure_tls)
+        except Exception:
+            logger.warning(
+                "Asset download skipped",
+                extra={"event.name": "api.asset_download_skip", "asset_url": asset_url, "source_kind": source_kind},
+            )
+            continue
+        replacements[asset_url] = local_url
+        localized_urls.append(local_url)
+
+    localized_hero = hero_image_url
+    if hero_image_url and hero_image_url.startswith(("http://", "https://")):
+        try:
+            localized_hero = download_remote_asset(hero_image_url, source_kind, source_id, allow_insecure_tls)
+        except Exception:
+            logger.warning(
+                "Hero asset download skipped",
+                extra={"event.name": "api.hero_asset_download_skip", "asset_url": hero_image_url, "source_kind": source_kind},
+            )
+
+    localized_body = rewrite_html_asset_urls(body_html, replacements)
+    return localized_body, localized_hero, localized_urls
 
 
 def extract_node_links_from_listing(listing_html: str, site_url: str) -> list[dict]:
@@ -358,66 +329,6 @@ def extract_node_links_from_listing(listing_html: str, site_url: str) -> list[di
                 "listing_title": title,
             }
     return list(discovered.values())
-
-
-def parse_public_article_page(page_html: str, source_url: str) -> dict:
-    soup = BeautifulSoup(page_html, "html.parser")
-    title = None
-    for selector in ("h1.page-title", "h1", "meta[property='og:title']", "title"):
-        node = soup.select_one(selector)
-        if not node:
-            continue
-        if node.name == "meta":
-            title = (node.get("content") or "").strip()
-        else:
-            title = " ".join(node.get_text(" ", strip=True).split())
-        if title:
-            break
-
-    content_node = None
-    for selector in (
-        "article.node",
-        "article[role='article']",
-        ".node__content",
-        ".field--name-body .field__item",
-        ".text-formatted",
-        "main article",
-        "main",
-    ):
-        content_node = soup.select_one(selector)
-        if content_node:
-            break
-
-    if not content_node:
-        raise ValueError(f"Unable to locate article body for {source_url}")
-
-    image_urls = []
-    for image in content_node.select("img[src]"):
-        image_urls.append(urljoin(source_url, image.get("src", "").strip()))
-
-    summary = ""
-    meta_description = soup.select_one("meta[name='description']")
-    if meta_description and meta_description.get("content"):
-        summary = meta_description.get("content", "").strip()
-    if not summary:
-        first_paragraph = content_node.select_one("p")
-        if first_paragraph:
-            summary = " ".join(first_paragraph.get_text(" ", strip=True).split())
-
-    tags = []
-    for anchor in soup.select("a[href*='/taxonomy/term/']"):
-        tag_text = " ".join(anchor.get_text(" ", strip=True).split())
-        if tag_text and tag_text not in tags:
-            tags.append(tag_text)
-
-    return {
-        "title": title or source_url.rstrip("/").rsplit("/", 1)[-1],
-        "summary": summary,
-        "body_html": str(content_node),
-        "hero_image_url": image_urls[0] if image_urls else None,
-        "image_urls": image_urls,
-        "tags": tags,
-    }
 
 
 def public_crawl_preview_items(payload: dict) -> list[dict]:
@@ -474,20 +385,33 @@ def public_crawl_preview_items(payload: dict) -> list[dict]:
 def public_crawl_import_commands(payload: dict) -> list[dict]:
     preview = public_crawl_preview_items(payload)
     commands = []
+    localize_assets = bool(payload.get("localize_assets"))
+    allow_insecure_tls = bool(payload.get("allow_insecure_tls"))
     for item in preview:
+        body_html = item["markdown_body"]
+        hero_image_url = item["hero_image_url"]
+        image_urls = item["image_urls"]
+        if localize_assets:
+            body_html, hero_image_url, image_urls = localize_import_assets(
+                body_html,
+                hero_image_url,
+                "public-crawl",
+                str(item["source_id"]),
+                allow_insecure_tls,
+            )
         commands.append(
             {
                 "command_type": "UpsertArticleCommand",
-                "article_id": f"ART-{uuid.uuid4().hex[:8].upper()}",
+                "article_id": stable_import_article_id("public-crawl", item["source_id"], item["source_url"]),
                 "source_id": item["source_id"],
                 "source_nid": item["source_nid"],
                 "title": item["title"],
                 "slug": item["slug"],
                 "summary": item["summary"],
                 "body_format": "html",
-                "markdown_body": item["markdown_body"],
-                "hero_image_url": item["hero_image_url"],
-                "image_urls": item["image_urls"],
+                "markdown_body": body_html,
+                "hero_image_url": hero_image_url,
+                "image_urls": image_urls,
                 "theme_variant": item["theme_variant"],
                 "tags": item["tags"],
                 "author_email": payload.get("admin_email") or ADMIN_EMAIL,
@@ -705,6 +629,8 @@ def drupal_import_commands(document: dict, payload: dict) -> list[dict]:
     nid_filter = (payload.get("nid_filter") or "").strip()
     limit = int(payload.get("limit") or 0)
     selected_source_ids = {str(value) for value in (payload.get("selected_source_ids") or [])}
+    localize_assets = bool(payload.get("localize_assets"))
+    allow_insecure_tls = bool(payload.get("allow_insecure_tls"))
     commands = []
 
     for item in items[: limit or None]:
@@ -754,10 +680,19 @@ def drupal_import_commands(document: dict, payload: dict) -> list[dict]:
             if keyword_filter not in haystack:
                 continue
 
+        if body_format == "html" and localize_assets:
+            body, hero_image_url, image_urls = localize_import_assets(
+                body,
+                hero_image_url,
+                "drupal",
+                source_id or source_nid or slug,
+                allow_insecure_tls,
+            )
+
         commands.append(
             {
                 "command_type": "UpsertArticleCommand",
-                "article_id": f"ART-{uuid.uuid4().hex[:8].upper()}",
+                "article_id": stable_import_article_id("drupal", source_id, source_url or slug),
                 "source_id": source_id,
                 "source_nid": source_nid,
                 "title": title,
@@ -1148,6 +1083,7 @@ def import_drupal():
                 preview = drupal_preview_items(document, payload)
                 return jsonify({"status": "DrupalImportPreview", "count": len(preview), "items": preview}), 200
 
+            payload = {**payload, "localize_assets": True}
             commands = drupal_import_commands(document, payload)
 
             for command in commands:
@@ -1238,6 +1174,7 @@ def import_public_crawl():
                 preview = public_crawl_preview_items(payload)
                 return jsonify({"status": "PublicCrawlPreview", "count": len(preview), "items": preview}), 200
 
+            payload = {**payload, "localize_assets": True}
             commands = public_crawl_import_commands(payload)
             for command in commands:
                 publish_command(command)

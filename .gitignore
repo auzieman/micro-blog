@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+.env
+
+*.log
+*.out
+
+# Runtime import cache. Keep source fixtures under content/posts instead.
+content/imports/
+
+# Ad-hoc screenshots belong under docs/images when they are release artifacts.
+display bugs article in inventory but not published..png
