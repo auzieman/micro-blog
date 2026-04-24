@@ -113,6 +113,68 @@ body here
         self.assertEqual(preview[0]["status"], "draft")
         self.assertIn("/content-files/posts/linux/images/terminal-rig.svg", preview[0]["markdown_body"])
 
+    def test_article_fingerprint_changes_when_body_changes(self):
+        base = {
+            "title": "Demo",
+            "slug": "demo",
+            "summary": "Summary",
+            "body_format": "markdown",
+            "markdown_body": "# Demo",
+            "hero_image_url": "",
+            "theme_variant": "midnight",
+            "tags": ["linux"],
+            "status": "draft",
+            "source_url": "/content-files/posts/linux/demo.md",
+        }
+        changed = dict(base)
+        changed["markdown_body"] = "# Demo Updated"
+        self.assertNotEqual(import_utils.article_fingerprint(base), import_utils.article_fingerprint(changed))
+
+    def test_plan_bootstrap_sync_actions_skip_update_reset(self):
+        command = {
+            "article_id": "ART-TEST1",
+            "title": "Demo",
+            "slug": "demo",
+            "summary": "Summary",
+            "body_format": "markdown",
+            "markdown_body": "# Demo",
+            "hero_image_url": "",
+            "theme_variant": "midnight",
+            "tags": ["linux"],
+            "status": "published",
+            "source_url": "/content-files/posts/linux/demo.md",
+        }
+        existing_same = {
+            "ART-TEST1": {
+                "article_id": "ART-TEST1",
+                "title": "Demo",
+                "slug": "demo",
+                "summary": "Summary",
+                "body_format": "markdown",
+                "markdown_body": "# Demo",
+                "hero_image_url": "",
+                "theme_variant": "midnight",
+                "tags": ["linux"],
+                "status": "published",
+                "source_url": "/content-files/posts/linux/demo.md",
+            }
+        }
+        skip_plan = import_utils.plan_bootstrap_sync_actions([command], existing_same, "skip")
+        self.assertEqual(skip_plan["count"], 0)
+        self.assertEqual(skip_plan["skipped"], 1)
+
+        update_plan = import_utils.plan_bootstrap_sync_actions([command], existing_same, "update")
+        self.assertEqual(update_plan["count"], 0)
+        self.assertEqual(update_plan["skipped"], 1)
+
+        changed_existing = dict(existing_same["ART-TEST1"])
+        changed_existing["markdown_body"] = "# Old"
+        reset_plan = import_utils.plan_bootstrap_sync_actions([command], {"ART-TEST1": changed_existing}, "reset")
+        self.assertEqual(reset_plan["count"], 1)
+        self.assertEqual(reset_plan["reset_deleted"], 1)
+        self.assertEqual(reset_plan["planned"][0]["action"], "delete")
+        self.assertEqual(reset_plan["planned"][1]["action"], "upsert")
+
 
 if __name__ == "__main__":
     unittest.main()

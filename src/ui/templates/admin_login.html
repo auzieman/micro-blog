@@ -62,9 +62,13 @@
 <body>
   <section class="card">
     <h1>Author Access</h1>
-    <p>The public site stays open at <strong>/blog</strong>. Authoring lives here under <strong>/admin</strong>. For now this build uses a local admin challenge. Google sign-in can replace it once the deployment auth path is wired.</p>
+    <p>The public site stays open at <strong>/blog</strong>. Authoring lives here under <strong>/admin</strong>. This stays single-admin on purpose: one allowed email, no multi-user CMS layer.</p>
     <p>Allowed admin identity: <strong>{{ admin_email }}</strong></p>
 
+    {% if auth_mode == "google" %}
+    <a class="meta-link" href="/admin/login/google" style="display:block; margin-bottom:1rem;">Sign in with Google</a>
+    <p>Local code login is disabled while Google OAuth is configured.</p>
+    {% else %}
     <form method="post" action="/admin/login">
       <label for="email">Email</label>
       <input id="email" name="email" type="email" value="{{ admin_email }}" required />
@@ -74,9 +78,6 @@
 
       <button type="submit">Enter Admin Console</button>
     </form>
-
-    {% if auth_mode == "google" %}
-    <p>Google auth variables are present, but OAuth is not wired into the local UI yet. This screen is intentionally explicit about that.</p>
     {% endif %}
 
     {% if message %}

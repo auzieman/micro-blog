@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit {{ article.title }} | Micro Blog</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #edf3f5; color: #15232c; }
+    .shell { width: min(100%, 1200px); margin: 0 auto; padding: 1rem; }
+    .hero, .panel { background: white; border: 1px solid rgba(20,40,51,0.1); border-radius: 18px; box-shadow: 0 16px 40px rgba(13,27,35,0.08); }
+    .hero { padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .hero h1 { margin: 0 0 0.25rem; }
+    .hero p { margin: 0; color: #52616a; }
+    .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .actions a, .actions button { border: none; border-radius: 12px; padding: 0.75rem 0.95rem; background: #2a647d; color: white; text-decoration: none; cursor: pointer; font: inherit; font-weight: 700; }
+    .actions form { margin: 0; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr); gap: 1rem; }
+    .panel { padding: 1rem; }
+    label { display: block; font-weight: 700; margin: 0.8rem 0 0.3rem; }
+    input, textarea, select, button[type="submit"] { width: 100%; box-sizing: border-box; border-radius: 12px; padding: 0.75rem 0.85rem; border: 1px solid rgba(18,40,51,0.16); font: inherit; }
+    textarea { min-height: 140px; resize: vertical; }
+    button[type="submit"] { margin-top: 0.8rem; border: none; background: #2a647d; color: white; font-weight: 700; cursor: pointer; }
+    .secondary { background: #4c626e; }
+    .message { margin-bottom: 1rem; padding: 0.85rem 1rem; border-radius: 12px; background: #13222b; color: #eaf6fb; white-space: pre-wrap; }
+    .meta { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.55rem; font-size: 0.82rem; color: #627079; }
+    .pill { border-radius: 999px; background: #dce9ef; color: #245064; padding: 0.18rem 0.45rem; }
+    .revision-list { display: grid; gap: 0.75rem; }
+    .revision { border: 1px solid rgba(18,40,51,0.1); border-radius: 14px; padding: 0.85rem; background: #f7fafb; }
+    .revision h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+    .revision p { margin: 0; color: #57656d; }
+    @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    {% if message %}<div class="message">{{ message }}</div>{% endif %}
+    <section class="hero">
+      <div>
+        <h1>Edit "{{ article.title }}"</h1>
+        <p>Revisions are scaffolded from the write model. Soft delete, restore, publish, and re-mirror stay explicit actions instead of hidden state changes.</p>
+        <div class="meta">
+          <span class="pill">{{ article.article_id }}</span>
+          <span class="pill">{{ article.status }}</span>
+          <span class="pill">rev {{ article.revision }}</span>
+          <span>{{ article.slug }}</span>
+        </div>
+      </div>
+      <div class="actions">
+        <a href="/admin">Back to Admin</a>
+        <a href="/post/{{ article.slug }}">View Public</a>
+        <form method="post" action="/admin/posts/{{ article.article_id }}/remirror">
+          <input type="hidden" name="return_to" value="/admin/posts/{{ article.article_id }}/edit" />
+          <button type="submit" class="secondary">Re-mirror</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <form method="post" action="/admin/posts/{{ article.article_id }}/update">
+          <label for="title">Title</label>
+          <input id="title" name="title" value="{{ article.title }}" required />
+
+          <label for="slug">Slug</label>
+          <input id="slug" name="slug" value="{{ article.slug }}" />
+
+          <label for="summary">Summary</label>
+          <textarea id="summary" name="summary" style="min-height: 90px;" required>{{ article.summary }}</textarea>
+
+          <label for="tags">Tags</label>
+          <input id="tags" name="tags" value="{{ article.tags|join(', ') }}" />
+
+          <label for="hero_image_url">Hero image URL</label>
+          <input id="hero_image_url" name="hero_image_url" value="{{ article.hero_image_url or '' }}" />
+
+          <label for="seo_title">SEO title</label>
+          <input id="seo_title" name="seo_title" value="{{ article.seo_title or '' }}" />
+
+          <label for="seo_description">SEO description</label>
+          <textarea id="seo_description" name="seo_description" style="min-height: 90px;">{{ article.seo_description or '' }}</textarea>
+
+          <label for="canonical_url">Canonical URL override</label>
+          <input id="canonical_url" name="canonical_url" value="{{ article.canonical_url or '' }}" />
+
+          <label for="og_image_url">Open Graph image override</label>
+          <input id="og_image_url" name="og_image_url" value="{{ article.og_image_url or '' }}" />
+
+          <label for="body_format">Body format</label>
+          <select id="body_format" name="body_format">
+            <option value="markdown" {% if article.body_format == 'markdown' %}selected{% endif %}>markdown</option>
+            <option value="html" {% if article.body_format == 'html' %}selected{% endif %}>html</option>
+          </select>
+
+          <label for="theme_variant">Theme variant</label>
+          <select id="theme_variant" name="theme_variant">
+            {% for theme_name in theme_variants %}
+            <option value="{{ theme_name }}" {% if article.theme_variant == theme_name %}selected{% endif %}>{{ theme_name }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option value="draft" {% if article.status == 'draft' %}selected{% endif %}>draft</option>
+            <option value="published" {% if article.status == 'published' %}selected{% endif %}>published</option>
+            <option value="deleted" {% if article.status == 'deleted' %}selected{% endif %}>deleted</option>
+          </select>
+
+          <label for="markdown_body">Body</label>
+          <textarea id="markdown_body" name="markdown_body" required>{{ article.markdown_body }}</textarea>
+
+          <button type="submit">Save Changes</button>
+          <button type="submit" class="secondary" formaction="/admin/posts/preview">Preview Draft</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Post Actions</h2>
+        <div class="actions">
+          {% if article.status != 'published' and article.status != 'deleted' %}
+          <form method="post" action="/admin/posts/{{ article.article_id }}/publish">
+            <input type="hidden" name="return_to" value="/admin/posts/{{ article.article_id }}/edit" />
+            <button type="submit">Publish</button>
+          </form>
+          {% endif %}
+          {% if article.status == 'published' %}
+          <form method="post" action="/admin/posts/{{ article.article_id }}/unpublish">
+            <input type="hidden" name="return_to" value="/admin/posts/{{ article.article_id }}/edit" />
+            <button type="submit" class="secondary">Unpublish</button>
+          </form>
+          {% endif %}
+          {% if article.status == 'deleted' %}
+          <form method="post" action="/admin/posts/{{ article.article_id }}/restore">
+            <input type="hidden" name="return_to" value="/admin/posts/{{ article.article_id }}/edit" />
+            <button type="submit">Restore</button>
+          </form>
+          {% else %}
+          <form method="post" action="/admin/posts/{{ article.article_id }}/delete">
+            <input type="hidden" name="return_to" value="/admin/posts/{{ article.article_id }}/edit" />
+            <button type="submit" class="secondary">Soft Delete</button>
+          </form>
+          {% endif %}
+        </div>
+
+        <h2 style="margin-top:1rem;">Slug Aliases</h2>
+        {% if article.slug_aliases %}
+        <div class="meta">
+          {% for alias in article.slug_aliases %}
+          <span class="pill">{{ alias }}</span>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No alias redirects recorded yet.</p>
+        {% endif %}
+
+        <h2 style="margin-top:1rem;">Revision History</h2>
+        <div class="revision-list">
+          {% for revision in revisions %}
+          <article class="revision">
+            <h3>Revision {{ revision.revision }}</h3>
+            <p>{{ revision.created_at or 'n/a' }}</p>
+            <div class="meta">
+              <span class="pill">{{ revision.status }}</span>
+              <span>{{ revision.slug }}</span>
+            </div>
+          </article>
+          {% else %}
+          <p>No revisions recorded yet.</p>
+          {% endfor %}
+        </div>
+
+        <h2 style="margin-top:1rem;">Hard Delete</h2>
+        <p>Permanently remove this article, its slug aliases, and its revision history. Type the article ID exactly to continue.</p>
+        <form method="post" action="/admin/posts/{{ article.article_id }}/hard-delete">
+          <input type="hidden" name="return_to" value="/admin" />
+          <label for="confirm_article_id">Confirm article ID</label>
+          <input id="confirm_article_id" name="confirm_article_id" placeholder="{{ article.article_id }}" required />
+          <button type="submit" class="secondary">Hard Delete Permanently</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

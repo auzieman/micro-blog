@@ -427,6 +427,44 @@
         </div>
 
         <div class="panel">
+          <h2>Bootstrap Story Sync</h2>
+          <p class="subtle">Use the filesystem-backed article chain as managed bootstrap content. This is the controlled test/demo path for the markdown loader: rerun it in <strong>skip</strong>, <strong>update</strong>, or <strong>reset</strong> mode without touching unrelated posts.</p>
+
+          <form method="post" action="/admin/bootstrap/filesystem-sync">
+            <label for="bootstrap_content_subdir">Content subdirectory</label>
+            <input id="bootstrap_content_subdir" name="content_subdir" value="{{ bootstrap_form.get('content_subdir', 'posts/linux') }}" placeholder="posts/linux" />
+
+            <label for="bootstrap_keyword_filter">Keyword filter</label>
+            <input id="bootstrap_keyword_filter" name="keyword_filter" value="{{ bootstrap_form.get('keyword_filter', '') }}" placeholder="optional keyword subset" />
+
+            <label for="bootstrap_page_limit">Limit</label>
+            <input id="bootstrap_page_limit" name="page_limit" value="{{ bootstrap_form.get('page_limit', '') }}" placeholder="optional article limit" />
+
+            <label for="bootstrap_status">Imported status</label>
+            <select id="bootstrap_status" name="status">
+              <option value="published" {% if bootstrap_form.get('status', 'published') == 'published' %}selected{% endif %}>published</option>
+              <option value="draft" {% if bootstrap_form.get('status') == 'draft' %}selected{% endif %}>draft</option>
+            </select>
+
+            <label for="bootstrap_sync_mode">Sync mode</label>
+            <select id="bootstrap_sync_mode" name="sync_mode">
+              <option value="update" {% if bootstrap_form.get('sync_mode', 'update') == 'update' %}selected{% endif %}>update changed or missing</option>
+              <option value="skip" {% if bootstrap_form.get('sync_mode') == 'skip' %}selected{% endif %}>skip existing</option>
+              <option value="reset" {% if bootstrap_form.get('sync_mode') == 'reset' %}selected{% endif %}>soft delete then re-import</option>
+            </select>
+
+            <label for="bootstrap_theme_variant">Theme variant</label>
+            <select id="bootstrap_theme_variant" name="theme_variant">
+              {% for theme_name in theme_variants %}
+              <option value="{{ theme_name }}" {% if bootstrap_form.get('theme_variant', 'midnight') == theme_name %}selected{% endif %}>{{ theme_name }}</option>
+              {% endfor %}
+            </select>
+
+            <button type="submit" class="secondary">Run Bootstrap Sync</button>
+          </form>
+        </div>
+
+        <div class="panel">
           <h2>Draft and Publish</h2>
           <p>Signed in as <strong>{{ admin_email }}</strong>. Current published post count visible to the read model: <strong>{{ total }}</strong>.</p>
 
@@ -438,6 +476,9 @@
             <label for="title">Title</label>
             <input id="title" name="title" required />
 
+            <label for="slug">Slug</label>
+            <input id="slug" name="slug" placeholder="optional-clean-slug" />
+
             <label for="summary">Summary</label>
             <textarea id="summary" name="summary" style="min-height: 90px;" required></textarea>
 
@@ -446,6 +487,18 @@
 
             <label for="hero_image_url">Hero image URL</label>
             <input id="hero_image_url" name="hero_image_url" placeholder="https://example.com/image.jpg" />
+
+            <label for="seo_title">SEO title</label>
+            <input id="seo_title" name="seo_title" placeholder="Optional search title override" />
+
+            <label for="seo_description">SEO description</label>
+            <textarea id="seo_description" name="seo_description" style="min-height: 90px;" placeholder="Optional search description override"></textarea>
+
+            <label for="canonical_url">Canonical URL override</label>
+            <input id="canonical_url" name="canonical_url" placeholder="https://example.com/custom-canonical" />
+
+            <label for="og_image_url">Open Graph image override</label>
+            <input id="og_image_url" name="og_image_url" placeholder="https://example.com/social-card.jpg" />
 
             <label for="body_format">Body format</label>
             <select id="body_format" name="body_format">
@@ -470,23 +523,18 @@
             <textarea id="markdown_body" name="markdown_body" required># New Post</textarea>
 
             <button type="submit">Create Article</button>
-          </form>
-
-          <form method="post" action="/admin/publish">
-            <label for="article_id">Publish Existing Article by ID</label>
-            <input id="article_id" name="article_id" placeholder="ART-12345678" required />
-            <button type="submit" class="secondary">Publish Article</button>
+            <button type="submit" class="secondary" formaction="/admin/posts/preview">Preview Draft</button>
           </form>
         </div>
       </div>
 
       <div class="panel">
         <h2>Authoring Snapshot</h2>
-        <div class="post-list">
-          {% for post in posts %}
-          <div class="post-card">
-            <h3>{{ post.title }}</h3>
-            <p>{{ post.summary }}</p>
+          <div class="post-list">
+            {% for post in posts %}
+            <div class="post-card">
+              <h3>{{ post.title }}</h3>
+              <p>{{ post.summary }}</p>
             <div class="meta">
               <span class="pill">{{ post.article_id }}</span>
               <span>{{ post.slug }}</span>
@@ -497,15 +545,39 @@
               <span class="pill">{{ tag_name }}</span>
               {% endfor %}
             </div>
-            {% if post.status != 'published' %}
-            <form method="post" action="/admin/publish" style="margin-top: 0.75rem;">
-              <input type="hidden" name="article_id" value="{{ post.article_id }}" />
-              <button type="submit" class="secondary">Publish {{ post.article_id }}</button>
-            </form>
-            {% endif %}
+            <div class="actions" style="margin-top: 0.75rem;">
+              <a href="/admin/posts/{{ post.article_id }}/edit">Edit</a>
+              {% if post.status != 'published' and post.status != 'deleted' %}
+              <form method="post" action="/admin/posts/{{ post.article_id }}/publish">
+                <input type="hidden" name="return_to" value="/admin" />
+                <button type="submit" class="secondary">Publish</button>
+              </form>
+              {% endif %}
+              {% if post.status == 'published' %}
+              <form method="post" action="/admin/posts/{{ post.article_id }}/unpublish">
+                <input type="hidden" name="return_to" value="/admin" />
+                <button type="submit" class="secondary">Unpublish</button>
+              </form>
+              {% endif %}
+              <form method="post" action="/admin/posts/{{ post.article_id }}/remirror">
+                <input type="hidden" name="return_to" value="/admin" />
+                <button type="submit" class="secondary">Re-mirror</button>
+              </form>
+              {% if post.status == 'deleted' %}
+              <form method="post" action="/admin/posts/{{ post.article_id }}/restore">
+                <input type="hidden" name="return_to" value="/admin" />
+                <button type="submit" class="secondary">Restore</button>
+              </form>
+              {% else %}
+              <form method="post" action="/admin/posts/{{ post.article_id }}/delete">
+                <input type="hidden" name="return_to" value="/admin" />
+                <button type="submit" class="secondary">Soft Delete</button>
+              </form>
+              {% endif %}
+            </div>
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
       </div>
     </section>
   </main>

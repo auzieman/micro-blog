@@ -1,5 +1,6 @@
 import re
 import hashlib
+import json
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -12,6 +13,55 @@ def stable_import_article_id(source_kind: str, source_id: str | None, fallback: 
         raise ValueError("Stable import article IDs require a source identifier or fallback.")
     digest = hashlib.sha1(f"{source_kind}:{raw}".encode("utf-8")).hexdigest()[:12].upper()
     return f"ART-{digest}"
+
+
+def article_fingerprint(payload: dict) -> str:
+    normalized = {
+        "title": payload.get("title") or "",
+        "slug": payload.get("slug") or "",
+        "summary": payload.get("summary") or "",
+        "body_format": payload.get("body_format") or "markdown",
+        "markdown_body": payload.get("markdown_body") or "",
+        "hero_image_url": payload.get("hero_image_url") or "",
+        "theme_variant": payload.get("theme_variant") or "",
+        "tags": sorted(payload.get("tags") or []),
+        "status": payload.get("status") or "",
+        "seo_title": payload.get("seo_title") or "",
+        "seo_description": payload.get("seo_description") or "",
+        "canonical_url": payload.get("canonical_url") or "",
+        "og_image_url": payload.get("og_image_url") or "",
+        "source_url": payload.get("source_url") or "",
+    }
+    encoded = json.dumps(normalized, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha1(encoded.encode("utf-8")).hexdigest()
+
+
+def plan_bootstrap_sync_actions(commands: list[dict], existing_by_id: dict[str, dict], sync_mode: str) -> dict:
+    if sync_mode not in {"skip", "update", "reset"}:
+        raise ValueError("sync_mode must be one of: skip, update, reset")
+    planned = []
+    skipped = 0
+    reset_deleted = 0
+    for command in commands:
+        current = existing_by_id.get(command["article_id"])
+        desired_fingerprint = article_fingerprint(command)
+        current_fingerprint = article_fingerprint(current or {})
+        if sync_mode == "skip" and current:
+            skipped += 1
+            continue
+        if sync_mode == "update" and current and desired_fingerprint == current_fingerprint:
+            skipped += 1
+            continue
+        if sync_mode == "reset" and current:
+            planned.append({"action": "delete", "article_id": command["article_id"]})
+            reset_deleted += 1
+        planned.append({"action": "upsert", "command": command})
+    return {
+        "planned": planned,
+        "skipped": skipped,
+        "reset_deleted": reset_deleted,
+        "count": sum(1 for item in planned if item["action"] == "upsert"),
+    }
 
 
 def collect_asset_urls_from_html(html: str) -> list[str]:
@@ -284,7 +334,12 @@ def filesystem_preview_items(payload: dict, slugify_fn, content_import_root: Pat
             "markdown_body": rewritten_body,
             "status": str(metadata.get("status") or status),
             "source_path": relative_path,
+            "seo_title": str(metadata.get("seo_title") or ""),
+            "seo_description": str(metadata.get("seo_description") or ""),
+            "canonical_url": str(metadata.get("canonical_url") or ""),
+            "og_image_url": str(metadata.get("og_image_url") or ""),
         }
+        preview_item["fingerprint"] = article_fingerprint(preview_item)
         if keyword_filter:
             haystack = " ".join(
                 [

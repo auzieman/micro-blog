@@ -3,7 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Linux Tricks | Micro Blog</title>
+  <title>{{ meta_title }}</title>
+  <meta name="description" content="{{ meta_description }}" />
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{{ meta_title }}" />
+  <meta property="og:description" content="{{ meta_description }}" />
+  <meta property="og:url" content="{{ canonical_url }}" />
+  {% if meta_og_image %}<meta property="og:image" content="{{ meta_og_image }}" />{% endif %}
+  <meta name="twitter:card" content="{{ meta_twitter_card }}" />
+  <meta name="twitter:title" content="{{ meta_title }}" />
+  <meta name="twitter:description" content="{{ meta_description }}" />
+  {% if meta_og_image %}<meta name="twitter:image" content="{{ meta_og_image }}" />{% endif %}
+  {% if preview_mode %}<meta name="robots" content="noindex,nofollow" />{% endif %}
+  {% if json_ld %}<script type="application/ld+json">{{ json_ld|safe }}</script>{% endif %}
   <style>
     :root {
       color-scheme: light;
@@ -357,6 +370,18 @@
       color: #e4f0f5;
       border-radius: 14px;
     }
+    .article-body .codehilite {
+      margin: 1rem 0;
+      border-radius: 14px;
+      overflow: auto;
+      background: #11212c;
+      border: 1px solid rgba(106, 176, 216, 0.18);
+    }
+    .article-body .codehilite pre {
+      margin: 0;
+      background: transparent;
+      border-radius: 0;
+    }
     body.theme-midnight .sidebar,
     body.theme-midnight .article-panel,
     body.theme-midnight .masthead,
@@ -477,12 +502,15 @@
     <section class="masthead">
       <div class="masthead-top">
         <div>
-          <div class="site-mark">AuzieTek Linux Notes</div>
+          <div class="site-mark">{{ site_name }}</div>
           <h1>Linux tricks, break-fix notes, and practical systems articles.</h1>
-          <p class="tagline">A deliberately simple single-topic micro blog. Public reading stays clean and centered. Authoring stays off to the side under a separate route, so the site reads like a real publication instead of an admin console.</p>
+          <p class="tagline">{{ site_description }}</p>
         </div>
         <div class="mast-actions">
           <a class="button-link" href="/blog">Latest Posts</a>
+          {% if is_admin_authenticated %}
+          <a class="button-link primary" href="/admin">Author Console</a>
+          {% endif %}
         </div>
       </div>
     </section>
@@ -501,6 +529,7 @@
                   {% endfor %}
                 </select>
                 {% if tag %}<input type="hidden" name="tag" value="{{ tag }}" />{% endif %}
+                {% if active_theme %}<input type="hidden" name="theme" value="{{ active_theme }}" />{% endif %}
                 <button type="submit">Refresh</button>
               </form>
             </div>
@@ -512,7 +541,7 @@
 
           <div class="post-list">
             {% for post in posts %}
-            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/blog?slug={{ post.slug }}&page={{ page }}&page_size={{ page_size }}">
+            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/post/{{ post.slug }}?page={{ page }}&page_size={{ page_size }}{% if active_theme %}&theme={{ active_theme }}{% endif %}">
               <h3>{{ post.title }}</h3>
               {% if post.published_at or post.updated_at %}
               <p>{{ (post.published_at or post.updated_at)[:10] }}</p>

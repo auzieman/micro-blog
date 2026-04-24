@@ -30,17 +30,48 @@ def apply_projection_fault(fault_mode: str | None) -> None:
         raise RuntimeError("Injected cache failure.")
 
 
+def ensure_write_model_extensions() -> None:
+    with psycopg.connect(DATABASE_URL, autocommit=True) as conn:
+        with conn.cursor() as cur:
+            cur.execute("select to_regclass('public.articles')")
+            if cur.fetchone()[0] is None:
+                return
+            cur.execute("alter table articles add column if not exists seo_title text")
+            cur.execute("alter table articles add column if not exists seo_description text")
+            cur.execute("alter table articles add column if not exists canonical_url text")
+            cur.execute("alter table articles add column if not exists og_image_url text")
+            cur.execute("alter table articles add column if not exists deleted_at timestamptz")
+            cur.execute(
+                """
+                create table if not exists article_slug_aliases (
+                  alias_slug text primary key,
+                  article_id text not null references articles(article_id) on delete cascade,
+                  created_at timestamptz not null default now()
+                )
+                """
+            )
+
+
 def backfill_published_articles() -> int:
     with psycopg.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                select article_id, slug, title, summary, body_format, html_body, markdown_body,
-                       hero_image_url, theme_variant, tags, revision, author_email, source_url,
-                       updated_at, published_at, status
-                from articles
-                where status = 'published'
-                order by updated_at desc
+                select a.article_id, a.slug, a.title, a.summary, a.body_format, a.html_body, a.markdown_body,
+                       a.hero_image_url, a.theme_variant, a.tags, a.revision, a.author_email, a.source_url,
+                       a.updated_at, a.published_at, a.status, a.seo_title, a.seo_description,
+                       a.canonical_url, a.og_image_url, a.deleted_at,
+                       coalesce(
+                         (
+                           select jsonb_agg(alias_slug order by created_at asc, alias_slug asc)
+                           from article_slug_aliases
+                           where article_id = a.article_id
+                         ),
+                         '[]'::jsonb
+                       ) as slug_aliases
+                from articles a
+                where a.status = 'published' and a.deleted_at is null
+                order by a.updated_at desc
                 """
             )
             rows = cur.fetchall()
@@ -64,6 +95,12 @@ def backfill_published_articles() -> int:
             "updated_at": article[13].isoformat() if article[13] else None,
             "published_at": article[14].isoformat() if article[14] else None,
             "status": article[15],
+            "seo_title": article[16],
+            "seo_description": article[17],
+            "canonical_url": article[18],
+            "og_image_url": article[19],
+            "deleted_at": article[20].isoformat() if article[20] else None,
+            "slug_aliases": article[21] or [],
             "fault_mode": None,
         }
         store.upsert(payload)
@@ -82,8 +119,10 @@ def handle_event(ch, method, properties, body):
         try:
             apply_projection_fault(fault_mode)
             cache_started = time.perf_counter()
-            if payload.get("status") == "published":
+            if payload.get("status") == "published" and not payload.get("deleted_at"):
                 store.upsert(payload)
+            else:
+                store.remove(article_id)
             telemetry.cache("redis", "upsert", "success", (time.perf_counter() - cache_started) * 1000.0)
             ch.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as exc:
@@ -96,6 +135,7 @@ def handle_event(ch, method, properties, body):
 
 
 def main() -> None:
+    ensure_write_model_extensions()
     backfilled = backfill_published_articles()
     logger.info(
         "Projection backfilled published articles",
