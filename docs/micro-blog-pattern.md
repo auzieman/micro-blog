@@ -294,6 +294,26 @@ www.auzietek.com
 DNS updates should be applied through the provider API when possible and
 validated as part of the deployment receipt.
 
+## Lab registry mode
+
+The lab registry may run as an HTTP/insecure registry. That is acceptable for
+private lab work as long as the Docker daemons that build or pull images are
+configured intentionally.
+
+For the current lab pattern:
+
+```text
+swarm1.lab.auzietek.com:5001
+  private lab registry
+  HTTP/insecure mode is acceptable
+  production/public deployments should use TLS
+```
+
+Do not burn time trying to force HTTPS semantics onto the lab registry during
+content or UI work. If a push fails because Docker is assuming HTTPS, fix the
+daemon/registry trust path or use the documented lab registry route, then keep
+moving.
+
 ## Deployment receipt
 
 A deployment is not considered complete until these checks pass:

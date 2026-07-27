@@ -399,6 +399,37 @@
       font-size: 0.88rem;
       line-height: 1.45;
     }
+    .lane-hero-panel {
+      margin-top: 1rem;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: var(--glass-strong);
+      box-shadow: var(--shadow);
+    }
+    .lane-hero-panel img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 3 / 1;
+      object-fit: cover;
+    }
+    .lane-hero-caption {
+      position: absolute;
+      left: 1rem;
+      bottom: 1rem;
+      max-width: min(34rem, calc(100% - 2rem));
+      padding: 0.7rem 0.85rem;
+      border-radius: 16px;
+      color: #fff8ed;
+      background: linear-gradient(135deg, rgba(20, 12, 8, 0.76), rgba(52, 30, 15, 0.62));
+      border: 1px solid rgba(255, 231, 199, 0.18);
+      box-shadow: 0 16px 38px rgba(25, 12, 5, 0.24);
+      backdrop-filter: blur(10px);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
     .lane-landing {
       margin-top: 1rem;
       display: grid;
@@ -868,6 +899,12 @@
         </a>
         {% endfor %}
       </div>
+      {% if lane_hero_image_url %}
+      <figure class="lane-hero-panel">
+        <img src="{{ lane_hero_image_url }}" alt="{{ active_lane_label }} atmosphere artwork" loading="lazy" />
+        <figcaption class="lane-hero-caption">{{ site_description }}</figcaption>
+      </figure>
+      {% endif %}
       {% if lane_landing %}
       <section class="lane-landing" aria-label="{{ active_lane_label }} overview">
         <article class="lane-story">
