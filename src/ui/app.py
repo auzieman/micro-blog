@@ -99,24 +99,28 @@ DEFAULT_MICROSITES = [
         "label": "Auzietek",
         "role": "Business front door",
         "summary": "Services, product direction, client-fit proof, and polished public articles.",
+        "href": "/blog?lane=auzietek",
     },
     {
         "name": "blackknight.auzietek.com",
         "label": "BlackKnight",
         "role": "Product and platform journal",
         "summary": "BKC demos, hardware automation, pipeline evidence, and operator-facing patterns.",
+        "href": "/blog?lane=blackknight",
     },
     {
         "name": "linux-users.auzietek.com",
         "label": "Linux Users",
         "role": "Teaching lane",
         "summary": "Clear walkthroughs for newer engineers without losing the evidence trail.",
+        "href": "/blog?lane=linux",
     },
     {
         "name": "retro-users.auzietek.com",
         "label": "Retro Users",
         "role": "Retro computing lane",
         "summary": "Amiga, classic systems, preservation notes, and modern tooling around old iron.",
+        "href": "/blog?lane=retro",
     },
 ]
 
@@ -133,6 +137,26 @@ LANE_CONFIG = {
         "description": "Practical infrastructure automation, managed operations, and field-tested systems guidance.",
         "positioning": "Services, product direction, and polished public articles.",
         "audience": "engineering leaders, founders, and right-fit clients",
+        "landing": {
+            "eyebrow": "Friends and field resources",
+            "title": "Practical technology work is stronger with good neighbors.",
+            "body": (
+                "Auzietek keeps the public front door focused on useful infrastructure work, "
+                "client-fit proof, and the people or companies that make real systems easier "
+                "to build, repair, and explain."
+            ),
+            "bullets": [
+                "BlackKnightController is the lab-proven automation story.",
+                "Linux Users and Retro Users split teaching content into cleaner lanes.",
+                "Trusted field resources belong here when they help engineers and clients move faster.",
+            ],
+            "links": [
+                {"label": "BlackKnightController", "href": "/blog?lane=blackknight"},
+                {"label": "Garland Computers", "href": "https://www.garlandcomputers.com/"},
+                {"label": "Linux Users", "href": "/blog?lane=linux"},
+                {"label": "Retro Users", "href": "/blog?lane=retro"},
+            ],
+        },
     },
     "blackknight": {
         "label": "BlackKnight",
@@ -174,7 +198,7 @@ LANE_CONFIG = {
                 {
                     "title": "Segments 10-40: OpenStack, Proxmox, and move-in day",
                     "summary": "From destructive lab rebuilds to running services and validation.",
-                    "href": "https://www.youtube.com/@auzietek",
+                    "href": "https://youtu.be/BnD7X-uhDuI",
                 },
                 {
                     "title": "Segment 50: ESXi as a controlled lab target",

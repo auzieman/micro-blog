@@ -1,0 +1,89 @@
+---
+title: Prompt to Pipeline: The BlackKnightController Operating Contract
+slug: blackknightcontroller-prompt-to-pipeline
+summary: BlackKnightController is strongest when discovery work is converted back into executable pipeline actions, guards, parameters, and validation evidence.
+tags: [blackknightcontroller, lab, pipelines, ipmi, pxe, docker-swarm]
+theme_variant: midnight
+status: published
+seo_title: BlackKnightController prompt to pipeline operating model
+seo_description: Learn the BlackKnightController operating contract: use AI and diagnostics to discover the fix, then capture the result as executable pipeline logic with validation evidence.
+---
+
+The most important BlackKnightController rule is simple:
+
+```text
+prompt -> Codex -> BKC pipeline
+```
+
+The prompt starts the work. Codex helps investigate, reason, template, and
+repair. But the finished result must land back in the BlackKnightController
+pipeline.
+
+If a command only lived in an SSH session, it was diagnostic evidence. It was
+not the finished automation.
+
+## Why this rule exists
+
+Infrastructure work has a trap: a human and an assistant can fix a system once
+and still fail to improve the environment.
+
+That happens when the useful discovery disappears into shell history:
+
+- the PXE exception that had to be MAC-scoped;
+- the BIOS setting that changed the boot path;
+- the installer argument that made Debian behave;
+- the post-install validation that proved Horizon or Proxmox was actually
+  usable;
+- the edge proxy rule that made the service reachable from the operator side.
+
+BlackKnightController treats those discoveries as pipeline material.
+
+The pipeline should capture:
+
+- the action;
+- the target;
+- the guardrail;
+- the known-good fragment;
+- the validation check;
+- the evidence link or receipt.
+
+That is how a messy lab session becomes a better next run.
+
+## What the recent runs proved
+
+The lab sequence exercised the full control path:
+
+- iDRAC/IPMI power control;
+- exact-MAC PXE boot lanes;
+- Debian Trixie bare-metal provisioning;
+- OpenStack and Proxmox rebuilds;
+- ESXi installer handoff and post-install control;
+- Docker Swarm seeding on OpenStack and ESXi guests;
+- edge URLs, Grafana, Portainer, and resource graph visibility.
+
+The important part is not that every step was perfect the first time. The
+important part is that the failures produced better fragments.
+
+Once a Debian PXE lane was known good, it needed to be protected. Once the ESXi
+VM clone pattern worked, it became a reusable workload seed. Once a broad PXE
+listener was risky, PXE became deny-by-default with exact target exceptions.
+
+## The product direction
+
+BlackKnightController is not trying to replace every infrastructure tool. It is
+trying to connect the useful control surfaces that already exist:
+
+- power control;
+- boot intent;
+- installer payloads;
+- SSH and API actions;
+- generated scripts and templates;
+- network and DNS updates;
+- validation and evidence capture.
+
+That combination lets a small team treat physical infrastructure more like a
+repeatable deployment target.
+
+The magic is not that an AI assistant can type commands quickly. The magic is
+that the useful commands become part of an operational memory the next run can
+trust.

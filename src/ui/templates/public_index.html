@@ -156,14 +156,14 @@
     }
     a { color: var(--accent); text-decoration: none; }
     .frame {
-      width: min(100%, 1120px);
+      width: min(100%, 1180px);
       margin: 0 auto;
       padding: 1.25rem 1rem 2rem;
     }
     body.theme-auzietek .frame {
-      width: min(100%, 1280px);
+      width: min(100%, 1380px);
       display: grid;
-      grid-template-columns: 230px minmax(0, 1fr);
+      grid-template-columns: 220px minmax(0, 1fr);
       gap: 1.25rem;
       align-items: start;
       padding: 1.25rem;
@@ -365,10 +365,18 @@
       margin-top: 1rem;
     }
     .audience-card {
+      display: block;
       padding: 0.9rem;
       border-radius: 18px;
       border: 1px solid rgba(15, 55, 75, 0.12);
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(238, 246, 247, 0.78));
+      color: inherit;
+      transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+    .audience-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(20, 132, 160, 0.28);
+      box-shadow: 0 16px 34px rgba(17, 55, 70, 0.12);
     }
     .audience-card span {
       display: block;
@@ -482,7 +490,7 @@
       align-items: start;
     }
     body.theme-auzietek .content-grid {
-      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+      grid-template-columns: minmax(240px, 285px) minmax(0, 1fr);
       gap: 1.1rem;
     }
     .sidebar,
@@ -853,11 +861,11 @@
       </div>
       <div class="audience-strip" aria-label="Auzietek publishing lanes">
         {% for microsite in microsites %}
-        <article class="audience-card">
+        <a class="audience-card" href="{{ microsite.href if microsite.href else '#' }}">
           <span>{{ microsite.role }}</span>
           <strong>{{ microsite.label }}</strong>
           <p>{{ microsite.summary }}</p>
-        </article>
+        </a>
         {% endfor %}
       </div>
       {% if lane_landing %}
