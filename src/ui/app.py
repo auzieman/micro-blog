@@ -55,8 +55,8 @@ SITE_URL = os.getenv("SITE_URL", "http://localhost:8081").rstrip("/")
 SITE_NAME = os.getenv("SITE_NAME", "Micro Blog")
 SITE_DESCRIPTION = os.getenv("SITE_DESCRIPTION", "Single-admin micro blog with imports and observability.")
 DEFAULT_OG_IMAGE = os.getenv("DEFAULT_OG_IMAGE", "")
-THEME_VARIANTS = ["aurora", "paper", "midnight"]
-DEFAULT_THEME_VARIANT = os.getenv("DEFAULT_THEME_VARIANT", "midnight")
+THEME_VARIANTS = ["auzietek", "aurora", "paper", "midnight"]
+DEFAULT_THEME_VARIANT = os.getenv("DEFAULT_THEME_VARIANT", "auzietek")
 DRUPAL_SOURCE_TYPES = {
     "blog_post": "jsonapi/node/blog_post",
     "article": "jsonapi/node/article",

@@ -18,7 +18,7 @@ The project is intentionally narrow:
 - import-friendly article pipeline for Drupal, WordPress, or other sources
 - light presentation choices instead of a heavy theme engine
 
-The default public theme is `midnight`.
+The default public theme is `auzietek`: a cleaner corporate layout with left navigation, breadcrumbs, and Auzietek branding. `midnight` remains available for lab/dogfood demos.
 
 ## Release snapshot
 
@@ -54,6 +54,17 @@ Known next work:
 - tighter crawler body selection for noisy legacy pages
 - optional revision diff rendering instead of the current revision snapshot list
 - browser smoke coverage against the live Compose stack
+
+
+## Environment lanes
+
+Micro-blog is intended to move through three named lanes:
+
+- alpha: `microblog.lab.auzietek.com` / lab dogfood, rebuildable and experimental
+- beta: `beta.auzietek.com` / public preview and Auzietek content consolidation
+- production: `auzietek.com` / final cutover after DNS, SSL, redirects, backups, and rollback are proven
+
+Keep `ADMIN_ACCESS_CODE` available as a deployment-local admin bootstrap feature. Production can prefer Google OAuth, but the local-code route is still useful for isolated lab deployments, first-boot repair, and controlled single-admin migrations. Set a real non-default code anywhere the UI is reachable beyond the laptop/lab.
 
 ## Services
 
@@ -142,7 +153,7 @@ Article payloads support a small publishing-oriented model:
 - `body_format` (`markdown` or `html`)
 - `markdown_body`
 - `hero_image_url`
-- `theme_variant` (`aurora`, `paper`, `midnight`)
+- `theme_variant` (`auzietek`, `aurora`, `paper`, `midnight`)
 - `tags`
 - `status`
 - `seo_title`
