@@ -167,6 +167,12 @@ related repo/video
 Do not bulk-publish migrated content. The migration pipeline should make review
 easy; editorial promotion should stay deliberate.
 
+For legacy source crawls, TLS verification can be relaxed when the source site
+has an expired or mismatched certificate and the crawl is only reading public
+content. This is equivalent to using `curl -k` for migration capture. Record it
+as a source-crawl exception; do not carry that exception into public serving,
+admin sessions, or production promotion.
+
 Current lab mirror state:
 
 ```text

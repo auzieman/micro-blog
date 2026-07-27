@@ -52,6 +52,25 @@ ART-3942BEBDF7FC
   muirc-amigaos41-irc-client-codex
 ```
 
+## Article body polish started
+
+```text
+ART-3942BEBDF7FC
+  Source example reviewed:
+    https://auzietek.com/index.php/node/43
+  Preserved:
+    YouTube iframe
+    localized screenshot
+    source repository link
+  Updated:
+    exact legacy source URL
+    opening paragraphs
+    media intro sentence
+    summary / SEO description
+  Status:
+    still draft
+```
+
 ## Next editorial pass
 
 Before publishing these drafts:
