@@ -315,6 +315,87 @@ DEFAULT_HOST_LANE_MAP = {
     "retro-users.auzietek.com": "retro",
 }
 
+AUZIETEK_PAGES = {
+    "welcome": {
+        "path": "/",
+        "label": "Welcome",
+        "tag": "services",
+        "eyebrow": "Auzietek",
+        "title": "A practical technology studio for cleaner operations.",
+        "body": "Auzietek helps teams turn infrastructure, automation, and AI-assisted operations into systems that are easier to understand, rebuild, observe, and improve.",
+        "points": [
+            "Use lab evidence instead of slideware promises.",
+            "Make infrastructure behavior visible and repeatable.",
+            "Teach the pattern so teams become stronger after the engagement.",
+        ],
+    },
+    "thinktank": {
+        "path": "/thinktank",
+        "label": "ThinkTank",
+        "tag": "think-tank",
+        "eyebrow": "ThinkTank",
+        "title": "Ideas that connect systems, people, and better futures.",
+        "body": "The ThinkTank is where Auzietek keeps larger product and social-technology ideas: RACS, human-centered computing, BlackKnightController, AI operations, and the long arc of making complex technology feel more natural.",
+        "points": [
+            "RACS explores sustainable, autonomous infrastructure patterns for communities, education, and medical support.",
+            "Human-centered computing asks how interfaces, automation, and AI can reduce friction instead of increasing it.",
+            "BlackKnightController turns some of those ideas into working infrastructure automation.",
+        ],
+    },
+    "articles": {
+        "path": "/articles",
+        "label": "Articles",
+        "tag": None,
+        "eyebrow": "Articles",
+        "title": "Field notes rewritten into reusable engineering guidance.",
+        "body": "Articles are the polished side of the lab notebook: practical walkthroughs, migration notes, troubleshooting patterns, and product thinking that can help young engineers and right-fit clients see the shape of the work.",
+        "points": [
+            "Linux and platform articles move into the Linux Users lane.",
+            "BlackKnightController updates stay linked to working demos and pipeline evidence.",
+            "Retro computing articles preserve older lessons that still matter in modern systems.",
+        ],
+    },
+    "services": {
+        "path": "/services",
+        "label": "Services",
+        "tag": "services",
+        "eyebrow": "Services",
+        "title": "Practical infrastructure help with the evidence left attached.",
+        "body": "Auzietek is a fit for teams that need cleaner operations, repeatable deployments, service migration, observability, and automation that an engineer can still reason about at 2 AM.",
+        "points": [
+            "Infrastructure automation and lab-to-production pipeline design.",
+            "Small-office and homelab patterns that can grow into professional operations.",
+            "Documentation, training, and remediation plans that preserve context.",
+        ],
+    },
+    "aiops": {
+        "path": "/aiops",
+        "label": "AIOps",
+        "tag": "aiops",
+        "eyebrow": "Human + AI operations",
+        "title": "AI should compress research time, not hide responsibility.",
+        "body": "Auzietek's AIOps direction is grounded in human-led systems work: stable tool contracts, evidence retrieval, graph context, operational memory, and clear permissions before action.",
+        "points": [
+            "Humans steer intent; AI helps gather context, draft steps, and validate outcomes.",
+            "Operational memory keeps known-good fragments near the pipelines that use them.",
+            "The system should make work faster while making decisions easier to audit.",
+        ],
+    },
+    "friends": {
+        "path": "/friends",
+        "label": "Friends",
+        "tag": "partners",
+        "eyebrow": "Friends and partners",
+        "title": "Good infrastructure work is stronger with good neighbors.",
+        "body": "Auzietek keeps room for trusted field resources, community projects, and practical partners that make real systems easier to buy, repair, explain, and operate.",
+        "points": [
+            "Garland Computers and other practical resources belong beside the lab story.",
+            "Useful projects and examples should link out cleanly instead of becoming link confetti.",
+            "The public site should help people find the right lane quickly.",
+        ],
+    },
+}
+
 LAB_HOST_BY_LANE = {
     "auzietek": "auzietek.lab.auzietek.com",
     "blackknight": "blackknight.lab.auzietek.com",
@@ -438,7 +519,12 @@ def redirect_for_lane_mismatch(selected: dict | None, active_lane: str | None, h
     return redirect(f"{url_for('public_post', slug=selected['slug'])}?{urlencode(query)}#article-start", code=302)
 
 
-def lane_nav_links(active_lane: str | None, active_theme: str | None) -> list[dict]:
+def lane_nav_links(active_lane: str | None, active_theme: str | None, active_page: str | None = None) -> list[dict]:
+    if active_lane == "auzietek":
+        return [
+            {"label": page["label"], "href": page["path"], "active": key == active_page}
+            for key, page in AUZIETEK_PAGES.items()
+        ] + [{"label": "RSS", "href": "/rss.xml", "active": False}]
     links = []
     for key, lane in LANE_CONFIG.items():
         href = f"/blog?{urlencode({'lane': key})}"
@@ -608,7 +694,7 @@ def fetch_admin_revisions(article_id: str):
     return response.json()["items"]
 
 
-def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None):
+def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None):
     resolved_site_url = (site_url or SITE_URL).rstrip("/")
     site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
     site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
@@ -648,10 +734,11 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "site_positioning": site_positioning,
         "site_audience": site_audience,
         "site_headline": site_headline,
-        "site_nav_links": lane_nav_links(lane_key, resolved_theme) if lane else _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
+        "site_nav_links": lane_nav_links(lane_key, resolved_theme, active_page) if lane else _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
         "microsites": _load_json_list(MICROSITES_JSON, DEFAULT_MICROSITES),
         "lane_landing": lane.get("landing") if lane else None,
         "lane_hero_image_url": lane.get("hero_image_url") if lane else "",
+        "static_page": static_page,
         "meta_title": metadata["title"],
         "meta_description": metadata["description"],
         "canonical_url": metadata["canonical_url"],
@@ -717,7 +804,44 @@ def public_index():
             message = str(exc)
         finally:
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected)))
+    static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and request.path == "/" else None
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None))
+
+
+@app.get("/thinktank")
+@app.get("/articles")
+@app.get("/services")
+@app.get("/aiops")
+@app.get("/friends")
+def auzietek_page():
+    started = time.perf_counter()
+    result = "success"
+    page_key = request.path.strip("/") or "welcome"
+    static_page = AUZIETEK_PAGES.get(page_key)
+    if not static_page:
+        abort(404)
+    lane_key, lane = resolve_lane("auzietek")
+    page = int(request.args.get("page", "1"))
+    page_size = int(request.args.get("page_size", "10"))
+    tag = request.args.get("tag")
+    if not tag and static_page.get("tag") is not None:
+        tag = static_page.get("tag")
+    theme = request.args.get("theme") or lane.get("theme")
+    message = request.args.get("message")
+    with event_scope(logger, "ui.auzietek_page", page=page, page_size=page_size, tag=tag, theme=theme, page_key=page_key) as log:
+        try:
+            payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag)
+        except Exception as exc:
+            result = "error"
+            log.exception("UI Auzietek page failed")
+            telemetry.error("blog-ui", type(exc).__name__)
+            payload = {"items": [], "total": 0, "page": page, "page_size": page_size}
+            posts = []
+            selected = None
+            message = str(exc)
+        finally:
+            telemetry.api(request.path, "GET", result, (time.perf_counter() - started) * 1000.0)
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key))
 
 
 @app.get("/post/<slug>")

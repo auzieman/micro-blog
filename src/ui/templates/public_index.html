@@ -533,6 +533,50 @@
       margin: 0 0 0.55rem;
       font-size: 0.88rem;
     }
+    .static-page-panel {
+      margin-top: 1rem;
+      border-radius: 24px;
+      border: 1px solid rgba(112, 240, 255, 0.22);
+      background:
+        radial-gradient(circle at top left, rgba(112, 240, 255, 0.16), transparent 38%),
+        linear-gradient(180deg, rgba(8, 16, 24, 0.78), rgba(10, 20, 30, 0.94));
+      color: #eaf8ff;
+      padding: 1.15rem;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035), 0 24px 70px rgba(0, 0, 0, 0.2);
+    }
+    .static-page-panel .eyebrow {
+      color: var(--accent-hot);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .static-page-panel h2 {
+      color: #ffffff;
+      font-size: clamp(1.65rem, 3vw, 2.55rem);
+      letter-spacing: -0.045em;
+      margin: 0.35rem 0 0.55rem;
+    }
+    .static-page-panel p {
+      max-width: 76ch;
+      color: rgba(234, 248, 255, 0.78);
+      line-height: 1.6;
+    }
+    .static-point-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+    .static-point-card {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.85rem;
+      color: rgba(234, 248, 255, 0.82);
+      font-weight: 750;
+      line-height: 1.45;
+    }
     .content-shell {
       padding: 1rem;
     }
@@ -929,6 +973,7 @@
       .audience-strip { grid-template-columns: 1fr; }
       .lane-landing { grid-template-columns: 1fr; }
       .lane-proof-grid { grid-template-columns: 1fr; }
+      .static-point-grid { grid-template-columns: 1fr; }
       .content-grid { grid-template-columns: 1fr; }
       .sidebar {
         position: static;
@@ -991,7 +1036,21 @@
         <figcaption class="lane-hero-caption">{{ site_description }}</figcaption>
       </figure>
       {% endif %}
-      {% if lane_landing %}
+      {% if static_page %}
+      <section class="static-page-panel" aria-label="{{ static_page.label }} page">
+        <div class="eyebrow">{{ static_page.eyebrow }}</div>
+        <h2>{{ static_page.title }}</h2>
+        <p>{{ static_page.body }}</p>
+        {% if static_page.points %}
+        <div class="static-point-grid">
+          {% for point in static_page.points %}
+          <div class="static-point-card">{{ point }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </section>
+      {% endif %}
+      {% if lane_landing and not static_page %}
       <section class="lane-landing" aria-label="{{ active_lane_label }} overview">
         <article class="lane-story">
           <div class="eyebrow">{{ lane_landing.eyebrow }}</div>

@@ -183,6 +183,26 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn("<title>Auzietek | Infrastructure automation and practical systems support</title>", body)
         self.assertIn("Practical infrastructure automation", body)
 
+    def test_auzietek_thinktank_page_renders_static_page_and_related_tag(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/thinktank", headers={"Host": "auzietek.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "think-tank")
+        body = response.get_data(as_text=True)
+        self.assertIn("Ideas that connect systems, people, and better futures.", body)
+        self.assertIn('href="/thinktank" class="active"', body)
+        self.assertIn("RACS explores sustainable", body)
+
+    def test_auzietek_articles_page_can_show_all_recent_articles(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/articles", headers={"Host": "auzietek.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(mocked_fetch.call_args[0][3])
+        body = response.get_data(as_text=True)
+        self.assertIn("Field notes rewritten into reusable engineering guidance.", body)
+
     def test_blackknight_lab_host_selects_blackknight_lane(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
         with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
