@@ -134,28 +134,50 @@ LANE_CONFIG = {
         "theme": "auzietek",
         "tag": "services",
         "featured_slug": "infrastructure-automation-that-stays-repeatable",
-        "headline": "Infrastructure automation with the lab evidence still attached.",
-        "description": "Practical infrastructure automation, managed operations, and field-tested systems guidance.",
-        "positioning": "Services, product direction, and polished public articles.",
+        "headline": "Technology should feel natural, predictable, and clean.",
+        "description": "Auzietek turns real infrastructure work into repeatable systems, AI-assisted operations, and clear engineering guidance.",
+        "positioning": "A practical technology studio for automation, AIOps, and human-centered systems work.",
         "audience": "engineering leaders, founders, and right-fit clients",
         "landing": {
-            "eyebrow": "Friends and field resources",
-            "title": "Practical technology work is stronger with good neighbors.",
+            "eyebrow": "Auzietek ThinkTank",
+            "title": "Infrastructure, AI, and people working in the same direction.",
             "body": (
-                "Auzietek keeps the public front door focused on useful infrastructure work, "
-                "client-fit proof, and the people or companies that make real systems easier "
-                "to build, repair, and explain."
+                "Auzietek builds from the belief that good technology should reduce friction, "
+                "not add ceremony. The lab turns messy infrastructure work into repeatable "
+                "pipelines, observable systems, and teaching material that helps engineers "
+                "move with confidence."
             ),
             "bullets": [
-                "BlackKnightController is the lab-proven automation story.",
-                "Linux Users and Retro Users split teaching content into cleaner lanes.",
-                "Trusted field resources belong here when they help engineers and clients move faster.",
+                "BlackKnightController proves hardware-as-code patterns in a real lab.",
+                "AIOps work focuses on humans and models cooperating through evidence, not guesswork.",
+                "Tutorials turn field traces into practical guidance for newer engineers and clients.",
+                "The ThinkTank keeps product ideas, service patterns, and public lessons connected.",
             ],
             "links": [
                 {"label": "BlackKnightController", "href": "/blog?lane=blackknight"},
+                {"label": "ThinkTank notes", "href": "/blog?tag=thinktank&lane=auzietek"},
+                {"label": "AIOps direction", "href": "/blog?tag=aiops&lane=auzietek"},
                 {"label": "Garland Computers", "href": "https://www.garlandcomputers.com/"},
                 {"label": "Linux Users", "href": "/blog?lane=linux"},
                 {"label": "Retro Users", "href": "/blog?lane=retro"},
+            ],
+            "sections": [
+                {
+                    "title": "Innovation with evidence",
+                    "body": "New ideas are grounded in working demonstrations: PXE boots, IPMI control, OpenStack, Proxmox, ESXi, swarms, monitoring, and the operational notes that explain what actually happened.",
+                },
+                {
+                    "title": "Human + AI operations",
+                    "body": "The goal is not replacing engineers. It is compressing research time, preserving good decisions, and letting people steer more infrastructure with clearer feedback loops.",
+                },
+                {
+                    "title": "Natural systems",
+                    "body": "Technology should be named clearly, rebuilt predictably, observed honestly, and documented close to the work. Clean systems make teams faster because they stop hiding the truth.",
+                },
+                {
+                    "title": "ThinkTank to product",
+                    "body": "Auzietek is the public proving ground for BlackKnightController, lab automation, small-office patterns, and practical teaching lanes that can become services or products.",
+                },
             ],
         },
     },
