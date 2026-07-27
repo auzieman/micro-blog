@@ -675,6 +675,7 @@
     .article-panel {
       padding: 1.4rem 1.5rem 1.8rem;
       min-height: 72vh;
+      scroll-margin-top: 1rem;
     }
     .breadcrumbs {
       display: flex;
@@ -1027,7 +1028,7 @@
 
           <div class="post-list">
             {% for post in posts %}
-            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/post/{{ post.slug }}?page={{ page }}&page_size={{ page_size }}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">
+            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/post/{{ post.slug }}?page={{ page }}&page_size={{ page_size }}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}#article-start">
               <h3>{{ post.title }}</h3>
               {% if post.published_at or post.updated_at %}
               <p>{{ (post.published_at or post.updated_at)[:10] }}</p>
@@ -1050,7 +1051,7 @@
           </div>
         </aside>
 
-        <article class="article-panel">
+        <article class="article-panel" id="article-start">
           {% if selected %}
           <nav class="breadcrumbs" aria-label="Breadcrumb">
             <span>{{ site_brand }}</span>

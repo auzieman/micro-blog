@@ -205,6 +205,35 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn("<title>Linux Users | Infrastructure automation and practical systems support</title>", body)
         self.assertIn('class="theme-linux-pro"', body)
 
+    def test_lane_public_post_filters_post_list_by_lane_tag(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        selected = {
+            "slug": "rx-demo-part-1-cloud-native-observability",
+            "title": "RX-Demo Part 1",
+            "summary": "Summary",
+            "theme_variant": "linux-pro",
+            "tags": ["linux"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [selected], selected, None)) as mocked_fetch:
+            response = self.client.get("/post/rx-demo-part-1-cloud-native-observability", headers={"Host": "linux-users.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "linux")
+
+    def test_lane_public_post_redirects_misplaced_slug_to_article_lane(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        selected = {
+            "slug": "muirc-amigaos41-irc-client-codex",
+            "title": "MuIRC",
+            "summary": "Summary",
+            "theme_variant": "retro",
+            "tags": ["retro"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], selected, None)):
+            response = self.client.get("/post/muirc-amigaos41-irc-client-codex", headers={"Host": "linux-users.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("http://retro-users.lab.auzietek.com/post/muirc-amigaos41-irc-client-codex?lane=retro", response.location)
+        self.assertTrue(response.location.endswith("#article-start"))
+
     def test_sitemap_and_rss_routes_render(self):
         posts = [
             {

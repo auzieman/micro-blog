@@ -293,6 +293,22 @@ DEFAULT_HOST_LANE_MAP = {
     "retro-users.auzietek.com": "retro",
 }
 
+LAB_HOST_BY_LANE = {
+    "auzietek": "auzietek.lab.auzietek.com",
+    "blackknight": "blackknight.lab.auzietek.com",
+    "linux": "linux-users.lab.auzietek.com",
+    "retro": "retro-users.lab.auzietek.com",
+}
+
+PUBLIC_HOST_BY_LANE = {
+    "auzietek": "beta.auzietek.com",
+    "blackknight": "blackknight.auzietek.com",
+    "linux": "linux-users.auzietek.com",
+    "retro": "retro-users.auzietek.com",
+}
+
+THEME_LANE_MAP = {lane["theme"]: key for key, lane in LANE_CONFIG.items()}
+
 
 def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
     normalized = raw_value.strip()
@@ -367,6 +383,37 @@ def effective_site_url(host_lane_selected: bool) -> str:
     if host_lane_selected:
         return request.url_root.rstrip("/")
     return SITE_URL
+
+
+def article_lane_key(article: dict | None) -> str | None:
+    if not article:
+        return None
+    article_tags = {str(tag).strip().lower() for tag in article.get("tags") or []}
+    for key, lane in LANE_CONFIG.items():
+        lane_tag = str(lane.get("tag", "")).strip().lower()
+        if lane_tag and lane_tag in article_tags:
+            return key
+    return THEME_LANE_MAP.get(str(article.get("theme_variant") or "").strip().lower())
+
+
+def lane_host_for_current_zone(lane_key: str) -> str | None:
+    host = request_host()
+    if host.endswith(".lab.auzietek.com"):
+        return LAB_HOST_BY_LANE.get(lane_key)
+    if host.endswith(".auzietek.com"):
+        return PUBLIC_HOST_BY_LANE.get(lane_key)
+    return None
+
+
+def redirect_for_lane_mismatch(selected: dict | None, active_lane: str | None, host_lane_selected: bool):
+    selected_lane = article_lane_key(selected)
+    if not selected_lane or not active_lane or selected_lane == active_lane:
+        return None
+    query = {"lane": selected_lane}
+    host = lane_host_for_current_zone(selected_lane) if host_lane_selected else None
+    if host:
+        return redirect(f"{request.scheme}://{host}{url_for('public_post', slug=selected['slug'])}?{urlencode(query)}#article-start", code=302)
+    return redirect(f"{url_for('public_post', slug=selected['slug'])}?{urlencode(query)}#article-start", code=302)
 
 
 def lane_nav_links(active_lane: str | None, active_theme: str | None) -> list[dict]:
@@ -658,14 +705,20 @@ def public_post(slug: str):
     page = 1
     page_size = 10
     lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
+    tag = request.args.get("tag")
+    if lane and not tag:
+        tag = lane["tag"]
     theme = request.args.get("theme") or (lane.get("theme") if lane else None)
-    with event_scope(logger, "ui.public_post", slug=slug, theme=theme, lane=lane_key) as log:
+    with event_scope(logger, "ui.public_post", slug=slug, tag=tag, theme=theme, lane=lane_key) as log:
         try:
-            payload, posts, selected, redirect_slug = fetch_public_payload(page, page_size, slug, None)
+            payload, posts, selected, redirect_slug = fetch_public_payload(page, page_size, slug, tag)
             if redirect_slug and redirect_slug != slug:
                 return redirect(url_for("public_post", slug=redirect_slug, theme=theme, lane=lane_key), code=301)
             if not selected:
                 abort(404)
+            lane_redirect = redirect_for_lane_mismatch(selected, lane_key, host_lane_selected)
+            if lane_redirect:
+                return lane_redirect
         except Exception as exc:
             result = "error"
             log.exception("UI public post failed")
@@ -673,7 +726,7 @@ def public_post(slug: str):
             raise
         finally:
             telemetry.api("/post/{slug}", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected)))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected)))
 
 
 @app.get("/sitemap.xml")
