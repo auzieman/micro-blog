@@ -134,24 +134,24 @@ LANE_CONFIG = {
         "theme": "auzietek",
         "tag": "services",
         "featured_slug": "infrastructure-automation-that-stays-repeatable",
-        "headline": "Technology should feel natural, predictable, and clean.",
-        "description": "Auzietek turns real infrastructure work into repeatable systems, AI-assisted operations, and clear engineering guidance.",
-        "positioning": "A practical technology studio for automation, AIOps, and human-centered systems work.",
+        "headline": "Cleaner infrastructure, calmer operations, stronger engineers.",
+        "description": "Auzietek helps small teams and practical operators automate infrastructure, improve reliability, and turn messy systems work into repeatable patterns.",
+        "positioning": "Infrastructure automation, AIOps strategy, and practical systems guidance.",
         "audience": "engineering leaders, founders, and right-fit clients",
         "landing": {
-            "eyebrow": "Auzietek ThinkTank",
-            "title": "Infrastructure, AI, and people working in the same direction.",
+            "eyebrow": "What can Auzietek do for you?",
+            "title": "Turn fragile technology work into systems your team can trust.",
             "body": (
-                "Auzietek builds from the belief that good technology should reduce friction, "
-                "not add ceremony. The lab turns messy infrastructure work into repeatable "
-                "pipelines, observable systems, and teaching material that helps engineers "
-                "move with confidence."
+                "Auzietek helps organizations clean up infrastructure, automate repeatable work, "
+                "and make operations easier to explain. The lab work behind the site is not just "
+                "content; it is proof that the patterns are being built, tested, broken, repaired, "
+                "and documented in the open."
             ),
             "bullets": [
-                "BlackKnightController proves hardware-as-code patterns in a real lab.",
-                "AIOps work focuses on humans and models cooperating through evidence, not guesswork.",
-                "Tutorials turn field traces into practical guidance for newer engineers and clients.",
-                "The ThinkTank keeps product ideas, service patterns, and public lessons connected.",
+                "Stabilize Linux, virtualization, container, and network operations.",
+                "Automate deployments from bare metal through running services.",
+                "Use AI as an engineering amplifier with evidence, guardrails, and human judgment.",
+                "Convert tribal knowledge into reusable runbooks, pipelines, and training material.",
             ],
             "links": [
                 {"label": "BlackKnightController", "href": "/blog?lane=blackknight"},
@@ -163,20 +163,20 @@ LANE_CONFIG = {
             ],
             "sections": [
                 {
-                    "title": "Innovation with evidence",
-                    "body": "New ideas are grounded in working demonstrations: PXE boots, IPMI control, OpenStack, Proxmox, ESXi, swarms, monitoring, and the operational notes that explain what actually happened.",
+                    "title": "Infrastructure automation",
+                    "body": "PXE, IPMI, SSH, Docker, OpenStack, Proxmox, ESXi, monitoring, and repeatable deployment patterns for labs, small offices, and practical platform teams.",
                 },
                 {
-                    "title": "Human + AI operations",
-                    "body": "The goal is not replacing engineers. It is compressing research time, preserving good decisions, and letting people steer more infrastructure with clearer feedback loops.",
+                    "title": "AIOps without the fog",
+                    "body": "AI-assisted operations that keep people in control: structured context, clean tool contracts, retrieved evidence, and decisions that can be audited later.",
                 },
                 {
-                    "title": "Natural systems",
-                    "body": "Technology should be named clearly, rebuilt predictably, observed honestly, and documented close to the work. Clean systems make teams faster because they stop hiding the truth.",
+                    "title": "Operator education",
+                    "body": "Articles, demos, and working examples that teach younger engineers how to reason through real systems instead of memorizing disconnected commands.",
                 },
                 {
-                    "title": "ThinkTank to product",
-                    "body": "Auzietek is the public proving ground for BlackKnightController, lab automation, small-office patterns, and practical teaching lanes that can become services or products.",
+                    "title": "Product-minded cleanup",
+                    "body": "Auzietek can help turn recurring support pain into documented processes, internal tools, or product ideas that make future work smaller.",
                 },
             ],
         },
@@ -189,23 +189,23 @@ LANE_CONFIG = {
         "theme": "midnight",
         "tag": "blackknightcontroller",
         "featured_slug": "blackknightcontroller-recovery-weekend-repeatable-lab",
-        "headline": "Hardware as code, from power button to running service.",
-        "description": "BlackKnightController demos, pipeline evidence, IPMI/PXE/SSH automation, and operator-facing patterns.",
-        "positioning": "BKC product notes, lab proof, and repeatable infrastructure pipelines.",
+        "headline": "Rebuild real infrastructure from power button to running service.",
+        "description": "BlackKnightController automates the work engineers normally do by hand: power control, PXE, SSH, templates, APIs, validation, and evidence capture.",
+        "positioning": "A lab-proven infrastructure automation control plane.",
         "audience": "operators, platform engineers, MSPs, and infrastructure-curious clients",
         "landing": {
             "eyebrow": "What is BlackKnightController?",
-            "title": "A practical control plane for real infrastructure work.",
+            "title": "What can BlackKnightController do for you?",
             "body": (
-                "BlackKnightController joins IPMI, PXE, SSH, APIs, templates, pipelines, "
-                "validation, and evidence into one repeatable operating model. It is built "
-                "for the messy middle where real servers, labs, MSP work, and platform "
-                "engineering overlap."
+                "BlackKnightController turns normal IT actions into reusable pipelines. It can wake "
+                "hardware, boot installers, ship scripts and templates, configure services, call APIs, "
+                "validate the result, and keep the evidence close enough that the next run is smarter."
             ),
             "bullets": [
-                "Power on hardware, boot it, install it, configure it, and validate the result.",
-                "Turn ordinary engineer actions into reusable pipeline fragments.",
-                "Keep evidence near the decision so the next run is faster and safer.",
+                "Rebuild cattle-style lab or edge servers without treating them like pets.",
+                "Provision hypervisors, swarms, OpenStack labs, service VMs, and supporting network pieces.",
+                "Capture known-good fragments so hard-won fixes do not disappear into chat history.",
+                "Give operators a web UI and API for repeatable infrastructure actions.",
             ],
             "links": [
                 {"label": "GitHub", "href": "https://github.com/auzietek/BlackKnightController"},
@@ -321,12 +321,12 @@ AUZIETEK_PAGES = {
         "label": "Welcome",
         "tag": "services",
         "eyebrow": "Auzietek",
-        "title": "A practical technology studio for cleaner operations.",
-        "body": "Auzietek helps teams turn infrastructure, automation, and AI-assisted operations into systems that are easier to understand, rebuild, observe, and improve.",
+        "title": "What can Auzietek do for you?",
+        "body": "Auzietek helps you make technology more natural, predictable, and clean: fewer mystery systems, fewer one-off fixes, clearer automation, better observability, and engineering guidance your team can reuse.",
         "points": [
-            "Use lab evidence instead of slideware promises.",
-            "Make infrastructure behavior visible and repeatable.",
-            "Teach the pattern so teams become stronger after the engagement.",
+            "Assess and clean up Linux, virtualization, container, and network environments.",
+            "Build repeatable deployment paths from bare metal to application services.",
+            "Turn incidents and experiments into documentation, training, and better operating habits.",
         ],
     },
     "thinktank": {
@@ -334,8 +334,8 @@ AUZIETEK_PAGES = {
         "label": "ThinkTank",
         "tag": "think-tank",
         "eyebrow": "ThinkTank",
-        "title": "Ideas that connect systems, people, and better futures.",
-        "body": "The ThinkTank is where Auzietek keeps larger product and social-technology ideas: RACS, human-centered computing, BlackKnightController, AI operations, and the long arc of making complex technology feel more natural.",
+        "title": "Ideas with a path toward useful systems.",
+        "body": "The ThinkTank is where Auzietek keeps larger product and social-technology ideas: RACS, human-centered computing, BlackKnightController, AIOps, and the long arc of making complex technology feel more natural and humane.",
         "points": [
             "RACS explores sustainable, autonomous infrastructure patterns for communities, education, and medical support.",
             "Human-centered computing asks how interfaces, automation, and AI can reduce friction instead of increasing it.",
@@ -347,8 +347,8 @@ AUZIETEK_PAGES = {
         "label": "Articles",
         "tag": None,
         "eyebrow": "Articles",
-        "title": "Field notes rewritten into reusable engineering guidance.",
-        "body": "Articles are the polished side of the lab notebook: practical walkthroughs, migration notes, troubleshooting patterns, and product thinking that can help young engineers and right-fit clients see the shape of the work.",
+        "title": "Proof, walkthroughs, and practical teaching material.",
+        "body": "Articles are where Auzietek turns real work into public guidance: practical walkthroughs, migration notes, troubleshooting patterns, and product thinking that help engineers and clients see how the work is actually done.",
         "points": [
             "Linux and platform articles move into the Linux Users lane.",
             "BlackKnightController updates stay linked to working demos and pipeline evidence.",
@@ -360,10 +360,10 @@ AUZIETEK_PAGES = {
         "label": "Services",
         "tag": "services",
         "eyebrow": "Services",
-        "title": "Practical infrastructure help with the evidence left attached.",
-        "body": "Auzietek is a fit for teams that need cleaner operations, repeatable deployments, service migration, observability, and automation that an engineer can still reason about at 2 AM.",
+        "title": "Services for teams that need cleaner systems, not more ceremony.",
+        "body": "Auzietek is a fit for small teams, founders, MSP-style environments, and practical operators who need cleaner operations, repeatable deployments, service migration, observability, and automation an engineer can still reason about at 2 AM.",
         "points": [
-            "Infrastructure automation and lab-to-production pipeline design.",
+            "Infrastructure assessment, cleanup, and lab-to-production pipeline design.",
             "Small-office and homelab patterns that can grow into professional operations.",
             "Documentation, training, and remediation plans that preserve context.",
         ],
@@ -373,8 +373,8 @@ AUZIETEK_PAGES = {
         "label": "AIOps",
         "tag": "aiops",
         "eyebrow": "Human + AI operations",
-        "title": "AI should compress research time, not hide responsibility.",
-        "body": "Auzietek's AIOps direction is grounded in human-led systems work: stable tool contracts, evidence retrieval, graph context, operational memory, and clear permissions before action.",
+        "title": "AI should make engineers faster without making systems opaque.",
+        "body": "Auzietek's AIOps direction is grounded in human-led systems work: stable tool contracts, evidence retrieval, graph context, operational memory, and clear permissions before action. The point is better collaboration, not magic.",
         "points": [
             "Humans steer intent; AI helps gather context, draft steps, and validate outcomes.",
             "Operational memory keeps known-good fragments near the pipelines that use them.",
