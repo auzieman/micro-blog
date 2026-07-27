@@ -120,6 +120,96 @@ DEFAULT_MICROSITES = [
     },
 ]
 
+LANE_CONFIG = {
+    "auzietek": {
+        "label": "Auzietek",
+        "site_name": "Auzietek",
+        "site_brand": "Auzietek",
+        "site_section": "business",
+        "theme": "auzietek",
+        "tag": "services",
+        "featured_slug": "infrastructure-automation-that-stays-repeatable",
+        "headline": "Infrastructure automation with the lab evidence still attached.",
+        "description": "Practical infrastructure automation, managed operations, and field-tested systems guidance.",
+        "positioning": "Services, product direction, and polished public articles.",
+        "audience": "engineering leaders, founders, and right-fit clients",
+    },
+    "blackknight": {
+        "label": "BlackKnight",
+        "site_name": "BlackKnightController",
+        "site_brand": "BlackKnight",
+        "site_section": "product journal",
+        "theme": "midnight",
+        "tag": "blackknightcontroller",
+        "featured_slug": "blackknightcontroller-recovery-weekend-repeatable-lab",
+        "headline": "Hardware as code, from power button to running service.",
+        "description": "BlackKnightController demos, pipeline evidence, IPMI/PXE/SSH automation, and operator-facing patterns.",
+        "positioning": "BKC product notes, lab proof, and repeatable infrastructure pipelines.",
+        "audience": "operators, platform engineers, MSPs, and infrastructure-curious clients",
+        "landing": {
+            "eyebrow": "What is BlackKnightController?",
+            "title": "A practical control plane for real infrastructure work.",
+            "body": (
+                "BlackKnightController joins IPMI, PXE, SSH, APIs, templates, pipelines, "
+                "validation, and evidence into one repeatable operating model. It is built "
+                "for the messy middle where real servers, labs, MSP work, and platform "
+                "engineering overlap."
+            ),
+            "bullets": [
+                "Power on hardware, boot it, install it, configure it, and validate the result.",
+                "Turn ordinary engineer actions into reusable pipeline fragments.",
+                "Keep evidence near the decision so the next run is faster and safer.",
+            ],
+            "links": [
+                {"label": "GitHub", "href": "https://github.com/auzietek/BlackKnightController"},
+                {"label": "Recent BKC posts", "href": "/blog?lane=blackknight"},
+                {"label": "Lab evidence", "href": "/blog?tag=lab&lane=blackknight"},
+            ],
+            "videos": [
+                {
+                    "title": "Segment 01: IPMI and pipeline foundations",
+                    "summary": "Power control, PXE intent, and the first repeatable bare-metal flow.",
+                    "href": "https://www.youtube.com/@auzietek",
+                },
+                {
+                    "title": "Segments 10-40: OpenStack, Proxmox, and move-in day",
+                    "summary": "From destructive lab rebuilds to running services and validation.",
+                    "href": "https://www.youtube.com/@auzietek",
+                },
+                {
+                    "title": "Segment 50: ESXi as a controlled lab target",
+                    "summary": "A pragmatic commercial-hypervisor lane using BKC-style evidence.",
+                    "href": "https://www.youtube.com/@auzietek",
+                },
+            ],
+        },
+    },
+    "linux": {
+        "label": "Linux Users",
+        "site_name": "Linux Users",
+        "site_brand": "Linux Users",
+        "site_section": "teaching lane",
+        "theme": "linux-pro",
+        "tag": "linux",
+        "headline": "Linux operations taught from the evidence outward.",
+        "description": "Clear Linux walkthroughs for newer engineers using Debian, Fedora, containers, networks, and real troubleshooting traces.",
+        "positioning": "Practical Linux education without hand-waving.",
+        "audience": "newer Linux engineers, homelab builders, and practical operations teams",
+    },
+    "retro": {
+        "label": "Retro Users",
+        "site_name": "Retro Users",
+        "site_brand": "Retro Users",
+        "site_section": "retro computing lane",
+        "theme": "retro",
+        "tag": "retro",
+        "headline": "Old machines, new lessons, useful constraints.",
+        "description": "Classic computing, preservation, emulation, and the engineering lessons that still matter in modern labs.",
+        "positioning": "Retro systems as a practical teaching lens.",
+        "audience": "retro-computing fans, preservation-minded builders, and curious engineers",
+    },
+}
+
 
 def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
     normalized = raw_value.strip()
@@ -144,6 +234,25 @@ def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
         if isinstance(item, dict):
             clean_items.append(item)
     return clean_items or fallback
+
+
+def resolve_lane(lane_key: str | None) -> tuple[str | None, dict | None]:
+    if not lane_key:
+        return None, None
+    normalized = lane_key.strip().lower()
+    if normalized in LANE_CONFIG:
+        return normalized, LANE_CONFIG[normalized]
+    return None, None
+
+
+def lane_nav_links(active_lane: str | None, active_theme: str | None) -> list[dict]:
+    links = []
+    for key, lane in LANE_CONFIG.items():
+        href = f"/blog?{urlencode({'lane': key})}"
+        links.append({"label": lane["label"], "href": href, "active": key == active_lane})
+    links.append({"label": "All Posts", "href": f"/blog?{urlencode({'theme': active_theme})}" if active_theme else "/blog", "active": active_lane is None})
+    links.append({"label": "RSS", "href": "/rss.xml", "active": False})
+    return links
 
 
 def api_get(path: str, **params):
@@ -260,7 +369,7 @@ def admin_context(message=None):
     }
 
 
-def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str | None):
+def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str | None, featured_slug: str | None = None):
     payload = {"items": [], "total": 0, "page": page, "page_size": page_size}
     posts = []
     selected = None
@@ -269,13 +378,14 @@ def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str |
     response.raise_for_status()
     payload = response.json()
     posts = payload["items"]
-    if slug:
-        selected_response = api_get(f"/posts/{slug}")
+    selected_slug = slug or featured_slug
+    if selected_slug:
+        selected_response = api_get(f"/posts/{selected_slug}")
         if selected_response.status_code == 404:
             return payload, posts, None, None
         selected_response.raise_for_status()
         selected = selected_response.json()
-        redirect_slug = selected.get("redirect_slug")
+        redirect_slug = selected.get("redirect_slug") if slug else None
     elif posts:
         selected = posts[0]
     return payload, posts, selected, redirect_slug
@@ -305,15 +415,23 @@ def fetch_admin_revisions(article_id: str):
     return response.json()["items"]
 
 
-def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None):
-    metadata = article_public_metadata(selected, SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE or None) if selected else {
-        "title": f"{SITE_NAME} | Infrastructure automation and practical systems support",
-        "description": SITE_DESCRIPTION,
+def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None):
+    site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
+    site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
+    site_brand = lane.get("site_brand", SITE_BRAND) if lane else SITE_BRAND
+    site_section = lane.get("site_section", SITE_SECTION) if lane else SITE_SECTION
+    site_positioning = lane.get("positioning", SITE_POSITIONING) if lane else SITE_POSITIONING
+    site_audience = lane.get("audience", SITE_AUDIENCE) if lane else SITE_AUDIENCE
+    site_headline = lane.get("headline", SITE_HEADLINE) if lane else SITE_HEADLINE
+    resolved_theme = active_theme or (lane.get("theme") if lane else None) or (selected.get("theme_variant") if selected else DEFAULT_THEME_VARIANT)
+    metadata = article_public_metadata(selected, SITE_URL, site_name, DEFAULT_OG_IMAGE or None) if selected else {
+        "title": f"{site_name} | Infrastructure automation and practical systems support",
+        "description": site_description,
         "canonical_url": f"{SITE_URL}/blog",
         "og_image_url": DEFAULT_OG_IMAGE or None,
         "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
     }
-    json_ld = article_json_ld(selected, SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE or None) if selected else ""
+    json_ld = article_json_ld(selected, SITE_URL, site_name, DEFAULT_OG_IMAGE or None) if selected else ""
     total_pages = max(1, (payload["total"] + payload["page_size"] - 1) // payload["page_size"])
     return {
         "posts": posts,
@@ -323,19 +441,22 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "page_size": payload["page_size"],
         "total_pages": total_pages,
         "page_sizes": [10, 20],
-        "active_theme": active_theme or (selected.get("theme_variant") if selected else DEFAULT_THEME_VARIANT),
+        "active_theme": resolved_theme,
         "theme_variants": THEME_VARIANTS,
+        "active_lane": lane_key,
+        "active_lane_label": lane.get("label") if lane else "All Posts",
         "message": message,
         "is_admin_authenticated": is_admin_authenticated(),
-        "site_name": SITE_NAME,
-        "site_description": SITE_DESCRIPTION,
-        "site_brand": SITE_BRAND,
-        "site_section": SITE_SECTION,
-        "site_positioning": SITE_POSITIONING,
-        "site_audience": SITE_AUDIENCE,
-        "site_headline": SITE_HEADLINE,
-        "site_nav_links": _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
+        "site_name": site_name,
+        "site_description": site_description,
+        "site_brand": site_brand,
+        "site_section": site_section,
+        "site_positioning": site_positioning,
+        "site_audience": site_audience,
+        "site_headline": site_headline,
+        "site_nav_links": lane_nav_links(lane_key, resolved_theme) if lane else _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
         "microsites": _load_json_list(MICROSITES_JSON, DEFAULT_MICROSITES),
+        "lane_landing": lane.get("landing") if lane else None,
         "meta_title": metadata["title"],
         "meta_description": metadata["description"],
         "canonical_url": metadata["canonical_url"],
@@ -382,12 +503,15 @@ def public_index():
     result = "success"
     page = int(request.args.get("page", "1"))
     page_size = int(request.args.get("page_size", "10"))
+    lane_key, lane = resolve_lane(request.args.get("lane"))
     tag = request.args.get("tag")
-    theme = request.args.get("theme")
+    if lane and not tag:
+        tag = lane["tag"]
+    theme = request.args.get("theme") or (lane.get("theme") if lane else None)
     message = request.args.get("message")
-    with event_scope(logger, "ui.public_index", page=page, page_size=page_size, tag=tag, theme=theme) as log:
+    with event_scope(logger, "ui.public_index", page=page, page_size=page_size, tag=tag, theme=theme, lane=lane_key) as log:
         try:
-            payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag)
+            payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag, lane.get("featured_slug") if lane else None)
         except Exception as exc:
             result = "error"
             log.exception("UI public index failed")
@@ -398,7 +522,7 @@ def public_index():
             message = str(exc)
         finally:
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane))
 
 
 @app.get("/post/<slug>")
@@ -407,12 +531,13 @@ def public_post(slug: str):
     result = "success"
     page = 1
     page_size = 10
-    theme = request.args.get("theme")
-    with event_scope(logger, "ui.public_post", slug=slug, theme=theme) as log:
+    lane_key, lane = resolve_lane(request.args.get("lane"))
+    theme = request.args.get("theme") or (lane.get("theme") if lane else None)
+    with event_scope(logger, "ui.public_post", slug=slug, theme=theme, lane=lane_key) as log:
         try:
             payload, posts, selected, redirect_slug = fetch_public_payload(page, page_size, slug, None)
             if redirect_slug and redirect_slug != slug:
-                return redirect(url_for("public_post", slug=redirect_slug, theme=theme), code=301)
+                return redirect(url_for("public_post", slug=redirect_slug, theme=theme, lane=lane_key), code=301)
             if not selected:
                 abort(404)
         except Exception as exc:
@@ -422,7 +547,7 @@ def public_post(slug: str):
             raise
         finally:
             telemetry.api("/post/{slug}", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, lane_key=lane_key, lane=lane))
 
 
 @app.get("/sitemap.xml")

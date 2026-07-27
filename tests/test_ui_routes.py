@@ -159,6 +159,30 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn('link rel="canonical" href="https://blog.example/waves"', body)
         self.assertIn('property="og:image" content="https://blog.example/waves.png"', body)
 
+    def test_lane_public_index_applies_lane_posture_and_tag(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/blog?lane=blackknight")
+        self.assertEqual(response.status_code, 200)
+        mocked_fetch.assert_called_once()
+        self.assertEqual(mocked_fetch.call_args[0][3], "blackknightcontroller")
+        self.assertEqual(mocked_fetch.call_args[0][4], "blackknightcontroller-recovery-weekend-repeatable-lab")
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>BlackKnightController | Infrastructure automation and practical systems support</title>", body)
+        self.assertIn("What is BlackKnightController?", body)
+        self.assertIn('class="theme-midnight"', body)
+
+    def test_auzietek_lane_keeps_business_front_door(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/blog?lane=auzietek")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "services")
+        self.assertEqual(mocked_fetch.call_args[0][4], "infrastructure-automation-that-stays-repeatable")
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>Auzietek | Infrastructure automation and practical systems support</title>", body)
+        self.assertIn("Practical infrastructure automation", body)
+
     def test_sitemap_and_rss_routes_render(self):
         posts = [
             {

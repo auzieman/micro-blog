@@ -212,6 +212,11 @@
     .rail-nav a:hover {
       background: rgba(255, 255, 255, 0.13);
     }
+    .rail-nav a.active {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.36);
+      box-shadow: 0 14px 26px rgba(0, 0, 0, 0.12);
+    }
     .rail-note {
       margin-top: auto;
       color: rgba(239, 250, 249, 0.7);
@@ -385,6 +390,83 @@
       color: #4b5d66;
       font-size: 0.88rem;
       line-height: 1.45;
+    }
+    .lane-landing {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+    .lane-story,
+    .lane-video-board {
+      border-radius: 22px;
+      border: 1px solid rgba(112, 240, 255, 0.22);
+      background: linear-gradient(180deg, rgba(8, 16, 24, 0.72), rgba(10, 20, 30, 0.92));
+      color: #eaf8ff;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 22px 60px rgba(0, 0, 0, 0.18);
+      padding: 1rem;
+    }
+    .lane-story .eyebrow {
+      color: var(--accent-hot);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .lane-story h2 {
+      color: #f8fdff;
+      font-size: clamp(1.55rem, 3vw, 2.35rem);
+      letter-spacing: -0.045em;
+      margin: 0.35rem 0 0.5rem;
+    }
+    .lane-story p,
+    .lane-video-card p {
+      color: rgba(234, 248, 255, 0.76);
+      line-height: 1.55;
+    }
+    .lane-story ul {
+      margin: 0.9rem 0;
+      padding-left: 1.15rem;
+      color: rgba(234, 248, 255, 0.82);
+    }
+    .lane-story li { margin: 0.38rem 0; }
+    .lane-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .lane-links a,
+    .lane-video-card a {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 0.55rem 0.75rem;
+      background: rgba(112, 240, 255, 0.1);
+      border: 1px solid rgba(112, 240, 255, 0.28);
+      color: #effcff;
+      font-weight: 800;
+      font-size: 0.86rem;
+    }
+    .lane-video-board h3 {
+      margin: 0 0 0.7rem;
+      color: #f8fdff;
+    }
+    .lane-video-card {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.045);
+      padding: 0.8rem;
+      margin-bottom: 0.65rem;
+    }
+    .lane-video-card strong {
+      display: block;
+      color: #ffffff;
+      margin-bottom: 0.25rem;
+    }
+    .lane-video-card p {
+      margin: 0 0 0.55rem;
+      font-size: 0.88rem;
     }
     .content-shell {
       padding: 1rem;
@@ -721,6 +803,7 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
       .audience-strip { grid-template-columns: 1fr; }
+      .lane-landing { grid-template-columns: 1fr; }
       .content-grid { grid-template-columns: 1fr; }
       .sidebar {
         position: static;
@@ -743,7 +826,7 @@
       </div>
       <nav class="rail-nav" aria-label="Auzietek sections">
         {% for nav_item in site_nav_links %}
-        <a href="{{ nav_item.href }}">{{ nav_item.label }}</a>
+        <a href="{{ nav_item.href }}" class="{% if nav_item.active %}active{% endif %}">{{ nav_item.label }}</a>
         {% endfor %}
       </nav>
       <p class="rail-note"><strong>{{ site_section }}</strong>Beta is the proving ground. Articles promote from lab evidence when they are ready to stand in public.</p>
@@ -761,8 +844,8 @@
           <p class="tagline">{{ site_description }}</p>
         </div>
         <div class="mast-actions">
-          <a class="button-link" href="/blog">Latest Posts</a>
-          <a class="button-link" href="/blog?tag=services{% if active_theme %}&theme={{ active_theme }}{% endif %}">Client Fit</a>
+          <a class="button-link" href="/blog{% if active_lane %}?lane={{ active_lane }}{% endif %}">Latest Posts</a>
+          <a class="button-link" href="/blog?tag=services{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Client Fit</a>
           {% if is_admin_authenticated %}
           <a class="button-link primary" href="/admin">Author Console</a>
           {% endif %}
@@ -777,6 +860,41 @@
         </article>
         {% endfor %}
       </div>
+      {% if lane_landing %}
+      <section class="lane-landing" aria-label="{{ active_lane_label }} overview">
+        <article class="lane-story">
+          <div class="eyebrow">{{ lane_landing.eyebrow }}</div>
+          <h2>{{ lane_landing.title }}</h2>
+          <p>{{ lane_landing.body }}</p>
+          {% if lane_landing.bullets %}
+          <ul>
+            {% for bullet in lane_landing.bullets %}
+            <li>{{ bullet }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          {% if lane_landing.links %}
+          <div class="lane-links">
+            {% for link in lane_landing.links %}
+            <a href="{{ link.href }}">{{ link.label }}</a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </article>
+        {% if lane_landing.videos %}
+        <aside class="lane-video-board">
+          <h3>Recent evolution</h3>
+          {% for video in lane_landing.videos %}
+          <div class="lane-video-card">
+            <strong>{{ video.title }}</strong>
+            <p>{{ video.summary }}</p>
+            <a href="{{ video.href }}" target="_blank" rel="noopener">Watch / open</a>
+          </div>
+          {% endfor %}
+        </aside>
+        {% endif %}
+      </section>
+      {% endif %}
     </section>
 
     <section class="content-shell">
@@ -794,6 +912,7 @@
                 </select>
                 {% if tag %}<input type="hidden" name="tag" value="{{ tag }}" />{% endif %}
                 {% if active_theme %}<input type="hidden" name="theme" value="{{ active_theme }}" />{% endif %}
+                {% if active_lane %}<input type="hidden" name="lane" value="{{ active_lane }}" />{% endif %}
                 <button type="submit">Refresh</button>
               </form>
             </div>
@@ -805,7 +924,7 @@
 
           <div class="post-list">
             {% for post in posts %}
-            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/post/{{ post.slug }}?page={{ page }}&page_size={{ page_size }}{% if active_theme %}&theme={{ active_theme }}{% endif %}">
+            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/post/{{ post.slug }}?page={{ page }}&page_size={{ page_size }}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">
               <h3>{{ post.title }}</h3>
               {% if post.published_at or post.updated_at %}
               <p>{{ (post.published_at or post.updated_at)[:10] }}</p>
@@ -823,15 +942,15 @@
           </div>
 
           <div class="pager">
-            <a href="/blog?page={{ 1 if page <= 1 else page - 1 }}&page_size={{ page_size }}">Previous</a>
-            <a href="/blog?page={{ total_pages if page >= total_pages else page + 1 }}&page_size={{ page_size }}">Next</a>
+            <a href="/blog?page={{ 1 if page <= 1 else page - 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Previous</a>
+            <a href="/blog?page={{ total_pages if page >= total_pages else page + 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Next</a>
           </div>
         </aside>
 
         <article class="article-panel">
           {% if selected %}
           <nav class="breadcrumbs" aria-label="Breadcrumb">
-            <span>Auzietek</span>
+            <span>{{ site_brand }}</span>
             <span>Articles</span>
             {% if selected.tags %}<span>{{ selected.tags[0] }}</span>{% endif %}
             <span>{{ selected.title }}</span>
