@@ -112,6 +112,61 @@ code changes rebuild images
 content changes sync/import content
 ```
 
+## Legacy content migration
+
+Treat the old Drupal site as source material, not the final public voice.
+
+Current lab import posture:
+
+```text
+legacy auzietek.com article
+  -> public crawl import
+  -> draft article
+  -> lane assignment
+  -> image localization where possible
+  -> editorial rewrite
+  -> public beta
+  -> production promotion
+```
+
+The first lab migration targets are intentionally narrow:
+
+```text
+linux-users.lab.auzietek.com
+  Linux, Docker, Kubernetes, monitoring, Ansible, PXE, shell, and operations
+  articles. Keep the clean light theme; it reads like a teaching bench.
+
+retro-users.lab.auzietek.com
+  AmigaOS, retro tools, older repos, and classic-computing videos. Keep the
+  retro theme playful but restrained: warm paper, dark panels, and small
+  boing-ball-inspired accents rather than a toy UI.
+```
+
+Imported drafts should stay `draft` until reviewed. Before publishing:
+
+- rewrite titles so they name the engineering lesson;
+- remove casual filler or old valley-talk from the opening;
+- keep the original human spark in the body when it helps the teaching;
+- add a short summary suitable for search results;
+- keep the source URL for traceability;
+- verify images were localized under `/content-files/imports/assets/`;
+- avoid inline `data:image/...` assets as hero images;
+- add GitHub and YouTube links as useful evidence cards, not random link piles.
+
+Good article shape:
+
+```text
+problem
+why it matters
+what we observed
+repeatable pattern
+safe next step
+related repo/video
+```
+
+Do not bulk-publish migrated content. The migration pipeline should make review
+easy; editorial promotion should stay deliberate.
+
 ## Environment contract
 
 Each deployment gets its own `.env`; do not commit real `.env` files.

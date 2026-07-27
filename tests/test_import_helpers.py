@@ -87,6 +87,26 @@ body here
         self.assertNotIn("My Blog", parsed["body_html"])
         self.assertEqual(parsed["hero_image_url"], "https://example.com/sites/default/files/demo.png")
 
+    def test_parse_public_article_page_ignores_inline_data_image_as_hero(self):
+        html = """
+        <html>
+          <body>
+            <article class="node">
+              <div class="field--name-body">
+                <div class="field__item">
+                  <p>Real article text.</p>
+                  <img src="data:image/png;base64,AAAA" />
+                  <img src="/sites/default/files/real.png" />
+                </div>
+              </div>
+            </article>
+          </body>
+        </html>
+        """
+        parsed = import_utils.parse_public_article_page(html, "https://example.com/node/40")
+        self.assertEqual(parsed["hero_image_url"], "https://example.com/sites/default/files/real.png")
+        self.assertNotIn("data:image", parsed["image_urls"])
+
     def test_filesystem_preview_items(self):
         payload = {
             "root_path": str(PROJECT_ROOT / "content"),

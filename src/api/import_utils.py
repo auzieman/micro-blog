@@ -7,6 +7,20 @@ from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 
 
+IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".avif", ".bmp", ".ico")
+
+
+def is_importable_asset_url(value: str | None, require_image_extension: bool = False) -> bool:
+    if not value:
+        return False
+    normalized = value.strip()
+    if not normalized or normalized.startswith(("data:", "#", "mailto:", "tel:", "javascript:")):
+        return False
+    if require_image_extension and not normalized.lower().split("?", 1)[0].endswith(IMAGE_EXTENSIONS):
+        return False
+    return True
+
+
 def stable_import_article_id(source_kind: str, source_id: str | None, fallback: str = "") -> str:
     raw = (source_id or fallback or "").strip()
     if not raw:
@@ -73,12 +87,10 @@ def collect_asset_urls_from_html(html: str) -> list[str]:
     for selector, attribute in (("img[src]", "src"), ("source[src]", "src"), ("a[href]", "href")):
         for node in soup.select(selector):
             value = (node.get(attribute) or "").strip()
-            if not value or value.startswith(("data:", "#")):
+            if not is_importable_asset_url(value):
                 continue
             lowered = value.lower()
-            if attribute == "href" and not lowered.endswith(
-                (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".avif", ".bmp", ".ico")
-            ):
+            if attribute == "href" and not lowered.split("?", 1)[0].endswith(IMAGE_EXTENSIONS):
                 continue
             if value not in seen:
                 seen.add(value)
@@ -253,7 +265,11 @@ def parse_public_article_page(page_html: str, source_url: str) -> dict:
             if value:
                 node[attribute] = urljoin(source_url, value)
 
-    image_urls = [urljoin(source_url, image.get("src", "").strip()) for image in root.select("img[src]")]
+    image_urls = [
+        urljoin(source_url, image.get("src", "").strip())
+        for image in root.select("img[src]")
+        if is_importable_asset_url(image.get("src", ""))
+    ]
     summary = ""
     meta_description = soup.select_one("meta[name='description']")
     if meta_description and meta_description.get("content"):
