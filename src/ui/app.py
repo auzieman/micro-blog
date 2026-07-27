@@ -68,6 +68,7 @@ SITE_HEADLINE = os.getenv(
 )
 SITE_NAV_LINKS_JSON = os.getenv("SITE_NAV_LINKS_JSON", "")
 MICROSITES_JSON = os.getenv("MICROSITES_JSON", "")
+HOST_LANE_MAP_JSON = os.getenv("HOST_LANE_MAP_JSON", "")
 DEFAULT_OG_IMAGE = os.getenv("DEFAULT_OG_IMAGE", "")
 THEME_VARIANTS = ["auzietek", "linux-pro", "retro", "aurora", "paper", "midnight"]
 DEFAULT_THEME_VARIANT = os.getenv("DEFAULT_THEME_VARIANT", "auzietek")
@@ -234,6 +235,18 @@ LANE_CONFIG = {
     },
 }
 
+DEFAULT_HOST_LANE_MAP = {
+    "microblog.lab.auzietek.com": "auzietek",
+    "auzietek.lab.auzietek.com": "auzietek",
+    "blackknight.lab.auzietek.com": "blackknight",
+    "linux-users.lab.auzietek.com": "linux",
+    "retro-users.lab.auzietek.com": "retro",
+    "beta.auzietek.com": "auzietek",
+    "blackknight.auzietek.com": "blackknight",
+    "linux-users.auzietek.com": "linux",
+    "retro-users.auzietek.com": "retro",
+}
+
 
 def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
     normalized = raw_value.strip()
@@ -267,6 +280,47 @@ def resolve_lane(lane_key: str | None) -> tuple[str | None, dict | None]:
     if normalized in LANE_CONFIG:
         return normalized, LANE_CONFIG[normalized]
     return None, None
+
+
+def _load_json_object(raw_value: str, fallback: dict) -> dict:
+    normalized = raw_value.strip()
+    if (
+        len(normalized) >= 2
+        and normalized[0] == normalized[-1]
+        and normalized[0] in {"'", '"'}
+    ):
+        normalized = normalized[1:-1].strip()
+    if not normalized:
+        return fallback
+    try:
+        value = json.loads(normalized)
+    except json.JSONDecodeError:
+        logger.warning("invalid JSON object configuration ignored")
+        return fallback
+    if not isinstance(value, dict):
+        logger.warning("JSON object configuration must be an object")
+        return fallback
+    return {str(key).strip().lower(): str(val).strip().lower() for key, val in value.items() if str(key).strip() and str(val).strip()} or fallback
+
+
+def request_host() -> str:
+    return request.host.split(":", 1)[0].strip().lower()
+
+
+def resolve_request_lane(explicit_lane: str | None) -> tuple[str | None, dict | None, bool]:
+    lane_key, lane = resolve_lane(explicit_lane)
+    if lane:
+        return lane_key, lane, False
+    host_map = _load_json_object(HOST_LANE_MAP_JSON, DEFAULT_HOST_LANE_MAP)
+    host_lane = host_map.get(request_host())
+    lane_key, lane = resolve_lane(host_lane)
+    return lane_key, lane, bool(lane)
+
+
+def effective_site_url(host_lane_selected: bool) -> str:
+    if host_lane_selected:
+        return request.url_root.rstrip("/")
+    return SITE_URL
 
 
 def lane_nav_links(active_lane: str | None, active_theme: str | None) -> list[dict]:
@@ -439,7 +493,8 @@ def fetch_admin_revisions(article_id: str):
     return response.json()["items"]
 
 
-def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None):
+def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None):
+    resolved_site_url = (site_url or SITE_URL).rstrip("/")
     site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
     site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
     site_brand = lane.get("site_brand", SITE_BRAND) if lane else SITE_BRAND
@@ -448,14 +503,14 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
     site_audience = lane.get("audience", SITE_AUDIENCE) if lane else SITE_AUDIENCE
     site_headline = lane.get("headline", SITE_HEADLINE) if lane else SITE_HEADLINE
     resolved_theme = active_theme or (lane.get("theme") if lane else None) or (selected.get("theme_variant") if selected else DEFAULT_THEME_VARIANT)
-    metadata = article_public_metadata(selected, SITE_URL, site_name, DEFAULT_OG_IMAGE or None) if selected else {
+    metadata = article_public_metadata(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None) if selected else {
         "title": f"{site_name} | Infrastructure automation and practical systems support",
         "description": site_description,
-        "canonical_url": f"{SITE_URL}/blog",
+        "canonical_url": f"{resolved_site_url}/blog",
         "og_image_url": DEFAULT_OG_IMAGE or None,
         "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
     }
-    json_ld = article_json_ld(selected, SITE_URL, site_name, DEFAULT_OG_IMAGE or None) if selected else ""
+    json_ld = article_json_ld(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None) if selected else ""
     total_pages = max(1, (payload["total"] + payload["page_size"] - 1) // payload["page_size"])
     return {
         "posts": posts,
@@ -527,7 +582,7 @@ def public_index():
     result = "success"
     page = int(request.args.get("page", "1"))
     page_size = int(request.args.get("page_size", "10"))
-    lane_key, lane = resolve_lane(request.args.get("lane"))
+    lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
     tag = request.args.get("tag")
     if lane and not tag:
         tag = lane["tag"]
@@ -546,7 +601,7 @@ def public_index():
             message = str(exc)
         finally:
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected)))
 
 
 @app.get("/post/<slug>")
@@ -555,7 +610,7 @@ def public_post(slug: str):
     result = "success"
     page = 1
     page_size = 10
-    lane_key, lane = resolve_lane(request.args.get("lane"))
+    lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
     theme = request.args.get("theme") or (lane.get("theme") if lane else None)
     with event_scope(logger, "ui.public_post", slug=slug, theme=theme, lane=lane_key) as log:
         try:
@@ -571,7 +626,7 @@ def public_post(slug: str):
             raise
         finally:
             telemetry.api("/post/{slug}", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, lane_key=lane_key, lane=lane))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected)))
 
 
 @app.get("/sitemap.xml")

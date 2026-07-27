@@ -67,7 +67,17 @@ In the lab, these can be previewed with query parameters:
 /blog?lane=retro
 ```
 
-Later, edge/DNS can pin domains to the same code path.
+The lab hostnames should pin to the same lane behavior without query strings:
+
+```text
+microblog.lab.auzietek.com     -> auzietek lane
+auzietek.lab.auzietek.com      -> auzietek lane
+blackknight.lab.auzietek.com   -> blackknight lane
+linux-users.lab.auzietek.com   -> linux lane
+retro-users.lab.auzietek.com   -> retro lane
+```
+
+Later, production/beta edge DNS can pin public domains to the same code path.
 
 ## Content tree
 
@@ -151,6 +161,9 @@ For alpha:
 
 ```text
 microblog.lab.auzietek.com -> lab edge / ESXi swarm canary
+blackknight.lab.auzietek.com -> lab edge / BlackKnight lane
+linux-users.lab.auzietek.com -> lab edge / Linux teaching lane
+retro-users.lab.auzietek.com -> lab edge / Retro lane
 ```
 
 For beta:

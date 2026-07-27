@@ -183,6 +183,28 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn("<title>Auzietek | Infrastructure automation and practical systems support</title>", body)
         self.assertIn("Practical infrastructure automation", body)
 
+    def test_blackknight_lab_host_selects_blackknight_lane(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/blog", headers={"Host": "blackknight.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "blackknightcontroller")
+        self.assertEqual(mocked_fetch.call_args[0][4], "blackknightcontroller-recovery-weekend-repeatable-lab")
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>BlackKnightController | Infrastructure automation and practical systems support</title>", body)
+        self.assertIn('link rel="canonical" href="http://blackknight.lab.auzietek.com/blog"', body)
+        self.assertIn('class="theme-midnight"', body)
+
+    def test_linux_users_lab_host_selects_linux_lane(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/blog", headers={"Host": "linux-users.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "linux")
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>Linux Users | Infrastructure automation and practical systems support</title>", body)
+        self.assertIn('class="theme-linux-pro"', body)
+
     def test_sitemap_and_rss_routes_render(self):
         posts = [
             {
