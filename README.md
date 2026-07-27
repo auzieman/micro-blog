@@ -18,7 +18,9 @@ The project is intentionally narrow:
 - import-friendly article pipeline for Drupal, WordPress, or other sources
 - light presentation choices instead of a heavy theme engine
 
-The default public theme is `auzietek`: a cleaner corporate layout with left navigation, breadcrumbs, and Auzietek branding. `midnight` remains available for lab/dogfood demos.
+The default public theme is `auzietek`: a cleaner corporate layout with left navigation, breadcrumbs, and Auzietek branding. `midnight`, `linux-pro`, and `retro` remain available for product, teaching, and retro lanes.
+
+See [docs/micro-blog-pattern.md](./docs/micro-blog-pattern.md) for the repeatable alpha/beta/production deployment pattern, content sync boundary, DNS/edge expectations, and validation receipt.
 
 ## Release snapshot
 
@@ -63,6 +65,13 @@ Micro-blog is intended to move through three named lanes:
 - alpha: `microblog.lab.auzietek.com` / lab dogfood, rebuildable and experimental
 - beta: `beta.auzietek.com` / public preview and Auzietek content consolidation
 - production: `auzietek.com` / final cutover after DNS, SSL, redirects, backups, and rollback are proven
+
+Use microsite lanes to separate audience without forking the application:
+
+- `auzietek`: business front door
+- `blackknight`: BKC product and pipeline evidence
+- `linux`: teaching guides
+- `retro`: classic systems and preservation notes
 
 Keep `ADMIN_ACCESS_CODE` available as a deployment-local admin bootstrap feature. Production can prefer Google OAuth, but the local-code route is still useful for isolated lab deployments, first-boot repair, and controlled single-admin migrations. Set a real non-default code anywhere the UI is reachable beyond the laptop/lab.
 
@@ -155,7 +164,7 @@ Article payloads support a small publishing-oriented model:
 - `body_format` (`markdown` or `html`)
 - `markdown_body`
 - `hero_image_url`
-- `theme_variant` (`auzietek`, `aurora`, `paper`, `midnight`)
+- `theme_variant` (`auzietek`, `linux-pro`, `retro`, `aurora`, `paper`, `midnight`)
 - `tags`
 - `status`
 - `seo_title`
@@ -285,7 +294,7 @@ Supported sync modes:
 - `update`: only upsert missing or changed filesystem articles
 - `reset`: soft-delete matching managed filesystem articles, then re-import them
 
-This is intended for the article chain under [`content/posts`](./content/posts) so the stack can tell its own story while also exercising the markdown/file loader repeatedly.
+This is intended for the article chain under [`content/posts`](./content/posts) so the stack can tell its own story while also exercising the markdown/file loader repeatedly. Ordinary article changes should move through content sync/import; reserve image rebuilds for code or dependency changes.
 
 The admin UI exposes this as **Bootstrap Story Sync**. It only manages filesystem-origin records by their stable import article IDs, so unrelated hand-authored posts are left alone.
 
