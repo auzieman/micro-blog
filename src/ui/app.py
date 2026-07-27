@@ -491,12 +491,15 @@ def effective_site_url(host_lane_selected: bool) -> str:
 def article_lane_key(article: dict | None) -> str | None:
     if not article:
         return None
+    theme_lane = THEME_LANE_MAP.get(str(article.get("theme_variant") or "").strip().lower())
+    if theme_lane:
+        return theme_lane
     article_tags = {str(tag).strip().lower() for tag in article.get("tags") or []}
     for key, lane in LANE_CONFIG.items():
         lane_tag = str(lane.get("tag", "")).strip().lower()
         if lane_tag and lane_tag in article_tags:
             return key
-    return THEME_LANE_MAP.get(str(article.get("theme_variant") or "").strip().lower())
+    return None
 
 
 def lane_host_for_current_zone(lane_key: str) -> str | None:

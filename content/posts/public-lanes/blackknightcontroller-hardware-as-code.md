@@ -25,6 +25,20 @@ the full lifecycle:
 Each step is ordinary IT work. The value comes from joining those steps without
 burying them under a control plane that hides the useful details.
 
+![BlackKnightController edge ownership graph](/content-files/assets/bkc/bkc-edge-ownership-graph.png)
+
+BlackKnightController can turn the lab edge into a readable story: upstream
+router, firewall, managed switch, DHCP/DNS/PXE, hypervisors, service networks,
+and the evidence that connects them. The important trick is not the picture by
+itself; it is that the picture can be regenerated from live BKC data.
+
+![BlackKnightController pipeline paths graph](/content-files/assets/bkc/bkc-pipeline-paths-graph.png)
+
+Pipeline paths show the other half of the model: actions are not floating shell
+commands. They relate back to machines, stages, services, and validation
+evidence. That is how a lab rebuild becomes a repeatable operating pattern
+instead of another heroic Saturday.
+
 ## Why this matters
 
 Small teams often live in the uncomfortable middle. They have enough
@@ -48,4 +62,3 @@ nearest truthful boundary:
 - did the public edge route to it?
 
 Good automation does not remove these questions. It answers them faster.
-

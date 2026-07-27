@@ -254,6 +254,14 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn("http://retro-users.lab.auzietek.com/post/muirc-amigaos41-irc-client-codex?lane=retro", response.location)
         self.assertTrue(response.location.endswith("#article-start"))
 
+    def test_article_lane_prefers_theme_over_generic_services_tag(self):
+        selected = {
+            "slug": "blackknightcontroller-hardware-as-code",
+            "theme_variant": "midnight",
+            "tags": ["blackknightcontroller", "services", "lab"],
+        }
+        self.assertEqual(ui_app.article_lane_key(selected), "blackknight")
+
     def test_sitemap_and_rss_routes_render(self):
         posts = [
             {

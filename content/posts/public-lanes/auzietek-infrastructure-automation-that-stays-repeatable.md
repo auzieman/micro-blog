@@ -17,6 +17,15 @@ what changed, why it changed, how it was validated, and what should happen next.
 
 That is the core Auzietek pattern.
 
+![BlackKnightController Company Mind resource workbench](/content-files/assets/bkc/bkc-company-mind-resources.png)
+
+The screenshot above is not a mockup. It is a generated capture from the lab
+BlackKnightController instance: current resources, relationships, pipeline
+counts, and graph-linked operations in one living workbench. This is the kind of
+evidence Auzietek wants to leave behind: visual enough for a stakeholder,
+specific enough for an engineer, and repeatable enough to regenerate when the
+environment changes.
+
 We use real lab systems, real deployment pressure, and real operational
 constraints to build automation that can be repeated. A script is useful. A
 pipeline is better. A pipeline with evidence, validation, and a clean rollback
@@ -48,4 +57,3 @@ If you are learning systems work, pay attention to the pattern:
 
 That rhythm is slower than guessing and faster than repeatedly fixing the same
 thing from scratch.
-
