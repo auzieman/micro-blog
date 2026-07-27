@@ -111,6 +111,12 @@ DEFAULT_MICROSITES = [
         "role": "Teaching lane",
         "summary": "Clear walkthroughs for newer engineers without losing the evidence trail.",
     },
+    {
+        "name": "retro-users.auzietek.com",
+        "label": "Retro Users",
+        "role": "Retro computing lane",
+        "summary": "Amiga, classic systems, preservation notes, and modern tooling around old iron.",
+    },
 ]
 
 

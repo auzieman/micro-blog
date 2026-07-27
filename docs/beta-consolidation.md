@@ -34,6 +34,9 @@ blackknight.auzietek.com
 
 linux-users.auzietek.com
   practical teaching lane for Linux and infrastructure engineers
+
+retro-users.auzietek.com
+  Amiga, retro systems, preservation, and classic-computing experiments
 ```
 
 Keep `www.auzietek.com` business-forward. Use the microsites to hold deeper

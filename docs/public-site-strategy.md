@@ -31,6 +31,9 @@ blackknight.auzietek.com
 
 linux-users.auzietek.com
   Teaching lane for newer Linux and infrastructure engineers
+
+retro-users.auzietek.com
+  Amiga, retro systems, preservation, and classic-computing experiments
 ```
 
 Future domains should prove a distinct audience before they are added. Avoid
@@ -76,6 +79,8 @@ Recommended tag families:
 services
 blackknightcontroller
 linux
+retro
+amiga
 lab
 openstack
 proxmox
@@ -118,4 +123,3 @@ MICROSITES_JSON
 
 Use these instead of forking templates for each public face. Fork only when a
 domain has a genuinely different product experience.
-
