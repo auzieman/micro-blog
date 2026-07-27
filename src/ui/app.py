@@ -220,6 +220,25 @@ LANE_CONFIG = {
         "description": "Clear Linux walkthroughs for newer engineers using Debian, Fedora, containers, networks, and real troubleshooting traces.",
         "positioning": "Practical Linux education without hand-waving.",
         "audience": "newer Linux engineers, homelab builders, and practical operations teams",
+        "landing": {
+            "eyebrow": "Teaching lane",
+            "title": "Linux notes that turn real incidents into repeatable lessons.",
+            "body": (
+                "Linux Users is the clean-room teaching version of the lab notebook: PXE, "
+                "Debian, Fedora, containers, monitoring, SSH, storage, and practical "
+                "troubleshooting rewritten for engineers who want the pattern, not the fog."
+            ),
+            "bullets": [
+                "Legacy Auzietek articles are mirrored into lab as drafts before publishing.",
+                "Posts should explain the reusable operator pattern, not just the one-off fix.",
+                "The light theme stays intentional: readable, calm, and built for learning.",
+            ],
+            "links": [
+                {"label": "PXE install pattern", "href": "/blog?tag=pxe&lane=linux"},
+                {"label": "Monitoring notes", "href": "/blog?tag=monitoring&lane=linux"},
+                {"label": "Docker and swarms", "href": "/blog?tag=docker-swarm&lane=linux"},
+            ],
+        },
     },
     "retro": {
         "label": "Retro Users",
@@ -232,6 +251,33 @@ LANE_CONFIG = {
         "description": "Classic computing, preservation, emulation, and the engineering lessons that still matter in modern labs.",
         "positioning": "Retro systems as a practical teaching lens.",
         "audience": "retro-computing fans, preservation-minded builders, and curious engineers",
+        "hero_image_url": "/content-files/assets/retro/retro-computing-workbench-header.png",
+        "landing": {
+            "eyebrow": "Retro computing atmosphere",
+            "title": "Yesterday's machines still teach today's infrastructure habits.",
+            "body": (
+                "Retro Users collects the Amiga, classic workstation, terminal, and old-tools "
+                "side of Auzietek. The point is not a brand collage; it is the feeling of a "
+                "living workshop where constraints made engineers sharp."
+            ),
+            "bullets": [
+                "Legacy Amiga and tooling posts are mirrored into lab as reviewable drafts.",
+                "GitHub repos and YouTube clips become evidence cards beside the articles.",
+                "The theme can be playful, but the writing still teaches a usable lesson.",
+            ],
+            "links": [
+                {"label": "Amiga posts", "href": "/blog?tag=AmigaOS4.1&lane=retro"},
+                {"label": "Retro lessons", "href": "/blog?tag=retro&lane=retro"},
+                {"label": "Auzietek YouTube", "href": "https://www.youtube.com/@auzietek"},
+            ],
+            "videos": [
+                {
+                    "title": "Retro computing video playlist",
+                    "summary": "A safer media lane for older systems, experiments, and supporting build clips.",
+                    "href": "https://www.youtube.com/watch?v=Wb904ngIYY0&list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7",
+                },
+            ],
+        },
     },
 }
 
@@ -536,6 +582,7 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "site_nav_links": lane_nav_links(lane_key, resolved_theme) if lane else _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
         "microsites": _load_json_list(MICROSITES_JSON, DEFAULT_MICROSITES),
         "lane_landing": lane.get("landing") if lane else None,
+        "lane_hero_image_url": lane.get("hero_image_url") if lane else "",
         "meta_title": metadata["title"],
         "meta_description": metadata["description"],
         "canonical_url": metadata["canonical_url"],

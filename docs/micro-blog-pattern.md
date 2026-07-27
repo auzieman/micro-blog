@@ -167,6 +167,63 @@ related repo/video
 Do not bulk-publish migrated content. The migration pipeline should make review
 easy; editorial promotion should stay deliberate.
 
+Current lab mirror state:
+
+```text
+linux-pro
+  5 imported legacy drafts
+  2 curated published seed posts
+
+retro
+  3 imported legacy drafts
+  1 curated published seed post
+  retro workbench header staged under /content-files/assets/retro/
+  retro YouTube playlist linked from the lane landing card
+```
+
+## Joint media push approval gate
+
+Use the lab lanes as the review room before any public push.
+
+Approval checklist:
+
+- public lane page loads by hostname;
+- imported posts are still drafts until explicitly accepted;
+- selected posts have rewritten titles, summaries, and opening paragraphs;
+- article body keeps the useful technical lesson and removes distracting old
+  source-site phrasing;
+- images load from local `/content-files/...` paths or an intentional external
+  source;
+- video links open in a new tab and support the article/lane story;
+- GitHub links point to active repos or clearly marked archives;
+- canonical/SEO fields are filled before production promotion;
+- Kanboard or a promotion note records what was accepted.
+
+For a public campaign, promote in this order:
+
+```text
+lab lane
+  -> accepted draft
+  -> beta.auzietek.com / microsite beta
+  -> social/video post
+  -> production domain
+```
+
+Do not point `auzietek.com` or `www.auzietek.com` at the new app until SSL,
+redirects, backups, rollback, and content review are complete.
+
+## Content mount note
+
+The ESXi swarm lab canary currently uses node-local `/srv/micro-blog/content`
+bind mounts. That works, but any generated or imported asset must either:
+
+- be copied to every app worker that can run `blog-ui`; or
+- move to shared storage, such as the ns1 NFS-backed content mount.
+
+Prefer shared storage before production-style promotion. Node-local fan-out is
+acceptable for lab canary work, but it should be captured in the deployment
+receipt so future runs do not create 404s after Swarm reschedules a container.
+
 ## Environment contract
 
 Each deployment gets its own `.env`; do not commit real `.env` files.
