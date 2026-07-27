@@ -314,6 +314,27 @@ content or UI work. If a push fails because Docker is assuming HTTPS, fix the
 daemon/registry trust path or use the documented lab registry route, then keep
 moving.
 
+## Public certificate options
+
+Certificate work belongs in the IONOS/public stage, not the fast lab content
+stage.
+
+Likely options:
+
+```text
+Let's Encrypt
+  portable default
+  good for automated DNS-01 or HTTP-01 rotation pipelines
+
+IONOS / DigiCert hosted certificate tier
+  useful if the account exposes a free/easy certificate workflow
+  may be cleaner for IONOS-hosted public names
+```
+
+The promotion pipeline should record which certificate authority was used, when
+the certificate expires, how renewal is triggered, and which edge services were
+reloaded after issuance.
+
 ## Deployment receipt
 
 A deployment is not considered complete until these checks pass:
