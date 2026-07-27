@@ -1,6 +1,6 @@
 # 2026-07-27 lab draft polish receipt
 
-Status: live lab metadata polish, draft-only.
+Status: live lab content population and review pass.
 
 Target deployment:
 
@@ -12,7 +12,7 @@ retro-users.lab.auzietek.com
 
 ## Scope
 
-This pass intentionally updated metadata only:
+Initial pass updated metadata only:
 
 - title
 - slug
@@ -21,8 +21,9 @@ This pass intentionally updated metadata only:
 - SEO description
 - tags for one retro article missing tags
 
-Article bodies were not rewritten yet. The imported body content remains source
-material for a later editorial pass.
+Later lab review guidance changed the migrated Linux/retro articles from draft
+to published inside the lab canary so the lane pages can be reviewed directly.
+This is lab publication only, not production promotion.
 
 ## Updated Linux drafts
 
@@ -83,3 +84,51 @@ Before publishing these drafts:
 - verify rendered post pages before changing status to `published`.
 
 No production hostnames or public certificates were changed in this pass.
+
+## Lab publication
+
+The imported Linux and Retro articles were made visible in the lab lanes for
+review.
+
+```text
+linux-pro published count: 8
+retro published count: 4
+```
+
+Tags were normalized so lane filters include the migrated articles:
+
+```text
+linux-pro articles include: linux
+retro articles include: retro
+```
+
+Because one population step updated the write model directly, the projection
+service was force-refreshed so Redis/read-model state matched the published
+article table.
+
+## Additional Linux source imported
+
+```text
+ART-F2D326A50D99
+  Source:
+    https://auzietek.com/node/44
+  Published lab title:
+    RX-Demo Part 1: Building Observability Into a Cloud-Native App
+  Slug:
+    rx-demo-part-1-cloud-native-observability
+  Preserved:
+    YouTube iframe
+    localized screenshots
+    GitHub link to rx-demo
+  Lane:
+    linux-users.lab.auzietek.com
+  Status:
+    published in lab
+```
+
+## Lab review URLs
+
+```text
+http://linux-users.lab.auzietek.com/blog?page_size=20
+http://retro-users.lab.auzietek.com/blog?page_size=20
+```
