@@ -163,6 +163,14 @@
       font-size: 0.82rem;
       line-height: 1.5;
     }
+    .rail-note strong {
+      display: block;
+      color: #f7fffe;
+      margin-bottom: 0.25rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
     .page-column {
       min-width: 0;
     }
@@ -287,6 +295,41 @@
       background: linear-gradient(135deg, rgba(44, 132, 173, 0.94), rgba(133, 59, 190, 0.92));
       color: #f8fdff;
       box-shadow: 0 0 24px rgba(106, 176, 216, 0.2);
+    }
+    .audience-strip {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+    .audience-card {
+      padding: 0.9rem;
+      border-radius: 18px;
+      border: 1px solid rgba(15, 55, 75, 0.12);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(238, 246, 247, 0.78));
+    }
+    .audience-card span {
+      display: block;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .audience-card strong {
+      display: block;
+      font-size: 1rem;
+      color: #10212b;
+      margin-bottom: 0.35rem;
+    }
+    .audience-card p {
+      margin: 0;
+      color: #4b5d66;
+      font-size: 0.88rem;
+      line-height: 1.45;
     }
     .content-shell {
       padding: 1rem;
@@ -622,6 +665,7 @@
       body.theme-auzietek .rail-nav {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+      .audience-strip { grid-template-columns: 1fr; }
       .content-grid { grid-template-columns: 1fr; }
       .sidebar {
         position: static;
@@ -639,16 +683,15 @@
   <main class="frame">
     <aside class="brand-rail">
       <div>
-        <div class="brand-logo">Auzietek</div>
-        <div class="brand-kicker">Systems notes, lab evidence, and AI-assisted operations.</div>
+        <div class="brand-logo">{{ site_brand }}</div>
+        <div class="brand-kicker">{{ site_positioning }}</div>
       </div>
       <nav class="rail-nav" aria-label="Auzietek sections">
-        <a href="/blog">Articles</a>
-        <a href="/blog?tag=blackknightcontroller{% if active_theme %}&theme={{ active_theme }}{% endif %}">BlackKnightController</a>
-        <a href="/blog?tag=lab{% if active_theme %}&theme={{ active_theme }}{% endif %}">Labs</a>
-        <a href="/rss.xml">RSS</a>
+        {% for nav_item in site_nav_links %}
+        <a href="{{ nav_item.href }}">{{ nav_item.label }}</a>
+        {% endfor %}
       </nav>
-      <p class="rail-note">Beta is the proving ground. Articles promote from lab evidence when they are ready to stand in public.</p>
+      <p class="rail-note"><strong>{{ site_section }}</strong>Beta is the proving ground. Articles promote from lab evidence when they are ready to stand in public.</p>
     </aside>
     <div class="page-column">
     {% if message %}
@@ -659,15 +702,25 @@
       <div class="masthead-top">
         <div>
           <div class="site-mark">{{ site_name }}</div>
-          <h1>Linux tricks, break-fix notes, and practical systems articles.</h1>
+          <h1>{{ site_headline }}</h1>
           <p class="tagline">{{ site_description }}</p>
         </div>
         <div class="mast-actions">
           <a class="button-link" href="/blog">Latest Posts</a>
+          <a class="button-link" href="/blog?tag=services{% if active_theme %}&theme={{ active_theme }}{% endif %}">Client Fit</a>
           {% if is_admin_authenticated %}
           <a class="button-link primary" href="/admin">Author Console</a>
           {% endif %}
         </div>
+      </div>
+      <div class="audience-strip" aria-label="Auzietek publishing lanes">
+        {% for microsite in microsites %}
+        <article class="audience-card">
+          <span>{{ microsite.role }}</span>
+          <strong>{{ microsite.label }}</strong>
+          <p>{{ microsite.summary }}</p>
+        </article>
+        {% endfor %}
       </div>
     </section>
 

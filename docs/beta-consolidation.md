@@ -18,6 +18,28 @@ production
   -> later cutover after redirects, SSL, backups, and rollback are proven
 ```
 
+## Public domain split
+
+The beta lane should prove a bounded public map before production cutover:
+
+```text
+www.auzietek.com
+  main business site
+
+beta.auzietek.com
+  preview and promotion lane
+
+blackknight.auzietek.com
+  BlackKnightController product and field evidence
+
+linux-users.auzietek.com
+  practical teaching lane for Linux and infrastructure engineers
+```
+
+Keep `www.auzietek.com` business-forward. Use the microsites to hold deeper
+product journals, tutorials, and lab-heavy material so the main site does not
+feel like a catch-all archive.
+
 ## Source material
 
 Beta should be populated from a captured copy of the current Auzietek site:
@@ -60,6 +82,9 @@ dark code/evidence islands where useful
 
 The older `midnight` theme remains available for lab/dogfood demos.
 
+See `docs/public-site-strategy.md` for the writing voice, SEO posture, and
+promotion rules.
+
 ## Admin bootstrap
 
 Keep the deployment-local admin access feature:
@@ -79,4 +104,3 @@ single-admin emergency access
 ```
 
 Never leave the default local code on an internet-reachable deployment.
-

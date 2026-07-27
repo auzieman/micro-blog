@@ -1,4 +1,5 @@
 import logging
+import json
 import os
 import time
 import uuid
@@ -54,6 +55,19 @@ GOOGLE_OAUTH_REDIRECT_URI = os.getenv("GOOGLE_OAUTH_REDIRECT_URI", "")
 SITE_URL = os.getenv("SITE_URL", "http://localhost:8081").rstrip("/")
 SITE_NAME = os.getenv("SITE_NAME", "Micro Blog")
 SITE_DESCRIPTION = os.getenv("SITE_DESCRIPTION", "Single-admin micro blog with imports and observability.")
+SITE_BRAND = os.getenv("SITE_BRAND", SITE_NAME)
+SITE_SECTION = os.getenv("SITE_SECTION", "business")
+SITE_POSITIONING = os.getenv(
+    "SITE_POSITIONING",
+    "Infrastructure automation, practical operations, and field-tested systems guidance.",
+)
+SITE_AUDIENCE = os.getenv("SITE_AUDIENCE", "engineering leaders, young engineers, and right-fit clients")
+SITE_HEADLINE = os.getenv(
+    "SITE_HEADLINE",
+    "Infrastructure automation with the lab evidence still attached.",
+)
+SITE_NAV_LINKS_JSON = os.getenv("SITE_NAV_LINKS_JSON", "")
+MICROSITES_JSON = os.getenv("MICROSITES_JSON", "")
 DEFAULT_OG_IMAGE = os.getenv("DEFAULT_OG_IMAGE", "")
 THEME_VARIANTS = ["auzietek", "aurora", "paper", "midnight"]
 DEFAULT_THEME_VARIANT = os.getenv("DEFAULT_THEME_VARIANT", "auzietek")
@@ -69,6 +83,53 @@ ENABLE_HSTS = coerce_bool(os.getenv("ENABLE_HSTS"), False)
 
 _ADMIN_PREVIEW_CACHE: dict[str, dict] = {}
 _ADMIN_LOGIN_ATTEMPTS: dict[str, list[float]] = {}
+
+DEFAULT_SITE_NAV_LINKS = [
+    {"label": "Services", "href": "/blog?tag=services"},
+    {"label": "BlackKnight", "href": "https://blackknight.auzietek.com"},
+    {"label": "Linux Users", "href": "https://linux-users.auzietek.com"},
+    {"label": "Labs", "href": "/blog?tag=lab"},
+    {"label": "RSS", "href": "/rss.xml"},
+]
+
+DEFAULT_MICROSITES = [
+    {
+        "name": "www.auzietek.com",
+        "label": "Auzietek",
+        "role": "Business front door",
+        "summary": "Services, product direction, client-fit proof, and polished public articles.",
+    },
+    {
+        "name": "blackknight.auzietek.com",
+        "label": "BlackKnight",
+        "role": "Product and platform journal",
+        "summary": "BKC demos, hardware automation, pipeline evidence, and operator-facing patterns.",
+    },
+    {
+        "name": "linux-users.auzietek.com",
+        "label": "Linux Users",
+        "role": "Teaching lane",
+        "summary": "Clear walkthroughs for newer engineers without losing the evidence trail.",
+    },
+]
+
+
+def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
+    if not raw_value.strip():
+        return fallback
+    try:
+        value = json.loads(raw_value)
+    except json.JSONDecodeError:
+        logger.warning("invalid JSON list configuration ignored")
+        return fallback
+    if not isinstance(value, list):
+        logger.warning("JSON list configuration must be a list")
+        return fallback
+    clean_items = []
+    for item in value:
+        if isinstance(item, dict):
+            clean_items.append(item)
+    return clean_items or fallback
 
 
 def api_get(path: str, **params):
@@ -232,7 +293,7 @@ def fetch_admin_revisions(article_id: str):
 
 def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None):
     metadata = article_public_metadata(selected, SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE or None) if selected else {
-        "title": f"{SITE_NAME} | Linux notes",
+        "title": f"{SITE_NAME} | Infrastructure automation and practical systems support",
         "description": SITE_DESCRIPTION,
         "canonical_url": f"{SITE_URL}/blog",
         "og_image_url": DEFAULT_OG_IMAGE or None,
@@ -254,6 +315,13 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "is_admin_authenticated": is_admin_authenticated(),
         "site_name": SITE_NAME,
         "site_description": SITE_DESCRIPTION,
+        "site_brand": SITE_BRAND,
+        "site_section": SITE_SECTION,
+        "site_positioning": SITE_POSITIONING,
+        "site_audience": SITE_AUDIENCE,
+        "site_headline": SITE_HEADLINE,
+        "site_nav_links": _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
+        "microsites": _load_json_list(MICROSITES_JSON, DEFAULT_MICROSITES),
         "meta_title": metadata["title"],
         "meta_description": metadata["description"],
         "canonical_url": metadata["canonical_url"],

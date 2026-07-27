@@ -104,6 +104,8 @@ For local public-network style testing, set in `.env` before exposing anything b
 - `SITE_URL` to the public base URL
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_OAUTH_REDIRECT_URI` for production admin auth
 - `SITE_NAME`, `SITE_DESCRIPTION`, and `DEFAULT_OG_IMAGE` for public metadata defaults
+- `SITE_BRAND`, `SITE_SECTION`, `SITE_HEADLINE`, `SITE_POSITIONING`, and `SITE_AUDIENCE` for the public landing posture
+- `SITE_NAV_LINKS_JSON` and `MICROSITES_JSON` for bounded multi-site navigation without forking the app
 
 ## Admin model
 
