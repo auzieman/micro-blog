@@ -69,7 +69,7 @@ SITE_HEADLINE = os.getenv(
 SITE_NAV_LINKS_JSON = os.getenv("SITE_NAV_LINKS_JSON", "")
 MICROSITES_JSON = os.getenv("MICROSITES_JSON", "")
 DEFAULT_OG_IMAGE = os.getenv("DEFAULT_OG_IMAGE", "")
-THEME_VARIANTS = ["auzietek", "aurora", "paper", "midnight"]
+THEME_VARIANTS = ["auzietek", "linux-pro", "retro", "aurora", "paper", "midnight"]
 DEFAULT_THEME_VARIANT = os.getenv("DEFAULT_THEME_VARIANT", "auzietek")
 DRUPAL_SOURCE_TYPES = {
     "blog_post": "jsonapi/node/blog_post",
@@ -88,6 +88,7 @@ DEFAULT_SITE_NAV_LINKS = [
     {"label": "Services", "href": "/blog?tag=services"},
     {"label": "BlackKnight", "href": "https://blackknight.auzietek.com"},
     {"label": "Linux Users", "href": "https://linux-users.auzietek.com"},
+    {"label": "Retro Users", "href": "https://retro-users.auzietek.com"},
     {"label": "Labs", "href": "/blog?tag=lab"},
     {"label": "RSS", "href": "/rss.xml"},
 ]
@@ -121,10 +122,17 @@ DEFAULT_MICROSITES = [
 
 
 def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
-    if not raw_value.strip():
+    normalized = raw_value.strip()
+    if (
+        len(normalized) >= 2
+        and normalized[0] == normalized[-1]
+        and normalized[0] in {"'", '"'}
+    ):
+        normalized = normalized[1:-1].strip()
+    if not normalized:
         return fallback
     try:
-        value = json.loads(raw_value)
+        value = json.loads(normalized)
     except json.JSONDecodeError:
         logger.warning("invalid JSON list configuration ignored")
         return fallback

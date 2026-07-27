@@ -44,6 +44,19 @@ creating a domain for every tag.
 Write like an experienced engineer teaching someone smart who is still building
 their operational instincts.
 
+The desired voice is:
+
+```text
+serious professor
+  + practical field engineer
+  + just enough mad-science curiosity to stay memorable
+```
+
+Older funny Linux notes, valley-talk, late-night lab banter, and rough forum-like
+phrasing should be treated as source material, not final public copy. Keep the
+useful lesson and the human spark. Remove wording that would distract a young
+engineer, a potential MSP client, or a future product/funding conversation.
+
 Prefer:
 
 - problem first
@@ -59,6 +72,7 @@ Avoid:
 - unexplained acronyms
 - raw lab chatter without a takeaway
 - posts that are only “what I did today” unless they teach a reusable pattern
+- slang-heavy troubleshooting language in promoted public articles
 
 Personality is welcome in articles, but the landing pages should make the value
 plain within a few seconds.
