@@ -16,6 +16,7 @@ beta.auzietek.com
 blackknight.auzietek.com
 linux-users.auzietek.com
 retro-users.auzietek.com
+www.blackknightcontroller.com -> redirects to blackknight.auzietek.com
 ```
 
 All four names point at the IONOS primary host and route through nginx to the
@@ -95,9 +96,45 @@ python3 ionos_dns.py --api-key-file /root/.secrets/ionos-api-key \
 Avoid hand-building the DNS API request body. The helper already handles the
 IONOS record-create array payload requirement.
 
+## New BlackKnightController domain
+
+`blackknightcontroller.com` exists as a separate IONOS DNS zone. During the
+first pass, the API allowed creating:
+
+```text
+www.blackknightcontroller.com A 74.208.45.165
+```
+
+The IONOS-generated root records were visible but protected from PATCH by the
+DNS API:
+
+```text
+blackknightcontroller.com A    IONOS parking address
+blackknightcontroller.com AAAA IONOS parking address
+```
+
+Until the root parking/website-builder lock is cleared in the IONOS UI, the
+bare domain may continue to show IONOS parking content. The nginx redirect is
+already prepared for both names:
+
+```text
+blackknightcontroller.com
+www.blackknightcontroller.com
+```
+
+Both redirect to:
+
+```text
+https://blackknight.auzietek.com
+```
+
+`www.blackknightcontroller.com` works immediately because its A record points at
+the Auzietek VPS. HTTPS for the new domain still needs a dedicated certificate;
+the current `*.auzietek.com` certificate does not cover
+`blackknightcontroller.com`.
+
 ## Cutover boundary
 
 Do not point `auzietek.com` or `www.auzietek.com` at the micro-blog deployment
 until content review, admin security review, backup/rollback, and certificate
 validation are complete.
-
