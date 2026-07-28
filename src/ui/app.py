@@ -766,6 +766,7 @@ def apply_security_headers(response):
         "script-src 'self' 'unsafe-inline' https:; "
         "font-src 'self' https: data:; "
         "connect-src 'self' http: https:; "
+        "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self' https://accounts.google.com"
