@@ -47,6 +47,13 @@ The pipeline should capture:
 - the validation check;
 - the evidence link or receipt.
 
+![BlackKnightController pipeline workbench](/content-files/assets/bkc/bkc-pipeline-workbench.png)
+
+The pipeline workbench is where that contract becomes visible. A pipeline is not
+just a name in a list; it carries source layers, resolved dictionary values,
+latest run status, stage maps, actions, and run history. That gives the operator
+and the assistant the same object to reason about.
+
 That is how a messy lab session becomes a better next run.
 
 ## What the recent runs proved
@@ -67,6 +74,13 @@ important part is that the failures produced better fragments.
 Once a Debian PXE lane was known good, it needed to be protected. Once the ESXi
 VM clone pattern worked, it became a reusable workload seed. Once a broad PXE
 listener was risky, PXE became deny-by-default with exact target exceptions.
+
+![BlackKnightController inventory console](/content-files/assets/bkc/bkc-inventory-console.png)
+
+The same pattern applies to inventory. Hosts, groups, VMs, clusters, APIs,
+containers, pipelines, actions, and credentials should not live in separate
+mental drawers. BKC keeps them close enough that a pipeline can explain what it
+touches and why.
 
 ## The product direction
 
