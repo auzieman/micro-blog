@@ -20,6 +20,10 @@
   <style>
     :root {
       color-scheme: light;
+      --content-width: 1180px;
+      --reading-width: 76ch;
+      --page-pad: clamp(1rem, 3vw, 1.25rem);
+      --card-pad: clamp(0.9rem, 2.5vw, 1.15rem);
       --ink: #15232c;
       --muted: #5d6970;
       --glass: rgba(244, 246, 245, 0.88);
@@ -155,8 +159,14 @@
       opacity: 0.9;
     }
     a { color: var(--accent); text-decoration: none; }
+    a:focus-visible,
+    button:focus-visible,
+    select:focus-visible {
+      outline: 3px solid rgba(20, 132, 160, 0.42);
+      outline-offset: 3px;
+    }
     .frame {
-      width: min(100%, 1180px);
+      width: min(100%, var(--content-width));
       margin: 0 auto;
       padding: 1.25rem 1rem 2rem;
     }
@@ -224,13 +234,17 @@
       line-height: 1.5;
     }
     .rail-note strong {
-      display: block;
+      display: inline-flex;
       color: #f7fffe;
-      margin-bottom: 0.25rem;
+      margin: 0 0 0.35rem;
+      padding: 0.28rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
       font-size: 0.78rem;
       letter-spacing: 0.11em;
       text-transform: uppercase;
     }
+    .rail-note span { display: block; }
     .page-column {
       min-width: 0;
     }
@@ -247,6 +261,9 @@
       margin-bottom: 1rem;
       position: relative;
       overflow: hidden;
+    }
+    .masthead.interior {
+      padding: 0.85rem 1rem;
     }
     body.theme-auzietek .masthead {
       border-radius: 24px;
@@ -299,6 +316,33 @@
       font-weight: 900;
       letter-spacing: 0.18em;
     }
+    .beta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem 0.65rem;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+      position: relative;
+      z-index: 1;
+    }
+    .beta-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.9rem;
+      padding: 0.28rem 0.55rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(20, 132, 160, 0.18);
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
     h1 {
       margin: 0;
       font-size: clamp(2rem, 5vw, 3.1rem);
@@ -339,6 +383,7 @@
       color: var(--ink);
       font-size: 0.95rem;
       font-weight: 700;
+      min-height: 44px;
     }
     .button-link.primary {
       background: var(--accent);
@@ -544,6 +589,13 @@
       padding: 1.15rem;
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035), 0 24px 70px rgba(0, 0, 0, 0.2);
     }
+    .masthead.interior .static-page-panel {
+      margin-top: 0;
+      box-shadow: none;
+      background:
+        radial-gradient(circle at top left, rgba(112, 240, 255, 0.12), transparent 34%),
+        linear-gradient(180deg, rgba(8, 16, 24, 0.72), rgba(10, 20, 30, 0.9));
+    }
     .static-page-panel .eyebrow {
       color: var(--accent-hot);
       font-size: 0.75rem;
@@ -576,6 +628,62 @@
       color: rgba(234, 248, 255, 0.82);
       font-weight: 750;
       line-height: 1.45;
+    }
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .resource-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      min-height: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      padding: var(--card-pad);
+      color: rgba(234, 248, 255, 0.84);
+    }
+    .resource-card .category {
+      color: var(--accent-hot);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    .resource-card h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.18rem;
+      letter-spacing: -0.02em;
+    }
+    .resource-card p {
+      margin: 0;
+      line-height: 1.55;
+    }
+    .resource-card .why {
+      color: rgba(234, 248, 255, 0.72);
+      font-size: 0.92rem;
+    }
+    .resource-card .disclosure {
+      color: rgba(234, 248, 255, 0.62);
+      font-size: 0.82rem;
+      margin-top: auto;
+    }
+    .resource-card a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+      min-height: 44px;
+      padding: 0.6rem 0.78rem;
+      border-radius: 999px;
+      background: rgba(112, 240, 255, 0.1);
+      border: 1px solid rgba(112, 240, 255, 0.28);
+      color: #effcff;
+      font-weight: 850;
     }
     .content-shell {
       padding: 1rem;
@@ -785,7 +893,8 @@
       font-size: 1.05rem;
       line-height: 1.74;
       color: #17262f;
-      overflow-wrap: anywhere;
+      overflow-wrap: break-word;
+      max-width: var(--reading-width);
     }
     .article-body img,
     .article-body video,
@@ -961,29 +1070,71 @@
       box-shadow: var(--shadow);
     }
     @media (max-width: 860px) {
-      body.theme-auzietek .frame { display: block; padding: 0.8rem; }
+      body.theme-auzietek .frame { display: block; padding: 0.8rem; width: 100%; }
       body.theme-auzietek .brand-rail {
         position: static;
         min-height: auto;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
+        padding: 0.9rem;
+        border-radius: 18px;
       }
       body.theme-auzietek .rail-nav {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+      }
+      body.theme-auzietek .rail-nav a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 auto;
+        white-space: nowrap;
+        padding: 0.66rem 0.7rem;
       }
       .audience-strip { grid-template-columns: 1fr; }
       .lane-landing { grid-template-columns: 1fr; }
       .lane-proof-grid { grid-template-columns: 1fr; }
       .static-point-grid { grid-template-columns: 1fr; }
+      .resource-grid { grid-template-columns: 1fr; }
       .content-grid { grid-template-columns: 1fr; }
       .sidebar {
         position: static;
         max-height: none;
       }
       .toolbar { grid-template-columns: 1fr; }
-      .frame { padding: 0.75rem 0.75rem 1.5rem; }
+      .frame { padding: 0.75rem 0.75rem 1.5rem; width: 100%; }
       .masthead, .content-shell { border-radius: 18px; }
+      .masthead { padding: 0.85rem; }
+      .masthead.interior { padding: 0.75rem; }
+      .masthead-top { display: block; }
+      h1, body.theme-auzietek h1 { font-size: clamp(1.7rem, 9vw, 2.3rem); line-height: 1.02; }
+      .tagline { font-size: 0.98rem; }
+      .mast-actions { display: grid; grid-template-columns: 1fr; margin-top: 0.85rem; }
+      .button-link { width: 100%; }
+      .static-page-panel { padding: 0.95rem; border-radius: 18px; }
+      .static-page-panel h2 { font-size: clamp(1.45rem, 7vw, 2rem); }
+      .content-shell { padding: 0.75rem; }
+      .article-panel { padding: 1rem; }
       .article-panel { min-height: auto; }
       .post-list { max-height: none; }
+      .article-body iframe { min-height: 180px; }
+    }
+    @media (max-width: 430px) {
+      body.theme-auzietek .frame,
+      .frame { padding: 0.65rem; }
+      body.theme-auzietek .rail-nav a {
+        flex-basis: calc(50% - 0.45rem);
+        font-size: 0.88rem;
+      }
+      .rail-note { font-size: 0.78rem; }
+      .site-mark { letter-spacing: 0.14em; }
+      .audience-card,
+      .static-point-card,
+      .resource-card { border-radius: 15px; }
+    }
+    @media (max-width: 360px) {
+      body.theme-auzietek .rail-nav a { flex-basis: 100%; }
     }
   </style>
 </head>
@@ -999,14 +1150,16 @@
         <a href="{{ nav_item.href }}" class="{% if nav_item.active %}active{% endif %}">{{ nav_item.label }}</a>
         {% endfor %}
       </nav>
-      <p class="rail-note"><strong>{{ site_section }}</strong>Beta is the proving ground. Articles promote from lab evidence when they are ready to stand in public.</p>
+      <p class="rail-note"><strong>Business Beta</strong><span>Field-tested work graduates from the lab into public articles here.</span></p>
     </aside>
     <div class="page-column">
     {% if message %}
     <div class="message">{{ message }}</div>
     {% endif %}
 
-    <section class="masthead">
+    <section class="masthead {% if not is_homepage %}interior{% endif %}">
+      <div class="beta-strip"><span class="beta-badge">Public beta</span><span>Field-tested work graduates from the lab into public articles here.</span></div>
+      {% if is_homepage %}
       <div class="masthead-top">
         <div>
           <div class="site-mark">{{ site_name }}</div>
@@ -1036,6 +1189,7 @@
         <figcaption class="lane-hero-caption">{{ site_description }}</figcaption>
       </figure>
       {% endif %}
+      {% endif %}
       {% if static_page %}
       <section class="static-page-panel" aria-label="{{ static_page.label }} page">
         <div class="eyebrow">{{ static_page.eyebrow }}</div>
@@ -1045,6 +1199,20 @@
         <div class="static-point-grid">
           {% for point in static_page.points %}
           <div class="static-point-card">{{ point }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if static_resources %}
+        <div class="resource-grid" aria-label="{{ static_page.label }} resources">
+          {% for resource in static_resources %}
+          <article class="resource-card">
+            <span class="category">{{ resource.category }}</span>
+            <h3>{{ resource.name }}</h3>
+            <p>{{ resource.description }}</p>
+            <p class="why"><strong>Why it is here:</strong> {{ resource.why }}</p>
+            <a href="{{ resource.url }}" target="_blank" rel="noopener">Open resource ↗</a>
+            {% if resource.disclosure %}<p class="disclosure">{{ resource.disclosure }}</p>{% endif %}
+          </article>
           {% endfor %}
         </div>
         {% endif %}
@@ -1097,10 +1265,12 @@
       {% endif %}
     </section>
 
+    {% if show_article_section %}
     <section class="content-shell">
       <div class="content-grid">
         <aside class="sidebar">
           <h2>Recent Articles</h2>
+          {% if total > 0 %}
           <div class="toolbar">
             <div>
               <label for="page_size">Posts per page</label>
@@ -1121,6 +1291,7 @@
               <div class="stat"><span>Page</span><strong>{{ page }}</strong></div>
             </div>
           </div>
+          {% endif %}
 
           <div class="post-list">
             {% for post in posts %}
@@ -1141,10 +1312,12 @@
             {% endfor %}
           </div>
 
+          {% if total > 0 %}
           <div class="pager">
             <a href="/blog?page={{ 1 if page <= 1 else page - 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Previous</a>
             <a href="/blog?page={{ total_pages if page >= total_pages else page + 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Next</a>
           </div>
+          {% endif %}
         </aside>
 
         <article class="article-panel" id="article-start">
@@ -1169,11 +1342,12 @@
           <div class="article-body">{{ selected.html_body|safe }}</div>
           {% else %}
           <h2>Feature Article</h2>
-          <p class="summary">No article is available yet. Load sample content from the admin route, then publish a post and the public view will start to fill out.</p>
+          <p class="summary">Articles for this section are being prepared. Explore the other Auzietek lanes or check back as lab work is promoted into published guidance.</p>
           {% endif %}
         </article>
       </div>
     </section>
+    {% endif %}
     </div>
   </main>
 </body>

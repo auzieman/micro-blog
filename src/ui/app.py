@@ -389,11 +389,37 @@ AUZIETEK_PAGES = {
         "tag": "partners",
         "eyebrow": "Friends and partners",
         "title": "Good infrastructure work is stronger with good neighbors.",
-        "body": "Auzietek keeps room for trusted field resources, community projects, and practical partners that make real systems easier to buy, repair, explain, and operate.",
+        "body": "Auzietek keeps room for field-tested resources, community projects, and practical vendors that make real systems easier to buy, repair, explain, and operate. This page is intentionally curated: useful links, clear context, no link confetti.",
         "points": [
-            "Garland Computers and other practical resources belong beside the lab story.",
-            "Useful projects and examples should link out cleanly instead of becoming link confetti.",
-            "The public site should help people find the right lane quickly.",
+            "Resources are listed because they are useful to the work, not because every listing is a formal partnership.",
+            "Hardware, open-source tools, learning material, and collaborators should each have enough context to be worth the click.",
+            "As lab work becomes public guidance, this page will collect the people and projects that helped make it practical.",
+        ],
+        "resources": [
+            {
+                "name": "Garland Computers",
+                "category": "Hardware and lab supplier",
+                "description": "A practical local computer resource for parts, systems, repair conversations, and the kind of hands-on hardware support that keeps labs moving.",
+                "why": "Referenced as a useful field resource while Auzietek builds and documents repeatable infrastructure labs.",
+                "url": "https://www.garlandcomputers.com/",
+                "disclosure": "Informal lab/resource reference; not presented as a formal partnership.",
+            },
+            {
+                "name": "BlackKnightController",
+                "category": "Auzietek project",
+                "description": "The infrastructure automation control plane used in the lab stories: IPMI, PXE, hypervisor buildouts, Docker Swarm, OpenStack, ESXi, DNS, and evidence capture.",
+                "why": "It is the working proof engine behind many of the public examples.",
+                "url": "https://github.com/auzieman/BlackKnightController-main",
+                "disclosure": "Auzietek-owned project.",
+            },
+            {
+                "name": "Micro Blog",
+                "category": "Auzietek project",
+                "description": "A lightweight publishing system for turning lab work, imports, screenshots, and field notes into public articles without dragging a full CMS everywhere.",
+                "why": "This beta site is running on it now, which makes the site itself part of the evidence trail.",
+                "url": "https://github.com/auzieman/micro-blog",
+                "disclosure": "Auzietek-owned project.",
+            },
         ],
     },
 }
@@ -699,7 +725,7 @@ def fetch_admin_revisions(article_id: str):
     return response.json()["items"]
 
 
-def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None):
+def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None, is_homepage=False):
     resolved_site_url = (site_url or SITE_URL).rstrip("/")
     site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
     site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
@@ -744,6 +770,9 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "lane_landing": lane.get("landing") if lane else None,
         "lane_hero_image_url": lane.get("hero_image_url") if lane else "",
         "static_page": static_page,
+        "is_homepage": is_homepage,
+        "show_article_section": bool(selected or posts) or not static_page,
+        "static_resources": static_page.get("resources", []) if static_page else [],
         "meta_title": metadata["title"],
         "meta_description": metadata["description"],
         "canonical_url": metadata["canonical_url"],
@@ -811,7 +840,7 @@ def public_index():
         finally:
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
     static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and request.path == "/" else None
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=bool(static_page)))
 
 
 @app.get("/thinktank")
@@ -847,7 +876,7 @@ def auzietek_page():
             message = str(exc)
         finally:
             telemetry.api(request.path, "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key, is_homepage=False))
 
 
 @app.get("/post/<slug>")
