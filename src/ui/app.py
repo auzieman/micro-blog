@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 import requests
 from flask import Flask, abort, redirect, render_template, request, send_from_directory, session, url_for, Response
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from blog_shared import (
     BlogTelemetry,
@@ -38,6 +39,7 @@ def coerce_bool(value, default: bool = False) -> bool:
 
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "change-me-for-real-deployments")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
