@@ -54,6 +54,13 @@ just a name in a list; it carries source layers, resolved dictionary values,
 latest run status, stage maps, actions, and run history. That gives the operator
 and the assistant the same object to reason about.
 
+![BlackKnightController pipeline detail editor](/content-files/assets/bkc/bkc-pipeline-detail-edit.png)
+
+The edit/detail view is where the pipeline becomes maintainable instead of
+mysterious. JSON fields, stage definitions, notes, links, and dashboards need to
+be readable enough that an engineer can review them quickly and an assistant can
+reuse them without drifting into guesswork.
+
 That is how a messy lab session becomes a better next run.
 
 ## What the recent runs proved
