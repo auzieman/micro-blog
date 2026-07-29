@@ -136,24 +136,25 @@ LANE_CONFIG = {
         "theme": "auzietek",
         "tag": "services",
         "featured_slug": "infrastructure-automation-that-stays-repeatable",
-        "headline": "Cleaner infrastructure, calmer operations, stronger engineers.",
-        "description": "Auzietek helps small teams and practical operators automate infrastructure, improve reliability, and turn messy systems work into repeatable patterns.",
-        "positioning": "Infrastructure automation, AIOps strategy, and practical systems guidance.",
+        "headline": "Human-first engineering for cleaner systems.",
+        "description": "Auzietek helps small teams and practical operators make technology more natural, predictable, and clean through repeatable automation, clear evidence, and human-led AI operations.",
+        "positioning": "Simpler solutions, practical automation, and human-first AIOps.",
         "audience": "engineering leaders, founders, and right-fit clients",
         "landing": {
             "eyebrow": "What can Auzietek do for you?",
-            "title": "Turn fragile technology work into systems your team can trust.",
+            "title": "Make complex technology feel natural again.",
             "body": (
-                "Auzietek helps organizations clean up infrastructure, automate repeatable work, "
-                "and make operations easier to explain. The lab work behind the site is not just "
-                "content; it is proof that the patterns are being built, tested, broken, repaired, "
-                "and documented in the open."
+                "Auzietek is built around a simple rule: solutions should be simpler than the "
+                "problems that demanded them. We help organizations clean up infrastructure, "
+                "automate repeatable work, and make operations easier to explain. The lab work "
+                "behind the site is not just content; it is proof that the patterns are being "
+                "built, tested, broken, repaired, and documented in the open."
             ),
             "bullets": [
                 "Stabilize Linux, virtualization, container, and network operations.",
                 "Automate deployments from bare metal through running services.",
                 "Use AI as an engineering amplifier with evidence, guardrails, and human judgment.",
-                "Convert tribal knowledge into reusable runbooks, pipelines, and training material.",
+                "Convert tribal knowledge into reusable runbooks, pipelines, training material, and opportunities for more people to learn.",
             ],
             "links": [
                 {"label": "BlackKnightController", "href": "/blog?lane=blackknight"},
@@ -174,7 +175,7 @@ LANE_CONFIG = {
                 },
                 {
                     "title": "Operator education",
-                    "body": "Articles, demos, and working examples that teach younger engineers how to reason through real systems instead of memorizing disconnected commands.",
+                    "body": "Articles, demos, and working examples that teach engineers how to reason through real systems instead of memorizing disconnected commands.",
                 },
                 {
                     "title": "Product-minded cleanup",
@@ -342,6 +343,22 @@ AUZIETEK_PAGES = {
             "RACS explores sustainable, autonomous infrastructure patterns for communities, education, and medical support.",
             "Human-centered computing asks how interfaces, automation, and AI can reduce friction instead of increasing it.",
             "BlackKnightController turns some of those ideas into working infrastructure automation.",
+        ],
+    },
+    "principles": {
+        "path": "/principles",
+        "label": "Principles",
+        "tag": "principles",
+        "eyebrow": "Why we build",
+        "title": "Solutions should be simpler than the problems that demanded them.",
+        "body": "Auzietek is built around human-first engineering: technology should reduce friction, preserve dignity, and make serious systems work easier to understand. We value demonstrated skill over credentials alone, practical evidence over theatre, and flexible work that leaves room for a real life.",
+        "points": [
+            "Make engineering accessible, exciting, and repeatable instead of turning it into ceremony.",
+            "Hire and collaborate around merit, evidence, curiosity, judgment, and what people have actually built.",
+            "Use lean learning loops: build the smallest useful thing, validate it against reality, preserve what worked, and improve the next pass.",
+            "Use AI to amplify human operators, not to hide decisions inside opaque systems.",
+            "Protect team health with trust, clarity, accountability, and respect before process theater.",
+            "If the company succeeds, direct meaningful resources toward education, disaster relief, community labs, and broader access to technology.",
         ],
     },
     "articles": {
@@ -844,6 +861,7 @@ def public_index():
 
 
 @app.get("/thinktank")
+@app.get("/principles")
 @app.get("/articles")
 @app.get("/services")
 @app.get("/aiops")
