@@ -1091,8 +1091,9 @@ def public_index():
             message = str(exc)
         finally:
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
-    static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and request.path == "/" else None
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=bool(static_page), show_article_section=request.path == "/blog"))
+    is_lane_homepage = request.path == "/"
+    static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and is_lane_homepage else None
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=is_lane_homepage, show_article_section=request.path == "/blog"))
 
 
 @app.get("/thinktank")
