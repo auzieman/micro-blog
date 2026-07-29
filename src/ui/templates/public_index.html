@@ -660,6 +660,11 @@
       width: min(100%, var(--narrow-width));
       margin-left: auto;
       margin-right: auto;
+      border: 1px solid rgba(15, 55, 75, 0.12);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 250, 0.94));
+      color: var(--ink);
+      box-shadow: 0 18px 42px rgba(15, 36, 48, 0.1);
     }
     .masthead.interior .static-page-panel {
       margin-top: 0;
@@ -667,6 +672,11 @@
       background:
         radial-gradient(circle at top left, rgba(112, 240, 255, 0.12), transparent 34%),
         linear-gradient(180deg, rgba(8, 16, 24, 0.72), rgba(10, 20, 30, 0.9));
+    }
+    body.theme-auzietek .masthead.interior .static-page-panel {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(21, 94, 117, 0.08), transparent 22rem),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 251, 0.96));
     }
     .static-page-panel .eyebrow {
       color: var(--accent-hot);
@@ -681,10 +691,18 @@
       letter-spacing: -0.045em;
       margin: 0.35rem 0 0.55rem;
     }
+    body.theme-auzietek .static-page-panel h2 {
+      color: var(--ink);
+      max-width: 24ch;
+    }
     .static-page-panel p {
       max-width: 76ch;
       color: rgba(234, 248, 255, 0.78);
       line-height: 1.6;
+    }
+    body.theme-auzietek .static-page-panel p {
+      color: #40535d;
+      font-size: 1.02rem;
     }
     .static-point-grid {
       display: grid;
@@ -700,6 +718,13 @@
       color: rgba(234, 248, 255, 0.82);
       font-weight: 750;
       line-height: 1.45;
+    }
+    body.theme-auzietek .static-point-card {
+      border-color: rgba(15, 55, 75, 0.11);
+      background: rgba(239, 247, 247, 0.72);
+      color: #29424d;
+      font-weight: 680;
+      box-shadow: none;
     }
     .resource-grid {
       display: grid;

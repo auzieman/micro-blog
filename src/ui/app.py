@@ -340,9 +340,10 @@ AUZIETEK_PAGES = {
         "title": "Ideas with a path toward useful systems.",
         "body": "The ThinkTank is where Auzietek keeps larger product and social-technology ideas: RACS, human-centered computing, BlackKnightController, AIOps, and the long arc of making complex technology feel more natural and humane.",
         "points": [
-            "RACS explores sustainable, autonomous infrastructure patterns for communities, education, and medical support.",
+            "RACS remains a serious long-range thread: sustainable, autonomous infrastructure patterns for communities, education, medical support, and disaster resilience.",
             "Human-centered computing asks how interfaces, automation, and AI can reduce friction instead of increasing it.",
-            "BlackKnightController turns some of those ideas into working infrastructure automation.",
+            "BlackKnightController turns the more immediate parts of that vision into working infrastructure automation.",
+            "Auzix and next-era computing ideas stay in debate until they have enough practical evidence to promote.",
         ],
     },
     "principles": {
