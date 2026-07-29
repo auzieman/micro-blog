@@ -298,6 +298,8 @@ LANE_CONFIG = {
                 "The theme can be playful, but the writing still teaches a usable lesson.",
             ],
             "links": [
+                {"label": "AI-assisted Amiga projects", "href": "/post/ai-assisted-amiga-projects-small-tools-real-lessons?lane=retro"},
+                {"label": "AuziX retro-future OS", "href": "/post/auzix-retro-roots-future-workstation-os-experiment?lane=retro"},
                 {"label": "Amiga posts", "href": "/blog?tag=AmigaOS4.1&lane=retro"},
                 {"label": "Retro lessons", "href": "/blog?tag=retro&lane=retro"},
                 {"label": "Auzietek YouTube", "href": "https://www.youtube.com/@auzietek"},
