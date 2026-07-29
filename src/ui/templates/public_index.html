@@ -95,6 +95,7 @@
         linear-gradient(rgba(8, 20, 27, 0.22), rgba(8, 20, 27, 0.35)),
         url("{{ selected.hero_image_url if selected and selected.hero_image_url else lane_hero_image_url if lane_hero_image_url else 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1600&q=80' }}") center center / cover fixed;
       min-height: 100vh;
+      overflow-x: hidden;
     }
     body.theme-auzietek {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -894,7 +895,15 @@
       line-height: 1.74;
       color: #17262f;
       overflow-wrap: break-word;
+      word-break: normal;
       max-width: var(--reading-width);
+    }
+    .article-body table {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      border-collapse: collapse;
     }
     .article-body img,
     .article-body video,
@@ -1070,27 +1079,68 @@
       box-shadow: var(--shadow);
     }
     @media (max-width: 860px) {
-      body.theme-auzietek .frame { display: block; padding: 0.8rem; width: 100%; }
+      body {
+        background-attachment: scroll;
+      }
+      body.theme-auzietek .frame {
+        display: block;
+        width: 100%;
+        padding: 0;
+      }
       body.theme-auzietek .brand-rail {
         position: static;
         min-height: auto;
-        margin-bottom: 0.75rem;
-        padding: 0.9rem;
-        border-radius: 18px;
+        margin-bottom: 0;
+        padding: 0.72rem max(0.75rem, env(safe-area-inset-left)) 0.65rem max(0.75rem, env(safe-area-inset-right));
+        border-radius: 0;
+        gap: 0.75rem;
+        box-shadow: 0 12px 32px rgba(9, 39, 54, 0.16);
+      }
+      body.theme-auzietek .brand-rail > div:first-child {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      body.theme-auzietek .brand-logo {
+        font-size: 0.98rem;
+        letter-spacing: 0.07em;
+      }
+      body.theme-auzietek .brand-kicker {
+        margin-top: 0;
+        max-width: 15rem;
+        text-align: right;
+        font-size: 0.72rem;
+        line-height: 1.3;
       }
       body.theme-auzietek .rail-nav {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 0.45rem;
+        margin: 0 -0.15rem;
+        padding: 0 0.15rem 0.2rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+      body.theme-auzietek .rail-nav::-webkit-scrollbar {
+        display: none;
       }
       body.theme-auzietek .rail-nav a {
         min-height: 44px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        flex: 1 1 auto;
+        flex: 0 0 auto;
         white-space: nowrap;
-        padding: 0.66rem 0.7rem;
+        padding: 0.58rem 0.72rem;
+        font-size: 0.9rem;
+      }
+      body.theme-auzietek .rail-note {
+        display: none;
+      }
+      body.theme-auzietek .page-column {
+        width: 100%;
       }
       .audience-strip { grid-template-columns: 1fr; }
       .lane-landing { grid-template-columns: 1fr; }
@@ -1107,34 +1157,87 @@
       .masthead, .content-shell { border-radius: 18px; }
       .masthead { padding: 0.85rem; }
       .masthead.interior { padding: 0.75rem; }
+      body.theme-auzietek .masthead,
+      body.theme-auzietek .content-shell {
+        width: 100%;
+        margin-inline: 0;
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+      }
+      body.theme-auzietek .masthead {
+        margin-bottom: 0;
+        padding: 0.7rem 0.75rem 0.9rem;
+      }
+      body.theme-auzietek .masthead.interior {
+        padding: 0.55rem 0.75rem 0.85rem;
+      }
+      body.theme-auzietek .content-shell {
+        padding: 0.75rem;
+        border-top: 0;
+      }
       .masthead-top { display: block; }
       h1, body.theme-auzietek h1 { font-size: clamp(1.7rem, 9vw, 2.3rem); line-height: 1.02; }
       .tagline { font-size: 0.98rem; }
       .mast-actions { display: grid; grid-template-columns: 1fr; margin-top: 0.85rem; }
       .button-link { width: 100%; }
       .static-page-panel { padding: 0.95rem; border-radius: 18px; }
+      body.theme-auzietek .static-page-panel,
+      body.theme-auzietek .article-panel {
+        max-width: 820px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      body.theme-auzietek .static-page-panel {
+        margin-top: 0.3rem;
+      }
       .static-page-panel h2 { font-size: clamp(1.45rem, 7vw, 2rem); }
+      .static-page-panel p,
+      .summary,
+      .article-body {
+        font-size: 1rem;
+        line-height: 1.64;
+      }
       .content-shell { padding: 0.75rem; }
       .article-panel { padding: 1rem; }
       .article-panel { min-height: auto; }
       .post-list { max-height: none; }
       .article-body iframe { min-height: 180px; }
+      .article-body .videoWrapper::before {
+        padding: 0.5rem 0.7rem;
+      }
     }
     @media (max-width: 430px) {
-      body.theme-auzietek .frame,
+      body.theme-auzietek .frame { padding: 0; }
       .frame { padding: 0.65rem; }
+      body.theme-auzietek .masthead,
+      body.theme-auzietek .content-shell {
+        padding-left: 0.55rem;
+        padding-right: 0.55rem;
+      }
       body.theme-auzietek .rail-nav a {
-        flex-basis: calc(50% - 0.45rem);
+        flex-basis: auto;
         font-size: 0.88rem;
       }
-      .rail-note { font-size: 0.78rem; }
+      body.theme-auzietek .brand-rail > div:first-child {
+        display: block;
+      }
+      body.theme-auzietek .brand-kicker {
+        display: none;
+      }
+      .beta-strip span:not(.beta-badge) {
+        display: none;
+      }
+      .beta-strip {
+        margin-bottom: 0.55rem;
+      }
       .site-mark { letter-spacing: 0.14em; }
       .audience-card,
       .static-point-card,
       .resource-card { border-radius: 15px; }
     }
     @media (max-width: 360px) {
-      body.theme-auzietek .rail-nav a { flex-basis: 100%; }
+      body.theme-auzietek .rail-nav a { font-size: 0.84rem; }
     }
   </style>
 </head>
