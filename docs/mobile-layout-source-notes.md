@@ -61,3 +61,32 @@ Regression guard:
 
 If a phone screenshot starts with mostly navigation/chrome and very little page
 content, the layout has drifted away from the Auzietek/Drupal mobile pattern.
+
+Responsive shell guard:
+
+- Keep the document itself bounded: `html`, `body`, and the main frame should
+  stay at `width/max-width: 100%`.
+- Prefer `minmax(0, 1fr)` and `minmax(min(100%, 18rem), 1fr)` in grids.
+- Flex and grid children should be allowed to shrink with `min-width: 0`.
+- Imported article HTML is hostile until proven otherwise; constrain images,
+  SVG, canvas, video, embeds, iframes, tables, code, and long links near the
+  `.article-body` boundary.
+- Do not use `overflow-x: hidden` as the primary fix. It can hide the symptom,
+  but the real fix is identifying which child is wider than the viewport.
+- Auzietek's left rail should survive tablet and narrow desktop widths. It only
+  collapses into the compact top rail at phone width.
+
+Browser-console overflow check:
+
+```js
+[...document.querySelectorAll("*")].filter((el) => {
+  const rect = el.getBoundingClientRect();
+  return rect.right > document.documentElement.clientWidth + 1;
+}).map((el) => ({
+  tag: el.tagName,
+  className: el.className,
+  id: el.id,
+  right: Math.round(el.getBoundingClientRect().right),
+  width: Math.round(el.getBoundingClientRect().width),
+}));
+```
