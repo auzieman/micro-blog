@@ -884,7 +884,13 @@ def admin_context(message=None):
     }
 
 
-def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str | None, featured_slug: str | None = None):
+def filter_posts_for_lane(posts: list[dict], lane_key: str | None) -> list[dict]:
+    if not lane_key:
+        return posts
+    return [post for post in posts if article_lane_key(post) == lane_key]
+
+
+def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str | None, featured_slug: str | None = None, lane_key: str | None = None):
     payload = {"items": [], "total": 0, "page": page, "page_size": page_size}
     posts = []
     selected = None
@@ -892,7 +898,9 @@ def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str |
     response = api_get("/posts", page=page, page_size=page_size, tag=tag)
     response.raise_for_status()
     payload = response.json()
-    posts = payload["items"]
+    posts = filter_posts_for_lane(payload["items"], lane_key)
+    if lane_key:
+        payload = {**payload, "items": posts, "total": len(posts)}
     selected_slug = slug or featured_slug
     if selected_slug:
         selected_response = api_get(f"/posts/{selected_slug}")
@@ -901,7 +909,11 @@ def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str |
         selected_response.raise_for_status()
         selected = selected_response.json()
         redirect_slug = selected.get("redirect_slug") if slug else None
+        if not slug and lane_key and article_lane_key(selected) != lane_key:
+            selected = None
     elif posts:
+        selected = posts[0]
+    if not selected and posts:
         selected = posts[0]
     return payload, posts, selected, redirect_slug
 
@@ -1082,7 +1094,7 @@ def public_index():
     message = request.args.get("message")
     with event_scope(logger, "ui.public_index", page=page, page_size=page_size, tag=tag, theme=theme, lane=lane_key) as log:
         try:
-            payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag, lane.get("featured_slug") if lane else None)
+            payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag, lane.get("featured_slug") if lane else None, lane_key)
         except Exception as exc:
             result = "error"
             log.exception("UI public index failed")
@@ -1122,7 +1134,7 @@ def auzietek_page():
     message = request.args.get("message")
     with event_scope(logger, "ui.auzietek_page", page=page, page_size=page_size, tag=tag, theme=theme, page_key=page_key) as log:
         try:
-            payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag)
+            payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag, None, lane_key)
         except Exception as exc:
             result = "error"
             log.exception("UI Auzietek page failed")
@@ -1149,7 +1161,7 @@ def public_post(slug: str):
     theme = request.args.get("theme") or (lane.get("theme") if lane else None)
     with event_scope(logger, "ui.public_post", slug=slug, tag=tag, theme=theme, lane=lane_key) as log:
         try:
-            payload, posts, selected, redirect_slug = fetch_public_payload(page, page_size, slug, tag)
+            payload, posts, selected, redirect_slug = fetch_public_payload(page, page_size, slug, tag, None, lane_key)
             if redirect_slug and redirect_slug != slug:
                 return redirect(url_for("public_post", slug=redirect_slug, theme=theme, lane=lane_key), code=301)
             if not selected:
