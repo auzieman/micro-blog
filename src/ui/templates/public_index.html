@@ -22,8 +22,12 @@
       color-scheme: light;
       --content-width: 1180px;
       --reading-width: 76ch;
+      --shell-width: 1380px;
+      --wide-width: 1100px;
+      --narrow-width: 820px;
       --page-pad: clamp(1rem, 3vw, 1.25rem);
       --card-pad: clamp(0.9rem, 2.5vw, 1.15rem);
+      --section-gap: clamp(0.75rem, 2vw, 1.15rem);
       --ink: #15232c;
       --muted: #5d6970;
       --glass: rgba(244, 246, 245, 0.88);
@@ -172,7 +176,7 @@
       padding: 1.25rem 1rem 2rem;
     }
     body.theme-auzietek .frame {
-      width: min(100%, 1380px);
+      width: min(100%, var(--shell-width));
       display: grid;
       grid-template-columns: 220px minmax(0, 1fr);
       gap: 1.25rem;
@@ -249,6 +253,17 @@
     .page-column {
       min-width: 0;
     }
+    .layout-well {
+      width: min(100%, var(--wide-width));
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .layout-well.narrow {
+      width: min(100%, var(--narrow-width));
+    }
+    .layout-readable {
+      max-width: var(--reading-width);
+    }
     .masthead,
     .content-shell {
       background: var(--glass);
@@ -270,6 +285,11 @@
       border-radius: 24px;
       padding: 1rem 1.1rem;
       background: rgba(255, 255, 255, 0.92);
+    }
+    body.theme-auzietek .masthead.interior {
+      max-width: var(--wide-width);
+      margin-left: auto;
+      margin-right: auto;
     }
     body.theme-midnight .masthead::before {
       content: "";
@@ -590,6 +610,11 @@
       padding: 1.15rem;
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035), 0 24px 70px rgba(0, 0, 0, 0.2);
     }
+    body.theme-auzietek .static-page-panel {
+      width: min(100%, var(--narrow-width));
+      margin-left: auto;
+      margin-right: auto;
+    }
     .masthead.interior .static-page-panel {
       margin-top: 0;
       box-shadow: none;
@@ -692,6 +717,9 @@
     body.theme-auzietek .content-shell {
       padding: 1.15rem;
       border-radius: 24px;
+      max-width: var(--wide-width);
+      margin-left: auto;
+      margin-right: auto;
     }
     .content-grid {
       display: grid;
@@ -878,6 +906,13 @@
     body.theme-auzietek .article-panel {
       padding: 1.6rem clamp(1.25rem, 4vw, 3rem) 2.25rem;
     }
+    body.theme-auzietek .article-panel > * {
+      max-width: var(--reading-width);
+    }
+    body.theme-auzietek .article-panel > .article-body,
+    body.theme-auzietek .article-panel > .summary {
+      max-width: var(--reading-width);
+    }
     .article-title {
       margin: 0;
       font-size: clamp(2rem, 4vw, 3rem);
@@ -897,6 +932,9 @@
       overflow-wrap: break-word;
       word-break: normal;
       max-width: var(--reading-width);
+    }
+    .article-body > * {
+      max-width: 100%;
     }
     .article-body table {
       display: block;
@@ -929,6 +967,18 @@
       background:
         linear-gradient(135deg, rgba(17, 33, 44, 0.92), rgba(27, 45, 58, 0.88));
       box-shadow: 0 18px 42px rgba(14, 31, 43, 0.18);
+    }
+    .article-body iframe[src*="youtube.com"],
+    .article-body iframe[src*="youtu.be"],
+    .article-body iframe[src*="youtube-nocookie.com"] {
+      max-width: min(100%, 760px);
+    }
+    .scroll-reveal {
+      animation: revealUp 420ms ease both;
+    }
+    @keyframes revealUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .article-body .videoWrapper,
     .article-body .media,
@@ -1082,6 +1132,9 @@
       body {
         background-attachment: scroll;
       }
+      :root {
+        --section-gap: 0.75rem;
+      }
       body.theme-auzietek .frame {
         display: block;
         width: 100%;
@@ -1121,7 +1174,7 @@
         padding: 0 0.15rem 0.2rem;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
+        scrollbar-width: none;
       }
       body.theme-auzietek .rail-nav::-webkit-scrollbar {
         display: none;
@@ -1160,6 +1213,7 @@
       body.theme-auzietek .masthead,
       body.theme-auzietek .content-shell {
         width: 100%;
+        max-width: none;
         margin-inline: 0;
         border-left: 0;
         border-right: 0;
@@ -1184,7 +1238,7 @@
       .static-page-panel { padding: 0.95rem; border-radius: 18px; }
       body.theme-auzietek .static-page-panel,
       body.theme-auzietek .article-panel {
-        max-width: 820px;
+        max-width: var(--narrow-width);
         margin-left: auto;
         margin-right: auto;
       }
@@ -1203,8 +1257,16 @@
       .article-panel { min-height: auto; }
       .post-list { max-height: none; }
       .article-body iframe { min-height: 180px; }
+      .article-body iframe[src*="youtube.com"],
+      .article-body iframe[src*="youtu.be"],
+      .article-body iframe[src*="youtube-nocookie.com"] {
+        max-width: 100%;
+      }
       .article-body .videoWrapper::before {
         padding: 0.5rem 0.7rem;
+      }
+      .scroll-reveal {
+        animation: none;
       }
     }
     @media (max-width: 430px) {
@@ -1260,7 +1322,7 @@
     <div class="message">{{ message }}</div>
     {% endif %}
 
-    <section class="masthead {% if not is_homepage %}interior{% endif %}">
+    <section class="masthead scroll-reveal {% if not is_homepage %}interior{% endif %}">
       <div class="beta-strip"><span class="beta-badge">Public beta</span><span>Field-tested work graduates from the lab into public articles here.</span></div>
       {% if is_homepage %}
       <div class="masthead-top">
@@ -1369,7 +1431,7 @@
     </section>
 
     {% if show_article_section %}
-    <section class="content-shell">
+    <section class="content-shell scroll-reveal">
       <div class="content-grid">
         <aside class="sidebar">
           <h2>Recent Articles</h2>
@@ -1453,5 +1515,19 @@
     {% endif %}
     </div>
   </main>
+  <script>
+    (() => {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener("click", (event) => {
+          const target = document.querySelector(link.getAttribute("href"));
+          if (!target) return;
+          event.preventDefault();
+          target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+          history.replaceState(null, "", link.getAttribute("href"));
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
