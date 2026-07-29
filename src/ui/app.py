@@ -339,6 +339,15 @@ AUZIETEK_PAGES = {
         "eyebrow": "ThinkTank",
         "title": "Ideas with a path toward useful systems.",
         "body": "The ThinkTank is where Auzietek keeps larger product and social-technology ideas: RACS, human-centered computing, BlackKnightController, AIOps, and the long arc of making complex technology feel more natural and humane.",
+        "html_content": """
+            <p>The ThinkTank is where Auzietek keeps larger product and social-technology ideas while they move from intuition toward evidence.</p>
+            <p>Some ideas are already becoming practical through BlackKnightController and the lab pipelines. Others need time, experiments, writing, and better tools before they are ready to promote.</p>
+            <h3>RACS remains alive</h3>
+            <p>RACS is the serious long-range thread: sustainable, autonomous infrastructure patterns for communities, education, medical support, and disaster resilience. It is lofty, but not ornamental. It asks what happens when automation, shelter, logistics, energy, water, fabrication, and learning systems are designed around human need instead of short-term extraction.</p>
+            <h3>Auzix and next-era computing</h3>
+            <p>Auzix is more debated and experimental, but it still belongs here. It points toward a computing model that feels closer to what Linux intended to become: open, understandable, flexible, humane, and powerful enough to let people reshape their tools instead of being trapped by them.</p>
+            <p>Now that BlackKnightController and the fragment system exist, these larger ideas can be revisited with better operational memory. The next pass can be less hand-wavy and more evidence-driven: smaller experiments, preserved fragments, clearer diagrams, and working demonstrations.</p>
+        """,
         "points": [
             "RACS remains a serious long-range thread: sustainable, autonomous infrastructure patterns for communities, education, medical support, and disaster resilience.",
             "Human-centered computing asks how interfaces, automation, and AI can reduce friction instead of increasing it.",
@@ -353,6 +362,21 @@ AUZIETEK_PAGES = {
         "eyebrow": "Why we build",
         "title": "Solutions should be simpler than the problems that demanded them.",
         "body": "Auzietek is built around human-first engineering: technology should reduce friction, preserve dignity, and make serious systems work easier to understand. We value demonstrated skill over credentials alone, practical evidence over theatre, and flexible work that leaves room for a real life.",
+        "html_content": """
+            <p>Auzietek is built around human-first engineering: technology should reduce friction, preserve dignity, and make serious systems work easier to understand.</p>
+            <p>We value demonstrated skill over credentials alone, practical evidence over theater, and flexible work that leaves room for a real life.</p>
+            <h3>How we work</h3>
+            <ul>
+              <li>Make engineering accessible, exciting, and repeatable instead of turning it into ceremony.</li>
+              <li>Hire and collaborate around merit, evidence, curiosity, judgment, and what people have actually built.</li>
+              <li>Use lean learning loops: build the smallest useful thing, validate it against reality, preserve what worked, and improve the next pass.</li>
+              <li>Use AI to amplify human operators, not to hide decisions inside opaque systems.</li>
+              <li>Protect team health with trust, clarity, accountability, and respect before process theater.</li>
+              <li>Share useful work broadly: play fair with the license, and ask for help when support is what makes adoption sustainable.</li>
+            </ul>
+            <h3>Why it matters</h3>
+            <p>If the company succeeds, part of that success should flow outward: education, disaster relief, community labs, broader access to technology, and practical support for people who are usually priced out of advanced tools.</p>
+        """,
         "points": [
             "Make engineering accessible, exciting, and repeatable instead of turning it into ceremony.",
             "Hire and collaborate around merit, evidence, curiosity, judgment, and what people have actually built.",
