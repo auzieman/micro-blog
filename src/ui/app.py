@@ -433,15 +433,15 @@ AUZIETEK_PAGES = {
             "The system should make work faster while making decisions easier to audit.",
         ],
     },
-    "business": {
+    "business-case": {
         "path": "/business-case",
         "label": "Business Case",
         "tag": "services",
         "eyebrow": "Grounded economics",
         "title": "A conservative case for human-led AIOps.",
-        "body": "Auzietek and BlackKnightController are not pitched as magic automation. The business case is simpler: reduce repeated labor, shorten rebuilds, preserve operational knowledge, and keep token spend tied to validated outcomes.",
+        "body": "Auzietek and BlackKnightController are speculative as a product path, but the financial model is grounded: reduce repeated labor, shorten rebuilds, preserve operational knowledge, and keep token spend tied to validated outcomes.",
         "html_content": """
-            <p>Auzietek's model starts with a practical claim: many infrastructure costs come from repeated discovery, fragile handoffs, unclear ownership, and fixes that never make it back into a reusable operating pattern.</p>
+            <p>Auzietek's model is still emerging, but the economics are not abstract. Many infrastructure costs come from repeated discovery, fragile handoffs, unclear ownership, and fixes that never make it back into a reusable operating pattern.</p>
             <p>BlackKnightController is designed to turn that work into executable evidence: pipeline steps, fragments, host state, diagrams, validation checks, and notes that stay near the system they describe.</p>
             <h3>Traditional operating cost</h3>
             <p>In a conventional environment, skilled labor is often spent rediscovering state, comparing scattered notes, rebuilding one-off systems, and translating between tickets, shell history, diagrams, and tribal memory. That labor is expensive even when everyone is doing their best.</p>
@@ -460,8 +460,11 @@ AUZIETEK_PAGES = {
             <h3>Conservative assumptions</h3>
             <p>The model should be judged against ordinary labor economics: engineer hours, incident time, deployment duration, documentation quality, avoided regressions, and service reliability. It should not depend on replacing entire teams or pretending every task can be automated safely.</p>
             <p>The strongest investment case is not that AI removes operators. It is that good operators, clean tools, and durable operational memory can compound faster than ad hoc consulting, manual runbooks, or isolated dashboards.</p>
+            <h3>Reasonable investor lens</h3>
+            <p>The near-term opportunity is to prove repeatability in visible, boring numbers: how long a rebuild takes, how many manual steps disappear, how often known-good fragments prevent regressions, and whether token spend is smaller than the labor it helps avoid.</p>
         """,
         "points": [
+            "Speculative product direction, concrete cost categories.",
             "Measure saved engineer hours, avoided rework, deployment duration, documentation quality, and reliability.",
             "Treat token spend as a metered engineering accelerator tied to validated results.",
             "Preserve known-good fragments so discoveries do not evaporate after one session.",
@@ -1097,6 +1100,7 @@ def public_index():
 @app.get("/articles")
 @app.get("/services")
 @app.get("/aiops")
+@app.get("/business-case")
 @app.get("/friends")
 def auzietek_page():
     started = time.perf_counter()
