@@ -1,4 +1,6 @@
 import logging
+import hashlib
+import ipaddress
 import json
 import os
 import time
@@ -83,9 +85,14 @@ CONTENT_IMPORT_ROOT = os.getenv("CONTENT_IMPORT_ROOT", "/content")
 ADMIN_LOGIN_WINDOW_SECONDS = int(os.getenv("ADMIN_LOGIN_WINDOW_SECONDS", "900"))
 ADMIN_LOGIN_MAX_ATTEMPTS = int(os.getenv("ADMIN_LOGIN_MAX_ATTEMPTS", "5"))
 ENABLE_HSTS = coerce_bool(os.getenv("ENABLE_HSTS"), False)
+VISITOR_HASH_SALT = os.getenv("VISITOR_HASH_SALT", app.secret_key)
+GEOIP_LOOKUP_URL = os.getenv("GEOIP_LOOKUP_URL", "").strip()
+GEOIP_TIMEOUT_SECONDS = float(os.getenv("GEOIP_TIMEOUT_SECONDS", "0.75"))
+GEOIP_CACHE_SECONDS = int(os.getenv("GEOIP_CACHE_SECONDS", "86400"))
 
 _ADMIN_PREVIEW_CACHE: dict[str, dict] = {}
 _ADMIN_LOGIN_ATTEMPTS: dict[str, list[float]] = {}
+_GEOIP_CACHE: dict[str, tuple[float, dict[str, str]]] = {}
 
 DEFAULT_SITE_NAV_LINKS = [
     {"label": "Services", "href": "/blog?tag=services"},
@@ -576,6 +583,88 @@ def request_host() -> str:
     return request.host.split(":", 1)[0].strip().lower()
 
 
+def client_ip() -> str:
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    if forwarded:
+        return forwarded.split(",", 1)[0].strip()
+    real_ip = request.headers.get("X-Real-IP", "").strip()
+    return real_ip or (request.remote_addr or "")
+
+
+def anonymized_visitor_id(ip_value: str) -> str:
+    if not ip_value:
+        return "unknown"
+    return hashlib.sha256(f"{VISITOR_HASH_SALT}:{ip_value}".encode("utf-8")).hexdigest()[:16]
+
+
+def private_or_invalid_ip(ip_value: str) -> bool:
+    try:
+        parsed = ipaddress.ip_address(ip_value)
+    except ValueError:
+        return True
+    return parsed.is_private or parsed.is_loopback or parsed.is_link_local or parsed.is_multicast or parsed.is_reserved
+
+
+def geoip_for_ip(ip_value: str) -> dict[str, str]:
+    unknown = {"country": "unknown", "region": "unknown", "source": "none"}
+    if not ip_value:
+        return unknown
+    if private_or_invalid_ip(ip_value):
+        return {"country": "private", "region": "private", "source": "local"}
+    if not GEOIP_LOOKUP_URL:
+        return unknown
+    now = time.time()
+    cached = _GEOIP_CACHE.get(ip_value)
+    if cached and now - cached[0] < GEOIP_CACHE_SECONDS:
+        return cached[1]
+    try:
+        response = requests.get(GEOIP_LOOKUP_URL.format(ip=ip_value), timeout=GEOIP_TIMEOUT_SECONDS)
+        response.raise_for_status()
+        payload = response.json()
+        country = (
+            payload.get("country_code")
+            or payload.get("countryCode")
+            or payload.get("country")
+            or "unknown"
+        )
+        region = (
+            payload.get("region")
+            or payload.get("regionName")
+            or payload.get("state_prov")
+            or "unknown"
+        )
+        result = {"country": str(country).lower(), "region": str(region).lower(), "source": "geoip"}
+    except Exception as exc:
+        logger.warning("geoip lookup failed", extra={"event.name": "ui.geoip_lookup_failed", "error_type": type(exc).__name__})
+        result = unknown
+    _GEOIP_CACHE[ip_value] = (now, result)
+    return result
+
+
+def page_kind_for_request() -> str:
+    if request.path == "/":
+        return "home"
+    if request.path == "/blog":
+        return "blog"
+    if request.path.startswith("/post/"):
+        return "post"
+    if request.path in {page["path"] for page in AUZIETEK_PAGES.values()}:
+        return "static"
+    if request.path.startswith("/admin"):
+        return "admin"
+    if request.path in {"/healthz", "/rss.xml", "/sitemap.xml"}:
+        return "system"
+    return "other"
+
+
+def route_label_for_request() -> str:
+    if request.path.startswith("/post/"):
+        return "/post/{slug}"
+    if request.path.startswith("/content-files/"):
+        return "/content-files/{path}"
+    return request.path or "/"
+
+
 def resolve_request_lane(explicit_lane: str | None) -> tuple[str | None, dict | None, bool]:
     lane_key, lane = resolve_lane(explicit_lane)
     if lane:
@@ -894,6 +983,37 @@ def apply_security_headers(response):
     if ENABLE_HSTS:
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Cache-Control"] = "no-store" if request.path.startswith("/admin") else "public, max-age=60"
+    if request.method == "GET" and not request.path.startswith(("/static/", "/content-files/")):
+        lane_key, _lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
+        ip_value = client_ip()
+        geo = geoip_for_ip(ip_value)
+        page_attrs = {
+            "host": request_host(),
+            "route": route_label_for_request(),
+            "page_kind": page_kind_for_request(),
+            "lane": lane_key or "none",
+            "country": geo["country"],
+            "region": geo["region"],
+            "status": str(response.status_code),
+        }
+        telemetry.page_view(page_attrs)
+        logger.info(
+            "public page view",
+            extra={
+                "event.name": "ui.page_view",
+                "host": page_attrs["host"],
+                "route": page_attrs["route"],
+                "page_kind": page_attrs["page_kind"],
+                "lane": page_attrs["lane"],
+                "status": response.status_code,
+                "geo.country": geo["country"],
+                "geo.region": geo["region"],
+                "geo.source": geo["source"],
+                "visitor.id": anonymized_visitor_id(ip_value),
+                "host_lane_selected": host_lane_selected,
+                "user_agent_family": request.user_agent.browser or "unknown",
+            },
+        )
     return response
 
 

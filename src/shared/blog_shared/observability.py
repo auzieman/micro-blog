@@ -92,6 +92,7 @@ class BlogTelemetry:
         self.cache_ops = meter.create_counter("blog.cache.ops_total")
         self.cache_duration = meter.create_histogram("blog.cache.duration_ms", unit="ms")
         self.errors = meter.create_counter("blog.errors_total")
+        self.page_views = meter.create_counter("blog.page.views_total")
         self.synthetic_requests = meter.create_counter("blog.synthetic.requests_total")
         self.synthetic_duration = meter.create_histogram("blog.synthetic.duration_ms", unit="ms")
         self.synthetic_errors = meter.create_counter("blog.synthetic.errors_total")
@@ -131,6 +132,10 @@ class BlogTelemetry:
 
     def error(self, source: str, error_type: str) -> None:
         self.errors.add(1, {"source": source, "error_type": error_type})
+
+    def page_view(self, attrs: dict[str, str]) -> None:
+        safe_attrs = {str(key): str(value or "unknown") for key, value in attrs.items()}
+        self.page_views.add(1, safe_attrs)
 
     def synthetic(self, operation: str, outcome: str, duration_ms: float, error_type: str | None = None) -> None:
         attrs = {"operation": operation, "outcome": outcome}

@@ -189,6 +189,50 @@ Before production cutover, normalize certificate naming and verify the served
 chain with external clients. Some corporate/work SSL filters may be stricter
 than Chrome on a home network.
 
+## Public viewer telemetry
+
+The UI emits `blog.page.views_total` for public GET requests. Static assets and
+mounted content-file fetches are excluded so page-view charts show human-facing
+routes rather than every CSS, image, or imported article asset.
+
+Metric labels intentionally stay low-cardinality:
+
+```text
+host
+route
+page_kind
+lane
+country
+region
+status
+```
+
+Raw visitor IP addresses are not used as metric labels. The structured app log
+includes only a salted `visitor.id` hash for correlation during troubleshooting.
+
+Optional GeoIP enrichment is controlled by environment variables:
+
+```text
+VISITOR_HASH_SALT=change-me-before-deploy
+GEOIP_LOOKUP_URL=
+GEOIP_TIMEOUT_SECONDS=0.75
+GEOIP_CACHE_SECONDS=86400
+```
+
+If `GEOIP_LOOKUP_URL` is blank, public requests still count but location labels
+remain `unknown` for public IPs and `private` for RFC1918/lab traffic. If used,
+the URL must include an `{ip}` placeholder and return JSON containing one of
+`country_code`, `countryCode`, or `country`, plus optionally `region`,
+`regionName`, or `state_prov`.
+
+The checked-in Grafana overview dashboard now includes public-page panels for:
+
+```text
+public page-view rate by host/lane/page kind
+top public routes over the last hour
+viewer countries over the last day
+```
+
 ## Current legacy Drupal routes
 
 Useful legacy routes observed during the 2026-07-29 crawl:
