@@ -119,6 +119,33 @@ lab evidence
 Drafts can be rough. Public beta should be readable. Production should be
 client-safe, search-safe, and linked from the correct domain lane.
 
+## Legacy Auzietek transition
+
+Keep the existing Drupal-era `auzietek.com` content available during the beta
+transition instead of treating cutover as an instant replacement.
+
+Recommended posture:
+
+```text
+current auzietek.com / www.auzietek.com
+  legacy production until beta content is reviewed and promoted
+
+legacy.auzietek.com or /legacy
+  read-only archive after cutover, with redirects from important old URLs
+
+beta.auzietek.com
+  new business site and content model under review
+```
+
+Useful older articles should be migrated into the correct lane, polished, and
+linked back to their source when that helps continuity. Less useful historical
+content can remain in the legacy archive rather than being forced into the new
+site structure.
+
+During the transition, static business pages should behave like pages, not blog
+indexes. Blog/article browsing belongs under `/blog`, lane domains, or specific
+article routes.
+
 ## Site configuration
 
 The app supports one codebase with per-deployment public posture:

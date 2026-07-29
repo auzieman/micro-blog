@@ -102,28 +102,28 @@ DEFAULT_MICROSITES = [
         "label": "Auzietek",
         "role": "Business front door",
         "summary": "Services, product direction, client-fit proof, and polished public articles.",
-        "href": "/blog?lane=auzietek",
+        "href": "https://beta.auzietek.com/",
     },
     {
         "name": "blackknight.auzietek.com",
         "label": "BlackKnight",
         "role": "Product and platform journal",
         "summary": "BKC demos, hardware automation, pipeline evidence, and operator-facing patterns.",
-        "href": "/blog?lane=blackknight",
+        "href": "https://blackknight.auzietek.com/",
     },
     {
         "name": "linux-users.auzietek.com",
         "label": "Linux Users",
         "role": "Teaching lane",
         "summary": "Clear walkthroughs for newer engineers without losing the evidence trail.",
-        "href": "/blog?lane=linux",
+        "href": "https://linux-users.auzietek.com/blog",
     },
     {
         "name": "retro-users.auzietek.com",
         "label": "Retro Users",
         "role": "Retro computing lane",
         "summary": "Amiga, classic systems, preservation notes, and modern tooling around old iron.",
-        "href": "/blog?lane=retro",
+        "href": "https://retro-users.auzietek.com/blog",
     },
 ]
 
@@ -458,6 +458,19 @@ PUBLIC_HOST_BY_LANE = {
 
 THEME_LANE_MAP = {lane["theme"]: key for key, lane in LANE_CONFIG.items()}
 
+MICROSITE_LANE_BY_NAME = {
+    "www.auzietek.com": "auzietek",
+    "auzietek": "auzietek",
+    "blackknight.auzietek.com": "blackknight",
+    "blackknight": "blackknight",
+    "linux-users.auzietek.com": "linux",
+    "linux users": "linux",
+    "linux-users": "linux",
+    "retro-users.auzietek.com": "retro",
+    "retro users": "retro",
+    "retro-users": "retro",
+}
+
 
 def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
     normalized = raw_value.strip()
@@ -482,6 +495,26 @@ def _load_json_list(raw_value: str, fallback: list[dict]) -> list[dict]:
         if isinstance(item, dict):
             clean_items.append(item)
     return clean_items or fallback
+
+
+def microsite_href_for_lane(lane_key: str) -> str:
+    host = PUBLIC_HOST_BY_LANE.get(lane_key)
+    if not host:
+        return "#"
+    return f"https://{host}/" if lane_key in {"auzietek", "blackknight"} else f"https://{host}/blog"
+
+
+def normalize_microsites(items: list[dict]) -> list[dict]:
+    normalized = []
+    for item in items:
+        fixed = dict(item)
+        if not str(fixed.get("href") or "").strip():
+            key_source = str(fixed.get("name") or fixed.get("label") or "").strip().lower()
+            lane_key = MICROSITE_LANE_BY_NAME.get(key_source)
+            if lane_key:
+                fixed["href"] = microsite_href_for_lane(lane_key)
+        normalized.append(fixed)
+    return normalized
 
 
 def resolve_lane(lane_key: str | None) -> tuple[str | None, dict | None]:
@@ -743,7 +776,7 @@ def fetch_admin_revisions(article_id: str):
     return response.json()["items"]
 
 
-def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None, is_homepage=False):
+def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None, is_homepage=False, show_article_section=None):
     resolved_site_url = (site_url or SITE_URL).rstrip("/")
     site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
     site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
@@ -753,14 +786,27 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
     site_audience = lane.get("audience", SITE_AUDIENCE) if lane else SITE_AUDIENCE
     site_headline = lane.get("headline", SITE_HEADLINE) if lane else SITE_HEADLINE
     resolved_theme = active_theme or (lane.get("theme") if lane else None) or (selected.get("theme_variant") if selected else DEFAULT_THEME_VARIANT)
-    metadata = article_public_metadata(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None) if selected else {
-        "title": f"{site_name} | Infrastructure automation and practical systems support",
-        "description": site_description,
-        "canonical_url": f"{resolved_site_url}/blog",
-        "og_image_url": DEFAULT_OG_IMAGE or None,
-        "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
-    }
-    json_ld = article_json_ld(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None) if selected else ""
+    if static_page:
+        metadata = {
+            "title": f"{static_page['title']} | {site_name}",
+            "description": static_page.get("body") or site_description,
+            "canonical_url": f"{resolved_site_url}{static_page.get('path') or request.path}",
+            "og_image_url": DEFAULT_OG_IMAGE or None,
+            "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
+        }
+        json_ld = ""
+    elif selected:
+        metadata = article_public_metadata(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
+        json_ld = article_json_ld(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
+    else:
+        metadata = {
+            "title": f"{site_name} | Infrastructure automation and practical systems support",
+            "description": site_description,
+            "canonical_url": f"{resolved_site_url}/blog",
+            "og_image_url": DEFAULT_OG_IMAGE or None,
+            "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
+        }
+        json_ld = ""
     total_pages = max(1, (payload["total"] + payload["page_size"] - 1) // payload["page_size"])
     return {
         "posts": posts,
@@ -784,12 +830,12 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "site_audience": site_audience,
         "site_headline": site_headline,
         "site_nav_links": lane_nav_links(lane_key, resolved_theme, active_page) if lane else _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
-        "microsites": _load_json_list(MICROSITES_JSON, DEFAULT_MICROSITES),
+        "microsites": normalize_microsites(_load_json_list(MICROSITES_JSON, DEFAULT_MICROSITES)),
         "lane_landing": lane.get("landing") if lane else None,
         "lane_hero_image_url": lane.get("hero_image_url") if lane else "",
         "static_page": static_page,
         "is_homepage": is_homepage,
-        "show_article_section": bool(selected or posts) or not static_page,
+        "show_article_section": (bool(selected or posts) or not static_page) if show_article_section is None else show_article_section,
         "static_resources": static_page.get("resources", []) if static_page else [],
         "meta_title": metadata["title"],
         "meta_description": metadata["description"],
@@ -858,7 +904,7 @@ def public_index():
         finally:
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
     static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and request.path == "/" else None
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=bool(static_page)))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=bool(static_page), show_article_section=request.path == "/blog"))
 
 
 @app.get("/thinktank")
@@ -895,7 +941,7 @@ def auzietek_page():
             message = str(exc)
         finally:
             telemetry.api(request.path, "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key, is_homepage=False))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key, is_homepage=False, show_article_section=False))
 
 
 @app.get("/post/<slug>")
