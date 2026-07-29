@@ -371,6 +371,30 @@
       position: relative;
       z-index: 1;
     }
+    .section-heading {
+      display: none;
+      position: relative;
+      z-index: 1;
+      margin-top: 0.35rem;
+    }
+    .section-heading h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 3vw, 2.35rem);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+    }
+    .section-heading p {
+      margin: 0.45rem 0 0;
+      max-width: 68ch;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    body.theme-auzietek .masthead.interior.compact {
+      padding: 0.8rem 1rem;
+    }
+    body.theme-auzietek .masthead.interior.compact .section-heading {
+      display: block;
+    }
     .beta-badge {
       display: inline-flex;
       align-items: center;
@@ -1413,8 +1437,14 @@
     <div class="message">{{ message }}</div>
     {% endif %}
 
-    <section class="masthead scroll-reveal {% if not is_homepage %}interior{% endif %}">
+    <section class="masthead scroll-reveal {% if not is_homepage %}interior{% endif %}{% if show_article_section and not static_page and not is_homepage %} compact{% endif %}">
       <div class="beta-strip"><span class="beta-badge">Public beta</span><span>Field-tested work graduates from the lab into public articles here.</span></div>
+      {% if show_article_section and not static_page and not is_homepage %}
+      <div class="section-heading">
+        <h1>{{ active_lane_label }} Articles</h1>
+        <p>{{ site_positioning }}</p>
+      </div>
+      {% endif %}
       {% if is_homepage %}
       <div class="masthead-top">
         <div>
@@ -1474,7 +1504,7 @@
         {% endif %}
       </section>
       {% endif %}
-      {% if lane_landing and not static_page %}
+      {% if lane_landing and is_homepage and not static_page %}
       <section class="lane-landing" aria-label="{{ active_lane_label }} overview">
         <article class="lane-story">
           <div class="eyebrow">{{ lane_landing.eyebrow }}</div>
