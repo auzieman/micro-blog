@@ -88,6 +88,24 @@ That rhythm is also a team-health practice. Trust, clarity, accountability, and
 respect matter because unhealthy teams hide problems until the systems do it for
 them. Good operations culture makes it safe to surface reality early.
 
+## Open work should still be fair
+
+This era of AI-assisted engineering makes it possible for a small lab to produce
+tools, examples, documentation, and working patterns that used to require a much
+larger organization.
+
+Auzietek offers that work as a gift to anyone who finds it useful.
+
+If you are learning, experimenting, teaching, or trying to make your own systems
+less painful, use the work and build on it. If you are commercial, follow the
+license and play fair. If you are a worthy nonprofit, school, community group,
+or mission-driven organization, consider support services when you need them,
+but also know that the goal is to help you control costs, innovate responsibly,
+and make the world a little better.
+
+Open work is strongest when it invites people in without pretending that labor,
+maintenance, and support are free to produce forever.
+
 ## Merit should be visible in the work
 
 If Auzietek grows into a larger company, the hiring philosophy is simple:

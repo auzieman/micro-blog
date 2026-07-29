@@ -358,6 +358,7 @@ AUZIETEK_PAGES = {
             "Use lean learning loops: build the smallest useful thing, validate it against reality, preserve what worked, and improve the next pass.",
             "Use AI to amplify human operators, not to hide decisions inside opaque systems.",
             "Protect team health with trust, clarity, accountability, and respect before process theater.",
+            "Share useful work broadly: play fair with the license, and ask for help when support is what makes adoption sustainable.",
             "If the company succeeds, direct meaningful resources toward education, disaster relief, community labs, and broader access to technology.",
         ],
     },
