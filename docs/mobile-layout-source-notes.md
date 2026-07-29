@@ -73,8 +73,12 @@ Responsive shell guard:
   `.article-body` boundary.
 - Do not use `overflow-x: hidden` as the primary fix. It can hide the symptom,
   but the real fix is identifying which child is wider than the viewport.
-- Auzietek's left rail should survive tablet and narrow desktop widths. It only
-  collapses into the compact top rail at phone width.
+- Auzietek's left rail should survive desktop browser resizing. If a desktop
+  window is squeezed below the comfortable layout width, reserve a sane content
+  column and let the document scroll rather than crushing the article into a
+  receipt.
+- Actual mobile/touch layouts should collapse into the compact top rail so the
+  content column remains the visual anchor.
 
 Browser-console overflow check:
 
