@@ -233,6 +233,31 @@ top public routes over the last hour
 viewer countries over the last day
 ```
 
+IONOS monitoring alignment note:
+
+```text
+remote Prometheus stack: /svc/grafana-compose
+micro-blog collector:    /svc/micro-blog/collector/otel-collector-local.yaml
+metric endpoint:         otel collector Prometheus exporter on port 9464
+```
+
+On the current VPS, Prometheus is a preserved swarm service while micro-blog is
+a compose deployment. A temporary scrape target can be made by attaching the
+Prometheus container to `micro-blog_app_net` and scraping the collector's
+private Docker IP on `:9464`. Long term, replace that with a durable shared
+monitoring network, a stable internal scrape hostname, or provisioning managed
+by the deployment pipeline.
+
+The dashboard JSON is deployed with the app under:
+
+```text
+/svc/micro-blog/collector/microblog-overview-dashboard.json
+```
+
+If Grafana API auth is available, import it with overwrite enabled. If not,
+mount/provision it into the existing Grafana stack rather than relying on the
+compose-local Grafana profile.
+
 ## Current legacy Drupal routes
 
 Useful legacy routes observed during the 2026-07-29 crawl:

@@ -433,6 +433,41 @@ AUZIETEK_PAGES = {
             "The system should make work faster while making decisions easier to audit.",
         ],
     },
+    "business": {
+        "path": "/business-case",
+        "label": "Business Case",
+        "tag": "services",
+        "eyebrow": "Grounded economics",
+        "title": "A conservative case for human-led AIOps.",
+        "body": "Auzietek and BlackKnightController are not pitched as magic automation. The business case is simpler: reduce repeated labor, shorten rebuilds, preserve operational knowledge, and keep token spend tied to validated outcomes.",
+        "html_content": """
+            <p>Auzietek's model starts with a practical claim: many infrastructure costs come from repeated discovery, fragile handoffs, unclear ownership, and fixes that never make it back into a reusable operating pattern.</p>
+            <p>BlackKnightController is designed to turn that work into executable evidence: pipeline steps, fragments, host state, diagrams, validation checks, and notes that stay near the system they describe.</p>
+            <h3>Traditional operating cost</h3>
+            <p>In a conventional environment, skilled labor is often spent rediscovering state, comparing scattered notes, rebuilding one-off systems, and translating between tickets, shell history, diagrams, and tribal memory. That labor is expensive even when everyone is doing their best.</p>
+            <h3>Typical AIOps risk</h3>
+            <p>Many AIOps efforts improve visibility but still leave operators with another disconnected platform. If the system cannot explain what changed, prove what worked, and preserve the reusable action, it can become another tool to babysit.</p>
+            <h3>The Auzietek / BKC model</h3>
+            <p>The goal is a leaner loop: prompt, inspect, act through stable tool boundaries, validate, and commit the working fragment back into the pipeline or documentation. Token spend becomes a metered assist for engineering work, not a blank check for vague automation.</p>
+            <h3>Where value should show up</h3>
+            <ul>
+              <li>Fewer repeated research hours for common infrastructure actions.</li>
+              <li>Faster lab-to-production migration when patterns have already been validated.</li>
+              <li>Lower onboarding cost because context, evidence, and operating steps are connected.</li>
+              <li>Reduced rework when known-good fragments are preserved and protected.</li>
+              <li>Clearer customer conversations because demonstrations are backed by running systems.</li>
+            </ul>
+            <h3>Conservative assumptions</h3>
+            <p>The model should be judged against ordinary labor economics: engineer hours, incident time, deployment duration, documentation quality, avoided regressions, and service reliability. It should not depend on replacing entire teams or pretending every task can be automated safely.</p>
+            <p>The strongest investment case is not that AI removes operators. It is that good operators, clean tools, and durable operational memory can compound faster than ad hoc consulting, manual runbooks, or isolated dashboards.</p>
+        """,
+        "points": [
+            "Measure saved engineer hours, avoided rework, deployment duration, documentation quality, and reliability.",
+            "Treat token spend as a metered engineering accelerator tied to validated results.",
+            "Preserve known-good fragments so discoveries do not evaporate after one session.",
+            "Keep humans accountable for judgment while automation handles repeatable execution.",
+        ],
+    },
     "friends": {
         "path": "/friends",
         "label": "Friends",
@@ -652,7 +687,7 @@ def page_kind_for_request() -> str:
         return "static"
     if request.path.startswith("/admin"):
         return "admin"
-    if request.path in {"/healthz", "/rss.xml", "/sitemap.xml"}:
+    if request.path in {"/healthz", "/rss.xml", "/sitemap.xml", "/favicon.ico", "/robots.txt"}:
         return "system"
     return "other"
 
@@ -983,7 +1018,12 @@ def apply_security_headers(response):
     if ENABLE_HSTS:
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Cache-Control"] = "no-store" if request.path.startswith("/admin") else "public, max-age=60"
-    if request.method == "GET" and not request.path.startswith(("/static/", "/content-files/")):
+    ignored_public_metric_paths = {"/favicon.ico", "/robots.txt"}
+    if (
+        request.method == "GET"
+        and request.path not in ignored_public_metric_paths
+        and not request.path.startswith(("/static/", "/content-files/"))
+    ):
         lane_key, _lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
         ip_value = client_ip()
         geo = geoip_for_ip(ip_value)
