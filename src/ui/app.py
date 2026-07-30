@@ -349,12 +349,21 @@ AUZIETEK_PAGES = {
                 <h3>Company Mind workbench</h3>
                 <p>A resource graph view that connects hosts, services, pipelines, and operational context.</p>
                 <img src="/content-files/assets/bkc/bkc-company-mind-resources.png" alt="BlackKnightController Company Mind resource workbench" loading="lazy" />
+                <p><a href="https://blackknight.auzietek.com/post/ui-captures-as-operational-evidence">See UI evidence capture</a></p>
               </article>
               <article class="resource-card">
                 <span class="category">Pipeline evidence</span>
                 <h3>Prompt to pipeline</h3>
                 <p>Infrastructure work becomes reusable pipeline action instead of disappearing into shell history.</p>
                 <img src="/content-files/assets/bkc/bkc-pipeline-workbench.png" alt="BlackKnightController pipeline workbench" loading="lazy" />
+                <p><a href="https://blackknight.auzietek.com/post/blackknightcontroller-prompt-to-pipeline">Read the operating contract</a></p>
+              </article>
+              <article class="resource-card">
+                <span class="category">Product proof</span>
+                <h3>Lab pipelines became articles</h3>
+                <p>Recent lab runs rebuilt bare metal, brought up hypervisors, seeded workloads, exposed edge services, and preserved the evidence.</p>
+                <img src="/content-files/assets/bkc/bkc-pipeline-paths-graph.png" alt="BlackKnightController pipeline paths graph" loading="lazy" />
+                <p><a href="/post/lab-pipelines-as-product-proof">Read the lab proof story</a></p>
               </article>
             </div>
         """,
@@ -453,6 +462,30 @@ AUZIETEK_PAGES = {
                 <h3>Classic computing, modern lessons</h3>
                 <p>AmigaOS projects, AuziX experiments, preservation, emulation, and the engineering habits old machines still teach beautifully.</p>
                 <p><a href="https://retro-users.auzietek.com/blog">Read Retro Users articles</a></p>
+              </article>
+            </div>
+            <h3>Current lab proof spotlight</h3>
+            <div class="resource-grid" aria-label="Current BlackKnightController proof articles">
+              <article class="resource-card">
+                <span class="category">Auzietek + BKC</span>
+                <h3>Lab pipelines as product proof</h3>
+                <p>How the recent rebuild sequence connects bare metal, hypervisors, swarms, edge routing, screenshots, and public documentation.</p>
+                <img src="/content-files/assets/bkc/bkc-pipeline-paths-graph.png" alt="BlackKnightController pipeline paths graph" loading="lazy" />
+                <p><a href="/post/lab-pipelines-as-product-proof">Read the spotlight</a></p>
+              </article>
+              <article class="resource-card">
+                <span class="category">BlackKnightController</span>
+                <h3>From recovery to repeatable lab</h3>
+                <p>A candid field story about damaged workstation state, recovered control-plane context, and why evidence belongs near the pipeline.</p>
+                <img src="/content-files/assets/bkc/bkc-inventory-console.png" alt="BlackKnightController inventory console" loading="lazy" />
+                <p><a href="https://blackknight.auzietek.com/post/blackknightcontroller-recovery-weekend-repeatable-lab">Read the recovery story</a></p>
+              </article>
+              <article class="resource-card">
+                <span class="category">BlackKnightController</span>
+                <h3>Pipelines as tutorial kits</h3>
+                <p>Validated BKC pipelines can become public articles, repo examples, manual guides, Ansible companions, and OpenVox/Puppet-style teaching material.</p>
+                <img src="/content-files/assets/bkc/bkc-pipeline-detail-edit.png" alt="BlackKnightController pipeline detail and edit view" loading="lazy" />
+                <p><a href="https://blackknight.auzietek.com/post/blackknightcontroller-pipelines-as-tutorial-kits">Read the tutorial pattern</a></p>
               </article>
             </div>
             <h3>How articles become trustworthy</h3>
