@@ -72,3 +72,17 @@ docs/prompts/release-notes.md
 Those prompt files should tell Codex how to transform the repo into public
 articles, examples, pipeline fragments, and documentation. This pairs well with
 BKC fragments: prompts steer the writing, fragments preserve operational truth.
+
+## Tutorial kit bridge
+
+When repo Markdown comes from a mature infrastructure project, do not stop at a
+single blog article. Consider whether it should become a companion tutorial kit:
+
+- public article for the story;
+- GitHub repo for complete files;
+- BKC pipeline for the native version;
+- Ansible version for common enterprise readers;
+- Puppet/OpenVox version for declarative configuration readers;
+- manual shell version for learners.
+
+See `docs/pipeline-to-tutorial-kit.md`.

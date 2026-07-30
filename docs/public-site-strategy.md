@@ -77,6 +77,61 @@ Avoid:
 Personality is welcome in articles, but the landing pages should make the value
 plain within a few seconds.
 
+## Article format: technical magazine, not raw notebook
+
+The blog-like lanes should feel closer to good classic computing magazines than
+to an unedited lab diary.
+
+The article should carry the story:
+
+- what problem we were solving;
+- why the reader should care;
+- what the important moving parts are;
+- what worked;
+- what failed or surprised us;
+- what a careful engineer would do next.
+
+The repo should carry the runnable artifacts:
+
+- complete scripts;
+- full playbooks;
+- pipeline JSON;
+- templates;
+- example inventories;
+- screenshots and diagrams;
+- validation commands;
+- issue notes.
+
+Long command blocks and giant configuration listings should usually become a
+highlight plus a GitHub link instead of dominating the article. The article can
+show the important excerpt, then point to the full runnable version.
+
+Good public article shape:
+
+```text
+headline
+short standfirst / summary
+why this matters
+architecture or mental model
+key excerpt
+what happened in the lab
+full example on GitHub
+lessons / caveats
+next step
+```
+
+Use callouts for:
+
+- “Known good fragment”
+- “Watch out”
+- “Full repo example”
+- “Manual version”
+- “BKC pipeline version”
+- “Ansible/Puppet companion”
+
+That keeps the pages readable on phones while still preserving depth for
+engineers who want the whole kit.
+
 ## SEO structure
 
 Each public article should have:
@@ -111,6 +166,7 @@ managed-operations
 lab evidence
   -> imported draft
   -> edited beta article
+  -> companion repo/tutorial kit when useful
   -> accepted Kanboard card
   -> public beta
   -> production promotion
@@ -141,6 +197,11 @@ Useful older articles should be migrated into the correct lane, polished, and
 linked back to their source when that helps continuity. Less useful historical
 content can remain in the legacy archive rather than being forced into the new
 site structure.
+
+Older technical examples should also be refreshed when the ecosystem moved on.
+For example, Puppet articles should preserve the original operational lesson
+while pointing readers toward current open-source Puppet/OpenVox-style tooling,
+modern Debian/Fedora assumptions, and a companion repo with current examples.
 
 During the transition, static business pages should behave like pages, not blog
 indexes. Blog/article browsing belongs under `/blog`, lane domains, or specific
