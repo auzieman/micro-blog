@@ -188,4 +188,9 @@ the next operator understands what happened.
 
 That is the shared lesson across configuration management generations.
 
+Companion planning repo:
+[Puppet / OpenVox next kit](https://github.com/auzieman/auzietek-linux-lab-guides/tree/main/examples/puppet-openvox-next).
+This is intentionally marked as a next kit until the runnable OpenVox-era
+example is validated.
+
 Legacy source: [A practical opensource Puppet setup](https://auzietek.com/node/14).

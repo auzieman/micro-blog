@@ -118,3 +118,6 @@ deploy it as a stack, and validate the service URLs.
 The practical conclusion: Swarm is not the whole future of container
 orchestration, but it remains an excellent “first cluster” and a reliable lab
 target for teaching infrastructure automation.
+
+Companion example:
+[Docker Swarm for small teams](https://github.com/auzieman/auzietek-linux-lab-guides/tree/main/examples/docker-swarm-small-team).

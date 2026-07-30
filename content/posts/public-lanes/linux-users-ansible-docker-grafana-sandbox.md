@@ -118,3 +118,6 @@ curl -fsS http://localhost:4242/api/version
 
 The value is not merely that Grafana starts. The value is that the setup can be
 repeated by another engineer without decoding your shell history.
+
+Companion example:
+[Ansible + Grafana sandbox](https://github.com/auzieman/auzietek-linux-lab-guides/tree/main/examples/ansible-grafana-sandbox).

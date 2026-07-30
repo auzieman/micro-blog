@@ -142,3 +142,6 @@ The tooling changes. The operator contract does not.
 Learners do reach advanced work if we coach the intermediate steps clearly.
 Understanding a script like this makes the later storage snapshot, backup API,
 or BKC pipeline feel less like magic.
+
+Companion example:
+[ESXi vim-cmd backup pattern](https://github.com/auzieman/auzietek-linux-lab-guides/tree/main/examples/esxi-vimcmd-backups).

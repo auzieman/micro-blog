@@ -457,6 +457,7 @@ AUZIETEK_PAGES = {
             </div>
             <h3>How articles become trustworthy</h3>
             <p>Auzietek is moving toward a magazine-and-repo pattern: the article explains the idea, the screenshots prove the work existed, and GitHub carries the runnable artifacts when the topic deserves a full tutorial kit.</p>
+            <p>The first curated companion repo is <a href="https://github.com/auzieman/auzietek-linux-lab-guides">Auzietek Linux Lab Guides</a>, with small ESXi, Docker Swarm, Ansible/Grafana, and Puppet/OpenVox planning examples.</p>
             <p>That matters for advanced topics. If we modernize an older Puppet article toward OpenVox, or turn a BKC bare-metal pipeline into an Ansible companion, the public article should either link to the real guide repo or clearly say the repo is the next build target.</p>
         """,
         "points": [
