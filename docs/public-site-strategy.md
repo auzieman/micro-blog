@@ -132,6 +132,11 @@ Use callouts for:
 That keeps the pages readable on phones while still preserving depth for
 engineers who want the whole kit.
 
+Before promoting content, use `docs/prompts/public-content-proof.md` as the
+autoprompt reminder. The key rule is simple: if real screenshots, diagrams,
+terminal captures, validation output, or GitHub artifacts exist, include or link
+them. Do not let polished prose replace proof.
+
 ## SEO structure
 
 Each public article should have:

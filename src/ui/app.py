@@ -439,6 +439,24 @@ AUZIETEK_PAGES = {
         "eyebrow": "Services",
         "title": "Services for teams that need cleaner systems, not more ceremony.",
         "body": "Auzietek is a fit for small teams, founders, MSP-style environments, and practical operators who need cleaner operations, repeatable deployments, service migration, observability, and automation an engineer can still reason about at 2 AM.",
+        "html_content": """
+            <p>Auzietek is a fit for small teams, founders, MSP-style environments, and practical operators who need cleaner operations, repeatable deployments, service migration, observability, and automation an engineer can still reason about at 2 AM.</p>
+            <p>The service model is evidence-first: assess the current environment, turn working fixes into reusable fragments, and leave behind diagrams, pipelines, runbooks, and validation checks instead of mystery hero work.</p>
+            <div class="resource-grid" aria-label="Auzietek service proof screenshots">
+              <article class="resource-card">
+                <span class="category">Infrastructure map</span>
+                <h3>Resource graph</h3>
+                <p>Hosts, services, and relationships are captured visually so the next engineer can see the operating shape.</p>
+                <img src="/content-files/assets/bkc/bkc-edge-ownership-graph.png" alt="BlackKnightController edge ownership graph" loading="lazy" />
+              </article>
+              <article class="resource-card">
+                <span class="category">Pipeline workbench</span>
+                <h3>Repeatable deployment paths</h3>
+                <p>Validated steps become named pipelines with inputs, stages, and evidence instead of disappearing into shell history.</p>
+                <img src="/content-files/assets/bkc/bkc-pipeline-detail-edit.png" alt="BlackKnightController pipeline detail and edit view" loading="lazy" />
+              </article>
+            </div>
+        """,
         "points": [
             "Infrastructure assessment, cleanup, and lab-to-production pipeline design.",
             "Small-office and homelab patterns that can grow into professional operations.",
@@ -452,6 +470,24 @@ AUZIETEK_PAGES = {
         "eyebrow": "Human + AI operations",
         "title": "AI should make engineers faster without making systems opaque.",
         "body": "Auzietek's AIOps direction is grounded in human-led systems work: stable tool contracts, evidence retrieval, graph context, operational memory, and clear permissions before action. The point is better collaboration, not magic.",
+        "html_content": """
+            <p>Auzietek's AIOps direction is grounded in human-led systems work: stable tool contracts, evidence retrieval, graph context, operational memory, and clear permissions before action.</p>
+            <p>The point is better collaboration, not magic. A model can help gather context, compare evidence, draft scripts, and update documentation, but durable systems still need explicit tools, validation, and human judgment.</p>
+            <div class="resource-grid" aria-label="Auzietek AIOps proof screenshots">
+              <article class="resource-card">
+                <span class="category">Operational memory</span>
+                <h3>Company Mind graph</h3>
+                <p>Resource context gives the assistant and operator a shared map instead of asking either one to remember everything.</p>
+                <img src="/content-files/assets/bkc/bkc-company-mind-resources.png" alt="BlackKnightController Company Mind resource graph" loading="lazy" />
+              </article>
+              <article class="resource-card">
+                <span class="category">Tool contracts</span>
+                <h3>Integrations</h3>
+                <p>Stable integration surfaces matter more than vague agent promises; the tool boundary is where safe action begins.</p>
+                <img src="/content-files/assets/bkc/bkc-integrations.png" alt="BlackKnightController integrations screen" loading="lazy" />
+              </article>
+            </div>
+        """,
         "points": [
             "Humans steer intent; AI helps gather context, draft steps, and validate outcomes.",
             "Operational memory keeps known-good fragments near the pipelines that use them.",
