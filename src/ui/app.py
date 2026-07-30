@@ -335,6 +335,29 @@ AUZIETEK_PAGES = {
         "eyebrow": "Auzietek",
         "title": "What can Auzietek do for you?",
         "body": "Auzietek helps you make technology more natural, predictable, and clean: fewer mystery systems, fewer one-off fixes, clearer automation, better observability, and engineering guidance your team can reuse.",
+        "html_content": """
+            <p>Auzietek helps you make technology more natural, predictable, and clean: fewer mystery systems, fewer one-off fixes, clearer automation, better observability, and engineering guidance your team can reuse.</p>
+            <p>The public beta is backed by running lab work, not stock theater. BlackKnightController captures infrastructure resources, pipeline steps, service relationships, and operational evidence so teams can see what changed and why it matters.</p>
+            <div class="static-point-grid">
+              <div class="static-point-card">Assess and clean up Linux, virtualization, container, and network environments.</div>
+              <div class="static-point-card">Build repeatable deployment paths from bare metal to application services.</div>
+              <div class="static-point-card">Turn incidents and experiments into documentation, training, and better operating habits.</div>
+            </div>
+            <div class="resource-grid" aria-label="Auzietek lab evidence screenshots">
+              <article class="resource-card">
+                <span class="category">Live lab evidence</span>
+                <h3>Company Mind workbench</h3>
+                <p>A resource graph view that connects hosts, services, pipelines, and operational context.</p>
+                <img src="/content-files/assets/bkc/bkc-company-mind-resources.png" alt="BlackKnightController Company Mind resource workbench" loading="lazy" />
+              </article>
+              <article class="resource-card">
+                <span class="category">Pipeline evidence</span>
+                <h3>Prompt to pipeline</h3>
+                <p>Infrastructure work becomes reusable pipeline action instead of disappearing into shell history.</p>
+                <img src="/content-files/assets/bkc/bkc-pipeline-workbench.png" alt="BlackKnightController pipeline workbench" loading="lazy" />
+              </article>
+            </div>
+        """,
         "points": [
             "Assess and clean up Linux, virtualization, container, and network environments.",
             "Build repeatable deployment paths from bare metal to application services.",

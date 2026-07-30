@@ -12,8 +12,15 @@ canonical_url: https://auzietek.com/node/11
 
 Containers are often introduced through big cloud stories.
 
-That framing can make them feel larger than the problem a small lab or small
-office is trying to solve. But the everyday container value is simpler:
+The original article pushed back on that a little: DigitalOcean, AWS, and the
+other big dogs are not the only place containers make sense. A small VPS, a
+small office server, or a lab box can benefit from the same basic packaging
+idea, even if the budget is tiny and the environment is not trying to become a
+public cloud.
+
+That framing matters because people sometimes hear “containers” and immediately
+picture Kubernetes, enterprise service meshes, and three meetings about YAML.
+The everyday value is simpler:
 
 - keep a service and its dependencies together;
 - make rebuilds less mysterious;
@@ -46,6 +53,35 @@ volumes:
 
 The file becomes a map. It shows what runs, where state lives, which ports are
 public, and which secrets should stay outside Git.
+
+## The VPS comfort problem
+
+The older Auzietek post had a very practical complaint: a cheap VPS is not much
+fun if it is just a blank machine with no creature comforts.
+
+DNS tools, port mapping, host-name routing, backups, firewall helpers, and a
+clear control panel all change the experience. If you are paying extra, it is
+reasonable to expect something useful in return.
+
+Containers help because they let you keep more of the service shape under your
+own control:
+
+```text
+nginx / caddy / traefik
+  -> public HTTPS routing
+
+compose or swarm
+  -> service placement and restart policy
+
+volumes
+  -> persistent state you can back up
+
+.env
+  -> deployment-specific secrets outside Git
+```
+
+That does not remove the need for a good host. It makes the application less
+dependent on the host's exact personality.
 
 ## The operator payoff
 
