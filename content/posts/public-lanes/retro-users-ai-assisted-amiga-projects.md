@@ -51,7 +51,7 @@ The current public repo cluster includes:
 
 ![AmiWriterReact editor screenshot](/content-files/assets/retro/projects/amiwriterreact.png)
 
-![AmiWriterMUI dark theme screenshot](/content-files/assets/retro/projects/amiwritermui/dark.png)
+![AmiWriterMUI build loop diagram](/content-files/assets/retro/projects/amiwritermui/amiwritermui-build-loop.svg)
 
 ## The assisted-development angle
 
