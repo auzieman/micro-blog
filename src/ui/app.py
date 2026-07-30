@@ -424,12 +424,46 @@ AUZIETEK_PAGES = {
         "label": "Articles",
         "tag": None,
         "eyebrow": "Articles",
-        "title": "Proof, walkthroughs, and practical teaching material.",
-        "body": "Articles are where Auzietek turns real work into public guidance: practical walkthroughs, migration notes, troubleshooting patterns, and product thinking that help engineers and clients see how the work is actually done.",
+        "title": "Field notes, walkthroughs, and proof-backed teaching material.",
+        "body": "Articles are where Auzietek turns real work into public guidance: practical walkthroughs, migration notes, troubleshooting patterns, product thinking, and retro engineering stories that help engineers and clients see how the work is actually done.",
+        "html_content": """
+            <p>Articles are where Auzietek turns real work into public guidance: practical walkthroughs, migration notes, troubleshooting patterns, product thinking, and retro engineering stories that help engineers and clients see how the work is actually done.</p>
+            <p>The goal is not to publish polished guesses. The goal is to preserve useful evidence: commands, screenshots, diagrams, caveats, repo links, and the decisions that made a messy system become repeatable.</p>
+            <div class="resource-grid" aria-label="Auzietek article lane guide">
+              <article class="resource-card">
+                <span class="category">Auzietek</span>
+                <h3>Business and operating model</h3>
+                <p>Human-first engineering, service strategy, AIOps economics, and the practical story behind turning lab work into reusable operations.</p>
+                <p><a href="/blog?lane=auzietek">Read Auzietek articles</a></p>
+              </article>
+              <article class="resource-card">
+                <span class="category">BlackKnightController</span>
+                <h3>Infrastructure automation evidence</h3>
+                <p>PXE, IPMI, OpenStack, Proxmox, ESXi, Docker Swarm, edge routing, screenshots, and pipeline fragments from the working lab.</p>
+                <p><a href="https://blackknight.auzietek.com/blog">Read BlackKnight articles</a></p>
+              </article>
+              <article class="resource-card">
+                <span class="category">Linux Users</span>
+                <h3>Practical systems teaching</h3>
+                <p>Linux commands, Docker, K3s, observability, ESXi, Puppet/OpenVox-style configuration management, and field-tested operations notes.</p>
+                <p><a href="https://linux-users.auzietek.com/blog">Read Linux Users articles</a></p>
+              </article>
+              <article class="resource-card">
+                <span class="category">Retro Users</span>
+                <h3>Classic computing, modern lessons</h3>
+                <p>AmigaOS projects, AuziX experiments, preservation, emulation, and the engineering habits old machines still teach beautifully.</p>
+                <p><a href="https://retro-users.auzietek.com/blog">Read Retro Users articles</a></p>
+              </article>
+            </div>
+            <h3>How articles become trustworthy</h3>
+            <p>Auzietek is moving toward a magazine-and-repo pattern: the article explains the idea, the screenshots prove the work existed, and GitHub carries the runnable artifacts when the topic deserves a full tutorial kit.</p>
+            <p>That matters for advanced topics. If we modernize an older Puppet article toward OpenVox, or turn a BKC bare-metal pipeline into an Ansible companion, the public article should either link to the real guide repo or clearly say the repo is the next build target.</p>
+        """,
         "points": [
-            "Linux and platform articles move into the Linux Users lane.",
-            "BlackKnightController updates stay linked to working demos and pipeline evidence.",
-            "Retro computing articles preserve older lessons that still matter in modern systems.",
+            "Auzietek articles explain the company direction, service model, and human-first operating principles.",
+            "BlackKnightController articles stay linked to working demos, screenshots, and pipeline evidence.",
+            "Linux Users articles preserve practical commands and caveats, with companion repos for larger guides.",
+            "Retro Users articles preserve older lessons, project screenshots, and build notes that still matter in modern systems.",
         ],
     },
     "services": {
