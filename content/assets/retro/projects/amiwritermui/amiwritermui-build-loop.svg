@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">AmiWriterMUI AmigaOS 4.1 build and test loop</title>
+  <desc id="desc">A dark retro-styled engineering diagram showing Linux editing, OS4 SDK container builds, FTP transfer, AmigaOS 4.1 testing, screenshots, and notes flowing back into the repository.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#101820"/>
+      <stop offset="0.55" stop-color="#192631"/>
+      <stop offset="1" stop-color="#0e151b"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" x2="1">
+      <stop offset="0" stop-color="#243542"/>
+      <stop offset="1" stop-color="#17232c"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000" flood-opacity="0.38"/>
+    </filter>
+    <style>
+      .label { font-family: Inter, "DejaVu Sans", Arial, sans-serif; fill: #e9f2ef; font-weight: 800; }
+      .small { font-family: "DejaVu Sans Mono", Consolas, monospace; fill: #b8cbc6; font-size: 24px; }
+      .micro { font-family: "DejaVu Sans Mono", Consolas, monospace; fill: #8fb0aa; font-size: 20px; }
+      .accent { fill: #7fd1b9; }
+      .amber { fill: #f5c16c; }
+      .muted { fill: #9eb2ae; }
+      .panel { fill: url(#card); stroke: #355465; stroke-width: 2; rx: 28; filter: url(#shadow); }
+      .inner { fill: #0f171e; stroke: #2f4654; stroke-width: 2; rx: 18; }
+      .line { stroke: #7fd1b9; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.9; }
+      .dash { stroke-dasharray: 14 18; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="820" fill="url(#bg)"/>
+  <path d="M0 120 C250 40 420 190 665 118 C930 40 1115 115 1400 58" stroke="#2d4553" stroke-width="2" fill="none" opacity="0.45"/>
+  <path d="M0 720 C260 640 430 780 700 706 C970 630 1160 710 1400 662" stroke="#2d4553" stroke-width="2" fill="none" opacity="0.35"/>
+
+  <text x="78" y="92" class="label" font-size="46">AmiWriterMUI</text>
+  <text x="80" y="132" class="small">Small AmigaOS 4.1 editor, repeatable Linux-to-Amiga workflow</text>
+
+  <rect x="70" y="190" width="350" height="420" class="panel"/>
+  <text x="105" y="245" class="label" font-size="30">Linux workstation</text>
+  <rect x="105" y="278" width="280" height="250" class="inner"/>
+  <text x="128" y="324" class="small">$ vim main.c</text>
+  <text x="128" y="368" class="small">$ make notes</text>
+  <text x="128" y="412" class="small">$ git diff</text>
+  <text x="128" y="456" class="micro">preserve fragments</text>
+  <text x="128" y="492" class="micro">tight feedback loop</text>
+  <circle cx="352" cy="244" r="16" class="accent"/>
+
+  <rect x="525" y="190" width="350" height="420" class="panel"/>
+  <text x="560" y="245" class="label" font-size="30">OS4 SDK container</text>
+  <rect x="560" y="278" width="280" height="250" class="inner"/>
+  <text x="583" y="324" class="small">$ docker run</text>
+  <text x="583" y="368" class="small">rolfkopman/os4env</text>
+  <text x="583" y="412" class="small">$ make clean</text>
+  <text x="583" y="456" class="small">$ make</text>
+  <text x="583" y="492" class="micro">AmiWriterMUI binary</text>
+  <circle cx="807" cy="244" r="16" class="amber"/>
+
+  <rect x="980" y="190" width="350" height="420" class="panel"/>
+  <text x="1015" y="245" class="label" font-size="30">AmigaOS 4.1 target</text>
+  <rect x="1015" y="278" width="280" height="250" class="inner"/>
+  <text x="1038" y="324" class="small">Pete's FTP</text>
+  <text x="1038" y="368" class="small">TextEditor.mcc</text>
+  <text x="1038" y="412" class="small">ASL open/save</text>
+  <text x="1038" y="456" class="small">GDB + SGrab</text>
+  <text x="1038" y="492" class="micro">test on real OS4 kit</text>
+  <circle cx="1262" cy="244" r="16" class="accent"/>
+
+  <path class="line" d="M420 394 H525"/>
+  <polygon points="520,376 552,394 520,412" fill="#7fd1b9"/>
+  <path class="line" d="M875 394 H980"/>
+  <polygon points="975,376 1007,394 975,412" fill="#7fd1b9"/>
+  <path class="line dash" d="M1155 610 C1050 724 365 724 245 610"/>
+  <polygon points="256,636 226,610 267,603" fill="#7fd1b9"/>
+
+  <rect x="310" y="662" width="780" height="74" rx="24" fill="#101820" stroke="#335163" stroke-width="2"/>
+  <text x="350" y="708" class="small">build small → test honestly → capture evidence → improve the next pass</text>
+</svg>

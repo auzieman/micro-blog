@@ -44,7 +44,7 @@ Codex can help turn a half-remembered platform into a working checklist:
 The useful pattern is the same one Auzietek uses in infrastructure work: make a
 small change, test it, preserve the fragment, and improve the next run.
 
-![AmiWriterMUI default theme](/content-files/assets/retro/projects/amiwritermui/default.png)
+![AmiWriterMUI build loop diagram](/content-files/assets/retro/projects/amiwritermui/amiwritermui-build-loop.svg)
 
 ## What we built
 
@@ -56,8 +56,6 @@ small change, test it, preserve the fragment, and improve the next run.
 - Drag-and-drop file open.
 - Theme switching and recolor experiments.
 - A growing README and concept notes so the work can be repeated.
-
-![AmiWriterMUI dark theme](/content-files/assets/retro/projects/amiwritermui/dark.png)
 
 ## The build-and-test loop
 
@@ -83,10 +81,6 @@ gdb --args AmiWriterMUI
 run
 bt full
 ```
-
-![AmiWriterMUI light theme](/content-files/assets/retro/projects/amiwritermui/light.png)
-
-![AmiWriterMUI solar theme](/content-files/assets/retro/projects/amiwritermui/solar.png)
 
 Video lane:
 [Auzietek retro development playlist](https://www.youtube.com/playlist?list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7).
