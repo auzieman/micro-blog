@@ -17,6 +17,7 @@ from urllib.request import Request, urlopen
 
 
 DEFAULT_TOKEN_FILE = Path.home() / ".secrets" / "github-auzieman-token"
+DEFAULT_ALLOWED_OWNER = "auzieman"
 
 
 def read_body(args: argparse.Namespace) -> str:
@@ -69,11 +70,21 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--label", action="append", default=[], help="Issue label. May repeat.")
     parser.add_argument("--create", action="store_true", help="Actually create the issue.")
     parser.add_argument("--token-file", default=str(DEFAULT_TOKEN_FILE))
+    parser.add_argument(
+        "--allowed-owner",
+        default=DEFAULT_ALLOWED_OWNER,
+        help="Safety guardrail: only create issues for this owner unless explicitly changed.",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
+    owner = args.repo.split("/", 1)[0].strip()
+    if owner != args.allowed_owner:
+        raise SystemExit(
+            f"refusing repo outside allowed owner: repo={args.repo!r} allowed_owner={args.allowed_owner!r}"
+        )
     body = read_body(args).strip()
     payload = {"title": args.title, "body": body, "labels": args.label}
     if not args.create:

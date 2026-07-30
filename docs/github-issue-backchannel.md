@@ -103,6 +103,30 @@ The helper reads the token from:
 
 or from `GITHUB_TOKEN`.
 
+## Owner guardrail
+
+The helper refuses to create issues outside the `auzieman/*` repo namespace by
+default.
+
+That is intentional. Public issues should represent Auzie/Auzietek-authored
+engineering work, not arbitrary prompts from someone who discovered an agent or
+automation hook.
+
+If a future organization-owned repo is approved, change the allowed owner
+explicitly:
+
+```bash
+python3 scripts/github_issue.py \
+  --repo auzietek/some-approved-repo \
+  --allowed-owner auzietek \
+  --title "Approved org issue" \
+  --body-file issue.md \
+  --create
+```
+
+Do not wire public comments, Discord messages, or anonymous web input directly
+to issue creation. Treat them as observations that require owner review first.
+
 ## Why this pairs well with local LLMs
 
 Once Ollama/OpenWebUI is back in the lab, issues can become a simple queue:
