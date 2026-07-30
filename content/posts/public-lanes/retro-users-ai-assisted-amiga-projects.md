@@ -76,3 +76,6 @@ There is also a wider retro-computing moment happening here. AmiWest and the
 Amiga community are beginning to talk openly about AI-assisted Amiga
 development, which makes these little projects less like isolated experiments
 and more like early field notes.
+
+Video lane:
+[AI-assisted Amiga and retro development playlist](https://www.youtube.com/playlist?list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7).

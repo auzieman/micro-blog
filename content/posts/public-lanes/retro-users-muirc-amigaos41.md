@@ -80,4 +80,7 @@ That makes MuIRC a useful Auzietek story: not “AI writes software by magic,”
 
 Repo: [MuIRC on GitHub](https://github.com/auzieman/MuIRC).
 
+Video lane:
+[Auzietek retro development playlist](https://www.youtube.com/playlist?list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7).
+
 Legacy source: [MuIRC on Auzietek](https://auzietek.com/index.php/node/43).

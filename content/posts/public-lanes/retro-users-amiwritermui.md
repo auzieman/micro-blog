@@ -88,4 +88,7 @@ bt full
 
 ![AmiWriterMUI solar theme](/content-files/assets/retro/projects/amiwritermui/solar.png)
 
+Video lane:
+[Auzietek retro development playlist](https://www.youtube.com/playlist?list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7).
+
 Repo: [AmiWriterMUI on GitHub](https://github.com/auzieman/AmiWriterMUI).

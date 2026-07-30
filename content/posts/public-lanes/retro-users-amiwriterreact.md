@@ -59,4 +59,7 @@ make
 The original walkthrough is still useful for seeing the project in motion:
 [AmiWriterReact video walkthrough](https://youtu.be/Wb904ngIYY0).
 
+More related clips are collected in the
+[Auzietek retro development playlist](https://www.youtube.com/playlist?list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7).
+
 Repo: [AmiWriterReact on GitHub](https://github.com/auzieman/AmiWriterReact).
