@@ -36,6 +36,35 @@ Write like a good classic computing magazine:
 - links to GitHub for full artifacts;
 - clear caveats and validation.
 
+Keep the author voice human. Avoid letting the article sound like an AI
+commentator reviewing Auzietek from outside the work. Prefer:
+
+```text
+Here is what we built.
+Here is what still matters.
+Here is the command, screenshot, repo, or caveat.
+Here is how a learner can safely reach the next step.
+```
+
+over polished but distant narration.
+
+## Modernization rule
+
+It is fine to update older articles when the current world has moved on. For
+example, a Puppet article may become an OpenVox-era configuration-management
+guide, or an older ESXi backup script may become an ESXi 8 lab backup pattern.
+
+But modernization must stay grounded:
+
+- preserve useful original explanation and historical context;
+- do not dismiss older techniques if they still teach or still work in labs;
+- avoid judgmental phrasing about tools, vendors, or operators;
+- clearly mark what is archival, what is current, and what is planned;
+- for complex topics, prepare or link a runnable guide repo before making big
+  claims;
+- if the guide repo does not exist yet, frame the article as a roadmap or
+  upcoming tutorial kit, not a completed walkthrough.
+
 ## Anti-spiral guardrail
 
 If a content pass becomes abstract, stop and ask:

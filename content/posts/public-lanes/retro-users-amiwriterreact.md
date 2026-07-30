@@ -15,6 +15,8 @@ layers are close enough to touch.
 
 That closeness is valuable.
 
+![AmiWriterReact screenshot](/content-files/assets/retro/projects/amiwriterreact.png)
+
 When the stack is smaller, design decisions feel more immediate. The program
 either responds cleanly or it does not. The file either saves correctly or it
 does not. The interface either fits the system's habits or it feels wrong.
@@ -41,3 +43,20 @@ framework, a container platform, a hypervisor API, or a monitoring stack, the
 engineer should understand the job before becoming loyal to the wrapper.
 
 Retro projects like AmiWriterReact keep that muscle sharp.
+
+## Build, test, and show the work
+
+The ReAction version keeps the app split across controller, model, and view
+code, while the MUI version leans into a compact tutorial-style `main.c`. That
+comparison is part of the value: same small editor goal, different AmigaOS UI
+toolkit habits.
+
+```bash
+cd AmiWriterReact
+make
+```
+
+The original walkthrough is still useful for seeing the project in motion:
+[AmiWriterReact video walkthrough](https://youtu.be/Wb904ngIYY0).
+
+Repo: [AmiWriterReact on GitHub](https://github.com/auzieman/AmiWriterReact).

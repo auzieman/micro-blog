@@ -1,26 +1,29 @@
 ---
-title: ESXi Backups in the Good Old Days
+title: ESXi Backups with vim-cmd, SSH, and Storage Snapshots
 slug: esxi-backups-vimcmd-good-old-days
-summary: An archival ESXi SSH backup pattern using `vim-cmd`, snapshots, suspend windows, and datastore copies.
+summary: A practical ESXi SSH backup pattern using `vim-cmd`, brief suspend or snapshot windows, datastore copies, and a storage target such as TrueNAS, ZFS, or LVM.
 tags: [linux, esxi, vmware, backup, shell, operations]
 theme_variant: linux-pro
 status: published
-seo_title: ESXi backup notes with vim-cmd and SSH
-seo_description: A practical archival ESXi backup walkthrough using SSH, vim-cmd, guest state checks, snapshots, and datastore copies.
+seo_title: ESXi backup notes with vim-cmd, SSH, and snapshots
+seo_description: A practical ESXi backup walkthrough using SSH, vim-cmd, guest state checks, brief suspend or snapshot windows, and storage-side copies.
 canonical_url: https://auzietek.com/node/13
 ---
 
-This one is a time capsule, but a useful one.
+This note started as an older ESXi backup script, but the pattern is still
+useful for labs and small environments.
 
-Before every platform had a polished backup appliance, many small shops used
-SSH, datastore copies, snapshots, and `vim-cmd` to get “good enough” VM backups
-from ESXi. It was not elegant, but it was understandable: ask the host what VMs
-exist, check power state, quiesce or suspend briefly, copy the files, and bring
-the guest back.
+If you have a supported backup product, use it. If you are running a lab, a
+small office host, or an ESXi 8 environment without fancy shared storage, it is
+still valuable to understand the moving parts. SSH, `vim-cmd`, guest state
+checks, brief suspend or snapshot windows, and a storage target such as TrueNAS,
+ZFS, LVM, or a NAS export can produce understandable backups.
 
-The caveat from the original note still matters: this kind of backup can pause
-guests. On a quiet lab that may be fine. In production, storage snapshots,
-backup APIs, and application-aware quiescing are better choices.
+The caveat from the original note still matters: this kind of workflow can
+pause guests or capture a crash-consistent image if you do not quiesce the
+application correctly. That may be acceptable for a quiet lab VM. For databases
+and business systems, add application-aware steps, test restores, and prefer
+storage/API-supported snapshots when they are available.
 
 ## The old operator loop
 
@@ -45,9 +48,11 @@ for vmhost in $(cat vmhosts); do
 done
 ```
 
-That is not a productized backup system. It is a readable operational pattern.
-It also shows why SSH access on ESXi remained useful for years: normal operators
-could script normal work.
+That is not a productized backup system. It is a readable operational pattern:
+discover the VM, identify its power state, move it into a safe-enough copy
+window, perform the storage copy or snapshot, then restore the previous state.
+That is why SSH access on ESXi remains useful in labs: normal operators can
+script normal work and see exactly what happened.
 
 ## What the script was really doing
 
@@ -57,24 +62,83 @@ The important pieces were:
 - keep a per-host list of guest names;
 - resolve guest names to VM IDs with `vim-cmd`;
 - check current power state;
-- briefly suspend or snapshot when needed;
-- copy VM files to a backup target;
+- briefly suspend, snapshot, or quiesce when needed;
+- copy VM files or snapshot-backed volumes to a backup target;
 - restore the previous power state;
 - log what happened.
 
 Those steps are still the right questions even if the implementation changes.
 
+## Storage target options
+
+A modern lab version usually has one of these backing stores:
+
+- a TrueNAS VM or physical TrueNAS box exporting NFS or iSCSI;
+- a Linux storage host using ZFS snapshots;
+- an LVM-backed volume where snapshot copies are acceptable;
+- a NAS share used as a landing zone for datastore copies;
+- a vendor array such as NetApp where snapshots and clones are first-class.
+
+The old companion script used LVM snapshots:
+
+```bash
+#!/bin/bash
+vol=$1
+
+if [ ! -f /etc/snapshots/$vol.last ]; then
+  echo "0" > /etc/snapshots/$vol.last
+fi
+
+last=$(cat /etc/snapshots/$vol.last)
+if [ "$last" -gt 0 ]; then
+  last=0
+fi
+
+mkdir -p /mnt/snapshots/$vol.$last
+umount /mnt/snapshots/$vol.$last || true
+
+lvremove -f /dev/nas0/$vol.$last
+sizeraw=$(du -sk /mnt/$vol | cut -f1)
+size=$(echo "$sizeraw * 1.15" | bc)
+lvcreate -L"${size}k" -s -n "$vol.$last" /dev/nas0/$vol
+mount /dev/nas0/$vol.$last /mnt/snapshots/$vol.$last
+
+last=$((last + 1))
+echo "$last" > /etc/snapshots/$vol.last
+```
+
+That exact script should be reviewed before reuse, but the idea is still sound:
+make a point-in-time copy at the storage layer, then copy from the stable view
+instead of chasing a moving guest disk.
+
+## How I would update it for an ESXi 8 lab
+
+For a current ESXi 8 lab, I would keep the same operator loop but tighten the
+edges:
+
+- use SSH keys with a dedicated automation account where possible;
+- resolve VM IDs with exact matching instead of loose `grep`;
+- record VMX paths and datastore names before acting;
+- prefer snapshots or guest-aware quiesce over suspend when the guest supports
+  it;
+- copy to a storage target with enough retention and checksums;
+- run a restore test into an isolated network;
+- keep logs beside the backup manifest.
+
+The commands may shift between ESXi generations, but the shape of the work is
+still useful.
+
 ## Why this belongs in the modern lane
 
 BlackKnightController now treats hypervisors through APIs, SSH, IPMI, and
-pipelines. This old ESXi pattern is a predecessor to the same idea:
+pipelines. This ESXi pattern is a predecessor to the same idea:
 
 ```text
 inventory -> state check -> controlled action -> validation -> evidence
 ```
 
-The tooling changed. The operator contract did not.
+The tooling changes. The operator contract does not.
 
-For a current lab, use supported backup tooling when available. For learning,
-this article is still valuable because it shows the moving parts without hiding
-behind a vendor wizard.
+Learners do reach advanced work if we coach the intermediate steps clearly.
+Understanding a script like this makes the later storage snapshot, backup API,
+or BKC pipeline feel less like magic.
