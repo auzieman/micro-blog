@@ -297,14 +297,20 @@
     body.theme-linux-pro .linux-mag-nav {
       display: block;
       overflow: hidden;
+      position: relative;
       margin: 0 0 1rem;
       border-radius: 18px;
       border: 1px solid rgba(38, 50, 56, 0.22);
       background:
+        url("/content-files/assets/theme/lu-circuit-field.svg") right center / auto 150% no-repeat,
         linear-gradient(135deg, rgba(23, 33, 38, 0.98), rgba(38, 50, 56, 0.96)),
         repeating-linear-gradient(90deg, rgba(158, 203, 117, 0.08) 0 1px, transparent 1px 12px);
       box-shadow: 0 0.8rem 2.2rem rgba(23, 33, 38, 0.12);
       color: #f4f7f2;
+    }
+    body.theme-linux-pro .linux-mag-nav > * {
+      position: relative;
+      z-index: 1;
     }
     .linux-mag-mast {
       display: flex;
@@ -362,14 +368,29 @@
     body.theme-retro .retro-mag-nav {
       display: block;
       overflow: hidden;
+      position: relative;
       margin: 0 0 1rem;
       border-radius: 18px;
       border: 1px solid rgba(35, 27, 45, 0.22);
       background:
+        url("/content-files/assets/theme/ru-grid-field.svg") center center / cover no-repeat,
         linear-gradient(135deg, rgba(30, 38, 68, 0.98), rgba(70, 48, 92, 0.95)),
         repeating-linear-gradient(90deg, rgba(245, 128, 37, 0.12) 0 2px, transparent 2px 20px);
       box-shadow: 0 1rem 2.5rem rgba(69, 38, 23, 0.15);
       color: #fff8ec;
+    }
+    body.theme-retro .retro-mag-nav::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 12px;
+      background: url("/content-files/assets/theme/ru-checker-ribbon.svg") center center / auto 100% repeat-x;
+      opacity: 0.38;
+      pointer-events: none;
+    }
+    body.theme-retro .retro-mag-nav > * {
+      position: relative;
+      z-index: 1;
     }
     .retro-mag-mast {
       display: grid;
@@ -1016,6 +1037,7 @@
       padding: clamp(0.9rem, 2vw, 1.25rem);
       border-radius: 18px;
       background:
+        radial-gradient(circle at 96% 4%, rgba(158, 203, 117, 0.12), transparent 20rem),
         linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 241, 232, 0.9));
       border-color: rgba(38, 50, 56, 0.16);
     }
@@ -1028,6 +1050,7 @@
       padding: clamp(0.9rem, 2vw, 1.25rem);
       border-radius: 18px;
       background:
+        radial-gradient(circle at 95% 5%, rgba(212, 87, 34, 0.13), transparent 18rem),
         linear-gradient(180deg, rgba(255, 252, 244, 0.96), rgba(247, 235, 218, 0.91));
       border-color: rgba(75, 49, 83, 0.18);
     }
@@ -1159,7 +1182,13 @@
       padding: 0.85rem;
       border-radius: 14px;
       border: 1px solid rgba(64, 82, 71, 0.18);
-      background: rgba(255, 255, 255, 0.72);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(240, 246, 241, 0.72));
+    }
+    body.theme-linux-pro .linux-rail-module:first-of-type {
+      background:
+        url("/content-files/assets/theme/lu-rack-silhouette.svg") right bottom / 58% auto no-repeat,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.83), rgba(240, 246, 241, 0.8));
     }
     .linux-rail-module h3 {
       margin: 0 0 0.45rem;
@@ -1195,7 +1224,14 @@
       border-radius: 14px;
       border: 1px solid rgba(75, 49, 83, 0.18);
       background:
+        linear-gradient(90deg, rgba(212, 87, 34, 0.12), transparent 35%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(255, 244, 225, 0.76));
+    }
+    body.theme-retro .retro-rail-module:first-of-type {
+      background:
+        url("/content-files/assets/theme/ru-checker-ribbon.svg") left top / auto 18px repeat-x,
+        linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 244, 225, 0.8));
+      padding-top: 1.1rem;
     }
     .retro-rail-module h3 {
       margin: 0 0 0.45rem;
@@ -1832,6 +1868,22 @@
       }
       .scroll-reveal {
         animation: none;
+      }
+    }
+    @media print {
+      body.theme-linux-pro,
+      body.theme-retro {
+        background: #fff !important;
+      }
+      body.theme-linux-pro .linux-mag-nav,
+      body.theme-retro .retro-mag-nav,
+      body.theme-linux-pro .linux-rail-module,
+      body.theme-retro .retro-rail-module {
+        background-image: none !important;
+        box-shadow: none !important;
+      }
+      body.theme-retro .retro-mag-nav::after {
+        display: none !important;
       }
     }
     @media (max-width: 430px) {

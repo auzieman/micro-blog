@@ -310,6 +310,14 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn("body.theme-retro .resource-card a", template)
         self.assertIn("color: #ffffff", template)
 
+    def test_linux_and_retro_theme_artwork_slots_are_payload_assets(self):
+        template = (ui_app.UI_SRC / "templates" / "public_index.html").read_text()
+        self.assertIn('/content-files/assets/theme/lu-circuit-field.svg', template)
+        self.assertIn('/content-files/assets/theme/lu-rack-silhouette.svg', template)
+        self.assertIn('/content-files/assets/theme/ru-grid-field.svg', template)
+        self.assertIn('/content-files/assets/theme/ru-checker-ribbon.svg', template)
+        self.assertIn("@media print", template)
+
     def test_static_page_overrides_load_from_content_mount(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             page_dir = Path(temp_dir) / "site" / "pages"
