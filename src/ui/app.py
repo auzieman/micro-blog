@@ -1436,9 +1436,20 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         }
         json_ld = static_page_json_ld(static_page, page_key, resolved_site_url, site_name, site_description)
     elif selected:
-        metadata = article_public_metadata(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
-        metadata["og_type"] = "article"
-        json_ld = article_json_ld(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
+        if is_homepage and lane:
+            metadata = {
+                "title": f"{site_name} | {site_headline}",
+                "description": site_description,
+                "canonical_url": f"{resolved_site_url}/",
+                "og_image_url": DEFAULT_OG_IMAGE or None,
+                "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
+                "og_type": "website",
+            }
+            json_ld = lane_home_json_ld(resolved_site_url, lane)
+        else:
+            metadata = article_public_metadata(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
+            metadata["og_type"] = "article"
+            json_ld = article_json_ld(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
     else:
         metadata = {
             "title": f"{site_name} | Infrastructure automation and practical systems support",

@@ -246,6 +246,25 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn('class="theme-midnight"', body)
         self.assertIn("What can BlackKnightController do for you?", body)
 
+    def test_lane_homepage_with_featured_article_keeps_site_identity_metadata(self):
+        payload = {"items": [], "total": 1, "page": 1, "page_size": 10}
+        selected = {
+            "slug": "blackknightcontroller-lab-proof",
+            "title": "BlackKnightController lab proof",
+            "summary": "Featured article summary",
+            "theme_variant": "midnight",
+            "tags": ["blackknightcontroller"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [selected], selected, None)):
+            response = self.client.get("/", headers={"Host": "blackknight.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>BlackKnightController | Rebuild real infrastructure from power button to running service.</title>", body)
+        self.assertIn('link rel="canonical" href="https://blackknight.auzietek.com/"', body)
+        self.assertIn('property="og:type" content="website"', body)
+        self.assertIn('"@type":"WebSite"', body)
+        self.assertIn("What can BlackKnightController do for you?", body)
+
     def test_authoritative_host_ignores_cross_lane_query(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
         with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
