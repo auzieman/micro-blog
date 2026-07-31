@@ -207,25 +207,48 @@ LANE_CONFIG = {
         "description": "BlackKnightController automates the work engineers normally do by hand: power control, PXE, SSH, templates, APIs, validation, and evidence capture.",
         "positioning": "A lab-proven infrastructure automation control plane.",
         "audience": "operators, platform engineers, MSPs, and infrastructure-curious clients",
+        "hero_image_url": "/content-files/assets/astra-polish-005/heroes/black-knight-hero.svg",
         "landing": {
-            "eyebrow": "What is BlackKnightController?",
+            "eyebrow": "Product proof from the lab",
             "title": "What can BlackKnightController do for you?",
             "body": (
-                "BlackKnightController turns normal IT actions into reusable pipelines. It can wake "
-                "hardware, boot installers, ship scripts and templates, configure services, call APIs, "
-                "validate the result, and keep the evidence close enough that the next run is smarter."
+                "BlackKnightController turns the work an infrastructure engineer normally performs "
+                "by hand into named, reviewable, repeatable actions. It can wake real servers, select "
+                "boot paths, drive PXE installs, ship scripts and templates, call service APIs, validate "
+                "the result, and keep the receipts close enough that the next run starts from evidence "
+                "instead of folklore."
             ),
             "bullets": [
-                "Rebuild cattle-style lab or edge servers without treating them like pets.",
-                "Provision hypervisors, swarms, OpenStack labs, service VMs, and supporting network pieces.",
-                "Capture known-good fragments so hard-won fixes do not disappear into chat history.",
-                "Give operators a web UI and API for repeatable infrastructure actions.",
+                "Rebuild cattle-style lab or edge servers without treating them like sacred pets.",
+                "Provision hypervisors, OpenStack labs, Docker swarms, service VMs, and edge routes.",
+                "Keep known-good fragments near the pipeline so hard-won fixes do not vanish into chat history.",
+                "Give humans, CLIs, web UIs, and AI agents the same clean action model.",
+            ],
+            "sections": [
+                {
+                    "title": "Prompt to pipeline",
+                    "body": "Turn intent, discoveries, and operator decisions into concrete BKC steps that can be reviewed, run, and improved.",
+                },
+                {
+                    "title": "Bare metal to service",
+                    "body": "Drive IPMI, boot order, PXE, installers, SSH handoff, package setup, API calls, and validation as one flow.",
+                },
+                {
+                    "title": "Fragments prevent regressions",
+                    "body": "Known-good BIOS notes, PXE arguments, shell snippets, and post-validation checks stay attached to the work.",
+                },
+                {
+                    "title": "Evidence becomes training",
+                    "body": "Pipeline receipts, screenshots, graphs, and companion articles become useful material for engineers and clients.",
+                },
             ],
             "links": [
                 {"label": "GitHub", "href": "https://github.com/auzietek/BlackKnightController"},
-                {"label": "Recent BKC posts", "href": "/blog?lane=blackknight"},
+                {"label": "Prompt to pipeline", "href": "/post/blackknightcontroller-prompt-to-pipeline"},
+                {"label": "Hardware as code", "href": "/post/blackknightcontroller-hardware-as-code"},
                 {"label": "Lab evidence", "href": "/blog?tag=lab&lane=blackknight"},
             ],
+            "sections_heading": "What the current lab already proves",
             "videos": [
                 {
                     "title": "Segment 01: IPMI and pipeline foundations",

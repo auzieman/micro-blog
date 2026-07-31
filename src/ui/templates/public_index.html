@@ -900,6 +900,84 @@
       margin: 0 0 0.55rem;
       font-size: 0.88rem;
     }
+    .bkc-showcase {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+    .bkc-showcase-card {
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(112, 240, 255, 0.18);
+      background:
+        linear-gradient(180deg, rgba(10, 24, 34, 0.88), rgba(6, 12, 19, 0.96));
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.035),
+        0 18px 48px rgba(0, 0, 0, 0.22);
+    }
+    .bkc-showcase-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(112, 240, 255, 0.14);
+      filter: saturate(1.08) contrast(1.05);
+    }
+    .bkc-showcase-card div {
+      padding: 0.8rem;
+    }
+    .bkc-showcase-card strong {
+      display: block;
+      color: #f8fdff;
+      margin-bottom: 0.25rem;
+      font-size: 0.95rem;
+    }
+    .bkc-showcase-card span {
+      display: block;
+      color: rgba(234, 248, 255, 0.7);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+    body.theme-midnight .lane-hero-panel {
+      border-color: rgba(112, 240, 255, 0.2);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(112, 240, 255, 0.12), transparent 24rem),
+        linear-gradient(135deg, rgba(5, 12, 22, 0.98), rgba(15, 18, 32, 0.96));
+    }
+    body.theme-midnight .lane-landing {
+      grid-template-columns: minmax(0, 1.22fr) minmax(300px, 0.78fr);
+    }
+    body.theme-midnight .lane-story {
+      background:
+        radial-gradient(circle at top left, rgba(112, 240, 255, 0.16), transparent 28rem),
+        radial-gradient(circle at bottom right, rgba(255, 79, 216, 0.1), transparent 24rem),
+        linear-gradient(180deg, rgba(7, 15, 24, 0.88), rgba(6, 10, 18, 0.97));
+    }
+    body.theme-midnight .lane-video-board {
+      background:
+        linear-gradient(180deg, rgba(18, 28, 42, 0.86), rgba(6, 12, 20, 0.96));
+    }
+    body.theme-midnight .lane-proof-card {
+      min-height: 8rem;
+    }
+    body.theme-midnight .lane-links a {
+      box-shadow: 0 0 22px rgba(112, 240, 255, 0.08);
+    }
+    body.theme-auzietek .masthead {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(31, 145, 122, 0.11), transparent 26rem),
+        radial-gradient(circle at 82% 14%, rgba(26, 91, 122, 0.08), transparent 24rem),
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,250,249,0.95));
+    }
+    body.theme-auzietek .site-mark {
+      color: #114555;
+      background: linear-gradient(135deg, rgba(223, 242, 237, 0.92), rgba(255,255,255,0.92));
+      border: 1px solid rgba(22, 101, 95, 0.16);
+    }
+    body.theme-auzietek .tagline {
+      max-width: 68ch;
+    }
     .static-page-panel {
       margin-top: 1rem;
       border-radius: 24px;
@@ -1902,6 +1980,7 @@
       .audience-strip { grid-template-columns: 1fr; }
       .lane-landing { grid-template-columns: 1fr; }
       .lane-proof-grid { grid-template-columns: 1fr; }
+      .bkc-showcase { grid-template-columns: 1fr; }
       .static-point-grid { grid-template-columns: 1fr; }
       .resource-grid { grid-template-columns: 1fr; }
       .content-grid { grid-template-columns: 1fr; }
@@ -2256,6 +2335,38 @@
               <span>{{ section.body }}</span>
             </div>
             {% endfor %}
+          </div>
+          {% endif %}
+          {% if active_lane == 'blackknight' %}
+          <div class="bkc-showcase" aria-label="BlackKnightController proof screenshots">
+            <a class="bkc-showcase-card" href="/post/blackknightcontroller-ui-captures-as-operational-evidence">
+              <img src="/content-files/assets/bkc/bkc-company-mind-resources.png" alt="BlackKnightController resource graph showing infrastructure relationships" loading="lazy" />
+              <div>
+                <strong>Company Mind resource graph</strong>
+                <span>Inventory, relationships, and operational context become navigable instead of buried in notes.</span>
+              </div>
+            </a>
+            <a class="bkc-showcase-card" href="/post/blackknightcontroller-prompt-to-pipeline">
+              <img src="/content-files/assets/bkc/bkc-pipeline-workbench.png" alt="BlackKnightController pipeline workbench with staged actions" loading="lazy" />
+              <div>
+                <strong>Prompt-to-pipeline workbench</strong>
+                <span>Discovery becomes executable steps, validation, and receipts that can be replayed.</span>
+              </div>
+            </a>
+            <a class="bkc-showcase-card" href="/post/blackknightcontroller-openstack-esxi-swarm-edge-wrap">
+              <img src="/content-files/assets/bkc/bkc-edge-ownership-graph.png" alt="BlackKnightController graph of edge services and ownership" loading="lazy" />
+              <div>
+                <strong>Edge and service ownership</strong>
+                <span>DNS, proxies, hypervisors, swarms, and lab services are mapped as one operating fabric.</span>
+              </div>
+            </a>
+            <a class="bkc-showcase-card" href="/post/blackknightcontroller-pipelines-as-tutorial-kits">
+              <img src="/content-files/assets/bkc/bkc-pipeline-detail-edit.png" alt="BlackKnightController pipeline editor with readable JSON and shell steps" loading="lazy" />
+              <div>
+                <strong>Readable action details</strong>
+                <span>Pipelines double as tutorials: JSON, shell, evidence, and intent stay close together.</span>
+              </div>
+            </a>
           </div>
           {% endif %}
           {% if lane_landing.links %}
