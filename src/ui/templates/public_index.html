@@ -46,15 +46,15 @@
       --muted: #6f6057;
     }
     body.theme-linux-pro {
-      --glass: rgba(246, 249, 252, 0.93);
+      --glass: rgba(226, 236, 248, 0.9);
       --glass-strong: rgba(255, 255, 255, 0.98);
       --accent: #294172;
       --accent-hot: #a80030;
-      --accent-soft: rgba(222, 232, 246, 0.88);
+      --accent-soft: rgba(210, 225, 245, 0.9);
       --ink: #162232;
       --muted: #5f6e82;
-      --line: rgba(41, 65, 114, 0.16);
-      --shadow: 0 22px 52px rgba(20, 33, 52, 0.14);
+      --line: rgba(32, 66, 126, 0.22);
+      --shadow: 0 24px 58px rgba(17, 35, 70, 0.18);
     }
     body.theme-retro {
       --glass: rgba(255, 247, 235, 0.92);
@@ -131,12 +131,13 @@
     body.theme-linux-pro {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        linear-gradient(90deg, rgba(23, 33, 38, 0.035) 1px, transparent 1px),
-        linear-gradient(rgba(23, 33, 38, 0.025) 1px, transparent 1px),
-        radial-gradient(circle at 15% 8%, rgba(41, 65, 114, 0.16), transparent 24rem),
-        radial-gradient(circle at 84% 18%, rgba(168, 0, 48, 0.08), transparent 20rem),
-        linear-gradient(135deg, #f8fbff 0%, #edf3fb 52%, #e8edf5 100%);
-      background-size: 44px 44px, 44px 44px, auto, auto, auto;
+        linear-gradient(90deg, rgba(41, 65, 114, 0.065) 1px, transparent 1px),
+        linear-gradient(rgba(41, 65, 114, 0.052) 1px, transparent 1px),
+        radial-gradient(circle at 15% 8%, rgba(41, 65, 114, 0.24), transparent 24rem),
+        radial-gradient(circle at 84% 18%, rgba(168, 0, 48, 0.10), transparent 20rem),
+        radial-gradient(circle at 55% 100%, rgba(33, 150, 180, 0.12), transparent 24rem),
+        linear-gradient(135deg, #f4f8ff 0%, #e3edf9 52%, #d8e3f2 100%);
+      background-size: 44px 44px, 44px 44px, auto, auto, auto, auto;
     }
     body.theme-retro {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -302,6 +303,7 @@
       border-radius: 18px;
       border: 1px solid rgba(38, 50, 56, 0.22);
       background:
+        url("/content-files/assets/astra-polish-005/heroes/linux-users-hero.svg") right center / auto 100% no-repeat,
         url("/content-files/assets/theme/lu-circuit-field.svg") right center / auto 150% no-repeat,
         linear-gradient(135deg, rgba(23, 33, 38, 0.98), rgba(38, 50, 56, 0.96)),
         repeating-linear-gradient(90deg, rgba(158, 203, 117, 0.08) 0 1px, transparent 1px 12px);
@@ -1052,9 +1054,14 @@
       padding: clamp(0.9rem, 2vw, 1.25rem);
       border-radius: 18px;
       background:
-        radial-gradient(circle at 96% 4%, rgba(158, 203, 117, 0.12), transparent 20rem),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 241, 232, 0.9));
-      border-color: rgba(38, 50, 56, 0.16);
+        url("/content-files/assets/astra-polish-005/backgrounds/linux-blueprint.svg") center top / min(100%, 860px) auto repeat,
+        linear-gradient(90deg, rgba(41, 65, 114, 0.055) 1px, transparent 1px),
+        linear-gradient(rgba(41, 65, 114, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 96% 4%, rgba(41, 65, 114, 0.18), transparent 20rem),
+        linear-gradient(180deg, rgba(241, 247, 255, 0.96), rgba(223, 233, 247, 0.92));
+      background-size: min(100%, 860px) auto, 34px 34px, 34px 34px, auto, auto;
+      border-color: rgba(41, 65, 114, 0.22);
+      box-shadow: 0 24px 60px rgba(22, 44, 82, 0.16);
     }
     body.theme-linux-pro .content-grid {
       grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
@@ -1093,15 +1100,32 @@
       gap: 0.85rem;
       max-height: calc(100vh - 2rem);
       background:
-        linear-gradient(180deg, rgba(238, 240, 234, 0.96), rgba(255, 255, 255, 0.94));
-      border-color: rgba(64, 82, 71, 0.22);
-      box-shadow: 0 0.8rem 2.2rem rgba(23, 33, 38, 0.08);
+        linear-gradient(180deg, rgba(15, 38, 70, 0.96), rgba(20, 54, 92, 0.94));
+      color: #eef6ff;
+      border-color: rgba(125, 180, 230, 0.28);
+      box-shadow: 0 1rem 2.6rem rgba(12, 28, 58, 0.24);
     }
     body.theme-linux-pro .article-panel {
       order: 1;
       max-width: none;
-      border-color: rgba(64, 82, 71, 0.18);
-      box-shadow: 0 0.8rem 2.2rem rgba(23, 33, 38, 0.08);
+      border-color: rgba(41, 65, 114, 0.18);
+      box-shadow: 0 0.8rem 2.2rem rgba(23, 45, 82, 0.12);
+    }
+    body.theme-linux-pro .article-panel > h2 {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.38rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(41, 65, 114, 0.1);
+      color: #294172;
+      border: 1px solid rgba(41, 65, 114, 0.16);
+    }
+    body.theme-linux-pro .article-panel > h2::before {
+      content: "";
+      width: 1.1rem;
+      height: 1.1rem;
+      background: url("/content-files/assets/astra-polish-005/icons/terminal.svg") center / contain no-repeat;
     }
     body.theme-retro .sidebar {
       order: 2;
@@ -1196,25 +1220,25 @@
       display: block;
       padding: 0.85rem;
       border-radius: 14px;
-      border: 1px solid rgba(64, 82, 71, 0.18);
+      border: 1px solid rgba(160, 201, 241, 0.26);
       background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(240, 246, 241, 0.72));
+        linear-gradient(135deg, rgba(224, 238, 255, 0.13), rgba(255, 255, 255, 0.06));
     }
     body.theme-linux-pro .linux-rail-module:first-of-type {
       background:
         url("/content-files/assets/theme/lu-rack-silhouette.svg") right bottom / 58% auto no-repeat,
-        linear-gradient(135deg, rgba(255, 255, 255, 0.83), rgba(240, 246, 241, 0.8));
+        linear-gradient(135deg, rgba(224, 238, 255, 0.18), rgba(255, 255, 255, 0.08));
     }
     .linux-rail-module h3 {
       margin: 0 0 0.45rem;
       font-size: 0.82rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: #405247;
+      color: #d9ebff;
     }
     .linux-rail-module p {
       margin: 0.35rem 0 0;
-      color: #405247;
+      color: #c6d8ea;
       line-height: 1.45;
       font-size: 0.9rem;
     }
@@ -1229,10 +1253,10 @@
       justify-content: space-between;
       gap: 0.7rem;
       padding: 0.38rem 0;
-      border-top: 1px solid rgba(64, 82, 71, 0.14);
+      border-top: 1px solid rgba(160, 201, 241, 0.18);
     }
     .lane-status-list strong {
-      color: #1d3b2c;
+      color: #eff7ff;
     }
     body.theme-retro .lane-status-list span {
       border-top-color: rgba(75, 49, 83, 0.14);
@@ -1254,6 +1278,27 @@
       color: #f4f7f2;
       font-size: 0.76rem;
       font-weight: 800;
+    }
+    .lane-proof-badges {
+      display: none;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      margin: 0.85rem 0 1.1rem;
+      padding-bottom: 0.9rem;
+      border-bottom: 1px solid rgba(41, 65, 114, 0.16);
+      background:
+        url("/content-files/assets/astra-polish-005/dividers/circuit-divider.svg") left bottom / min(100%, 620px) auto no-repeat;
+    }
+    body.theme-linux-pro .lane-proof-badges {
+      display: flex;
+    }
+    .lane-proof-badges img {
+      width: clamp(7.5rem, 18vw, 10.5rem);
+      max-width: 100%;
+      height: auto;
+      box-shadow: none;
+      border-radius: 0;
+      margin: 0;
     }
     body.theme-retro .retro-rail-module {
       display: block;
@@ -2294,6 +2339,13 @@
           <h2>Feature Article</h2>
           <h1 class="article-title">{{ selected.title }}</h1>
           <p class="summary">{{ selected.summary }}</p>
+          {% if active_theme == 'linux-pro' %}
+          <div class="lane-proof-badges" aria-label="Linux Users proof markers">
+            <img src="/content-files/assets/astra-polish-005/badges/tested-in-lab.svg" alt="Tested in the Lab" loading="lazy" />
+            <img src="/content-files/assets/astra-polish-005/badges/built-with-bkc.svg" alt="Built with BKC" loading="lazy" />
+            <img src="/content-files/assets/astra-polish-005/badges/known-good.svg" alt="Known Good" loading="lazy" />
+          </div>
+          {% endif %}
           <div class="meta">
             <span>{{ selected.author_email }}</span>
             <span>{{ selected.updated_at }}</span>
