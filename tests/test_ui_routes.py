@@ -1,6 +1,7 @@
 import importlib.util
 import sys
 import unittest
+import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -218,6 +219,32 @@ class UIRouteTests(unittest.TestCase):
     def test_resource_card_links_have_light_theme_contrast_rules(self):
         template = (ui_app.UI_SRC / "templates" / "public_index.html").read_text()
         self.assertIn("body.theme-auzietek .resource-card a", template)
+
+    def test_static_page_overrides_load_from_content_mount(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            page_dir = Path(temp_dir) / "site" / "pages"
+            page_dir.mkdir(parents=True)
+            (page_dir / "principles.md").write_text(
+                """---
+page: principles
+title: Mounted Principles
+body: Mounted summary
+points:
+  - Mounted point one
+  - Mounted point two
+---
+
+## Mounted heading
+
+Mounted body from private content payload.
+""",
+                encoding="utf-8",
+            )
+            overrides = ui_app.load_static_page_overrides(temp_dir)
+        self.assertIn("principles", overrides)
+        self.assertEqual(overrides["principles"]["title"], "Mounted Principles")
+        self.assertEqual(overrides["principles"]["points"], ["Mounted point one", "Mounted point two"])
+        self.assertIn("<h2>Mounted heading</h2>", overrides["principles"]["html_content"])
         self.assertIn("body.theme-linux-pro .resource-card a", template)
         self.assertIn("body.theme-retro .resource-card a", template)
         self.assertIn("color: #ffffff", template)

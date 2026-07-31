@@ -7,6 +7,7 @@ import time
 import uuid
 from urllib.parse import urlencode
 
+import markdown
 import requests
 from flask import Flask, abort, redirect, render_template, request, send_from_directory, session, url_for, Response
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -82,6 +83,7 @@ DRUPAL_SOURCE_TYPES = {
 }
 ADMIN_PREVIEW_TTL_SECONDS = int(os.getenv("ADMIN_PREVIEW_TTL_SECONDS", "1800"))
 CONTENT_IMPORT_ROOT = os.getenv("CONTENT_IMPORT_ROOT", "/content")
+STATIC_PAGE_OVERRIDES_SUBDIR = os.getenv("STATIC_PAGE_OVERRIDES_SUBDIR", "site/pages")
 ADMIN_LOGIN_WINDOW_SECONDS = int(os.getenv("ADMIN_LOGIN_WINDOW_SECONDS", "900"))
 ADMIN_LOGIN_MAX_ATTEMPTS = int(os.getenv("ADMIN_LOGIN_MAX_ATTEMPTS", "5"))
 ENABLE_HSTS = coerce_bool(os.getenv("ENABLE_HSTS"), False)
@@ -719,6 +721,103 @@ AUZIETEK_PAGES = {
         ],
     },
 }
+
+
+def _parse_frontmatter_document(raw_text: str) -> tuple[dict, str]:
+    text = raw_text.lstrip("\ufeff")
+    if not text.startswith("---"):
+        return {}, text
+    marker_end = text.find("\n---", 3)
+    if marker_end < 0:
+        return {}, text
+    frontmatter = text[3:marker_end].strip()
+    body = text[text.find("\n", marker_end + 1) + 1 :]
+    metadata: dict[str, object] = {}
+    current_key = None
+    current_list = None
+    for raw_line in frontmatter.splitlines():
+        line = raw_line.rstrip()
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        stripped = line.strip()
+        if current_key and stripped.startswith("- "):
+            current_list.append(stripped[2:].strip().strip('"\''))
+            continue
+        current_key = None
+        current_list = None
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            continue
+        if value == "":
+            metadata[key] = []
+            current_key = key
+            current_list = metadata[key]
+            continue
+        if value.lower() in {"null", "none"}:
+            metadata[key] = None
+            continue
+        if value.lower() in {"true", "false"}:
+            metadata[key] = value.lower() == "true"
+            continue
+        if value.startswith("[") or value.startswith("{"):
+            try:
+                metadata[key] = json.loads(value)
+                continue
+            except json.JSONDecodeError:
+                pass
+        metadata[key] = value.strip('"\'')
+    return metadata, body
+
+
+def _render_static_markdown(body: str) -> str:
+    return markdown.markdown(body, extensions=["fenced_code", "tables", "codehilite"])
+
+
+def load_static_page_overrides(root_path: str | os.PathLike, subdir: str = STATIC_PAGE_OVERRIDES_SUBDIR) -> dict[str, dict]:
+    root = os.path.realpath(os.fspath(root_path))
+    scan_root = os.path.realpath(os.path.join(root, subdir.strip("/")))
+    if not scan_root.startswith(root) or not os.path.isdir(scan_root):
+        return {}
+    overrides: dict[str, dict] = {}
+    for dirpath, _dirnames, filenames in os.walk(scan_root):
+        for filename in sorted(f for f in filenames if f.endswith(".md")):
+            path = os.path.join(dirpath, filename)
+            try:
+                raw_text = open(path, encoding="utf-8").read()
+            except OSError as exc:
+                logger.warning("static page override unreadable", extra={"event.name": "ui.static_page_override_unreadable", "path": path, "error_type": type(exc).__name__})
+                continue
+            metadata, body = _parse_frontmatter_document(raw_text)
+            page_key = str(metadata.get("page") or os.path.splitext(filename)[0]).strip().lower()
+            if page_key not in AUZIETEK_PAGES:
+                logger.warning("static page override ignored for unknown page", extra={"event.name": "ui.static_page_override_unknown", "page": page_key, "path": path})
+                continue
+            page = dict(AUZIETEK_PAGES[page_key])
+            for key in ("path", "label", "tag", "eyebrow", "title", "body"):
+                if key in metadata:
+                    page[key] = metadata[key]
+            if "points" in metadata and isinstance(metadata["points"], list):
+                page["points"] = metadata["points"]
+            if body.strip():
+                page["html_content"] = _render_static_markdown(body)
+            page["source_kind"] = "filesystem-static-page"
+            page["source_path"] = os.path.relpath(path, root)
+            overrides[page_key] = page
+    return overrides
+
+
+def apply_static_page_overrides() -> None:
+    overrides = load_static_page_overrides(CONTENT_IMPORT_ROOT)
+    if overrides:
+        AUZIETEK_PAGES.update(overrides)
+        logger.info("static page overrides loaded", extra={"event.name": "ui.static_page_overrides_loaded", "count": len(overrides)})
+
+
+apply_static_page_overrides()
 
 LAB_HOST_BY_LANE = {
     "auzietek": "auzietek.lab.auzietek.com",
