@@ -429,6 +429,28 @@ Mounted body from private content payload.
         self.assertIn("http://retro-users.lab.auzietek.com/post/muirc-amigaos41-irc-client-codex?lane=retro", response.location)
         self.assertTrue(response.location.endswith("#article-start"))
 
+    def test_retro_users_lab_host_selects_retro_lane_shell(self):
+        payload = {"items": [], "total": 1, "page": 1, "page_size": 10}
+        selected = {
+            "slug": "muirc-amigaos41-irc-client-codex",
+            "title": "MuIRC AmigaOS 4.1",
+            "summary": "Retro summary",
+            "html_body": "<p>Retro body</p><pre>READY.</pre>",
+            "theme_variant": "retro",
+            "tags": ["retro", "amiga"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [selected], selected, None)) as mocked_fetch:
+            response = self.client.get("/blog", headers={"Host": "retro-users.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "retro")
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>MuIRC AmigaOS 4.1 | Retro Users</title>", body)
+        self.assertIn('class="theme-retro"', body)
+        self.assertIn("retro-mag-nav", body)
+        self.assertIn("classic machines", body)
+        self.assertIn("Current Bench", body)
+        self.assertIn("Retro video playlist", body)
+
     def test_article_lane_prefers_theme_over_generic_services_tag(self):
         selected = {
             "slug": "blackknightcontroller-hardware-as-code",
