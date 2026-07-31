@@ -340,6 +340,18 @@
       color: #dbe7dd;
       font-size: 0.92rem;
     }
+    .linux-mag-artline,
+    .retro-mag-artline {
+      display: block;
+      height: 42px;
+      margin: -0.35rem 1.1rem 0.65rem;
+      border-radius: 14px;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    body.theme-linux-pro .linux-mag-artline {
+      background: url("/content-files/assets/theme/lu-icon-strip.svg") left center / auto 100% no-repeat;
+    }
     .linux-mag-links {
       display: flex;
       flex-wrap: wrap;
@@ -433,6 +445,9 @@
       color: #dff2ff;
       font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
       font-size: 0.82rem;
+    }
+    body.theme-retro .retro-mag-artline {
+      background: url("/content-files/assets/theme/ru-icon-strip.svg") left center / auto 100% no-repeat;
     }
     .retro-mag-links {
       display: flex;
@@ -1203,6 +1218,28 @@
       line-height: 1.45;
       font-size: 0.9rem;
     }
+    .lane-status-list {
+      display: grid;
+      gap: 0.42rem;
+      margin-top: 0.55rem;
+      font-size: 0.84rem;
+    }
+    .lane-status-list span {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.7rem;
+      padding: 0.38rem 0;
+      border-top: 1px solid rgba(64, 82, 71, 0.14);
+    }
+    .lane-status-list strong {
+      color: #1d3b2c;
+    }
+    body.theme-retro .lane-status-list span {
+      border-top-color: rgba(75, 49, 83, 0.14);
+    }
+    body.theme-retro .lane-status-list strong {
+      color: #4b3153;
+    }
     .linux-topic-cloud {
       display: flex;
       flex-wrap: wrap;
@@ -1232,6 +1269,18 @@
         url("/content-files/assets/theme/ru-checker-ribbon.svg") left top / auto 18px repeat-x,
         linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 244, 225, 0.8));
       padding-top: 1.1rem;
+    }
+    body.theme-retro .retro-rail-module.archive-card {
+      background:
+        url("/content-files/assets/theme/ru-icon-strip.svg") left bottom / 92% auto no-repeat,
+        linear-gradient(180deg, rgba(28, 24, 45, 0.94), rgba(62, 36, 70, 0.9));
+      color: #fff8ec;
+      padding-bottom: 2.8rem;
+    }
+    body.theme-retro .retro-rail-module.archive-card h3,
+    body.theme-retro .retro-rail-module.archive-card p,
+    body.theme-retro .retro-rail-module.archive-card a {
+      color: #fff8ec;
     }
     .retro-rail-module h3 {
       margin: 0 0 0.45rem;
@@ -1787,6 +1836,11 @@
         flex: 0 0 auto;
         white-space: nowrap;
       }
+      .linux-mag-artline,
+      .retro-mag-artline {
+        margin-inline: 0.9rem;
+        background-size: auto 86%;
+      }
       .sidebar {
         position: static;
         max-height: none;
@@ -1948,6 +2002,7 @@
         </div>
         <div class="linux-mag-search" aria-label="Search placeholder">Search the lab notebook…</div>
       </div>
+      <div class="linux-mag-artline" aria-hidden="true"></div>
       <div class="linux-mag-links">
         <a href="/blog?lane=linux">Home</a>
         <a href="/blog?tag=linux&lane=linux">Linux</a>
@@ -1968,6 +2023,7 @@
         </div>
         <div class="retro-mag-status" aria-label="Workbench status">READY.  Classic computing, rebuilt with receipts.</div>
       </div>
+      <div class="retro-mag-artline" aria-hidden="true"></div>
       <div class="retro-mag-links">
         <a href="/blog?lane=retro">Home</a>
         <a href="/blog?tag=amiga&lane=retro">Amiga-like</a>
@@ -2107,12 +2163,30 @@
           <section class="linux-rail-module" aria-label="Current lab build">
             <h3>Current Lab Build</h3>
             <p>Linux Users articles are being shaped from real Auzietek and BlackKnightController lab work: PXE, swarms, OpenStack, ESXi, monitoring, and recovery notes.</p>
+            <div class="lane-status-list" aria-label="Linux Users lab status">
+              <span><strong>Lab lane</strong><em>online</em></span>
+              <span><strong>Pipeline proof</strong><em>active</em></span>
+              <span><strong>Docs style</strong><em>field tested</em></span>
+            </div>
+          </section>
+          <section class="linux-rail-module" aria-label="Pipeline run">
+            <h3>Pipeline Run</h3>
+            <p>Current articles favor commands, receipts, validation output, and repeatable paths over theory-only walkthroughs.</p>
           </section>
           {% endif %}
           {% if active_theme == 'retro' %}
           <section class="retro-rail-module" aria-label="Current retro bench">
             <h3>Current Bench</h3>
             <p>Retro Users keeps the old sparks alive: AmigaOS notes, preservation screenshots, emulation experiments, and the engineering habits classic systems still teach.</p>
+            <div class="lane-status-list" aria-label="Retro Users archive status">
+              <span><strong>Archive</strong><em>powered</em></span>
+              <span><strong>Media</strong><em>restoring</em></span>
+              <span><strong>Lessons</strong><em>alive</em></span>
+            </div>
+          </section>
+          <section class="retro-rail-module archive-card" aria-label="From the archive">
+            <h3>From the Archive</h3>
+            <p>Classic machines, small tools, and old constraints still teach modern engineers how to build clearly.</p>
           </section>
           {% endif %}
           {% if total > 0 %}
@@ -2180,6 +2254,10 @@
             <p><a href="https://github.com/auzieman/auzietek-linux-lab-guides">Companion guide repo</a></p>
             <p><a href="https://blackknight.auzietek.com/">BlackKnightController proof lane</a></p>
           </section>
+          <section class="linux-rail-module" aria-label="Trending Linux Users topics">
+            <h3>Trending</h3>
+            <p>PXE, Docker Swarm, OpenStack, ESXi, observability, and the tiny details that make rebuilds repeatable.</p>
+          </section>
           {% endif %}
           {% if active_theme == 'retro' %}
           <section class="retro-rail-module" aria-label="Retro Users topics">
@@ -2197,6 +2275,10 @@
             <h3>Continue the Archive</h3>
             <p><a href="https://github.com/auzieman">Auzie GitHub projects</a></p>
             <p><a href="https://www.youtube.com/playlist?list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7">Retro video playlist</a></p>
+          </section>
+          <section class="retro-rail-module" aria-label="Popular retro systems">
+            <h3>Popular Systems</h3>
+            <p>AmigaOS, AROS, MorphOS, Atari-era lessons, emulation notes, and the long path from hobby systems to modern labs.</p>
           </section>
           {% endif %}
         </aside>

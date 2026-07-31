@@ -314,8 +314,10 @@ class UIRouteTests(unittest.TestCase):
         template = (ui_app.UI_SRC / "templates" / "public_index.html").read_text()
         self.assertIn('/content-files/assets/theme/lu-circuit-field.svg', template)
         self.assertIn('/content-files/assets/theme/lu-rack-silhouette.svg', template)
+        self.assertIn('/content-files/assets/theme/lu-icon-strip.svg', template)
         self.assertIn('/content-files/assets/theme/ru-grid-field.svg', template)
         self.assertIn('/content-files/assets/theme/ru-checker-ribbon.svg', template)
+        self.assertIn('/content-files/assets/theme/ru-icon-strip.svg', template)
         self.assertIn("@media print", template)
 
     def test_static_page_overrides_load_from_content_mount(self):
@@ -407,6 +409,8 @@ Mounted body from private content payload.
         self.assertIn("practical systems", body)
         self.assertIn("Current Lab Build", body)
         self.assertIn("Companion guide repo", body)
+        self.assertIn("Pipeline Run", body)
+        self.assertIn("Trending", body)
 
     def test_lane_public_post_filters_post_list_by_lane_tag(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -458,6 +462,8 @@ Mounted body from private content payload.
         self.assertIn("classic machines", body)
         self.assertIn("Current Bench", body)
         self.assertIn("Retro video playlist", body)
+        self.assertIn("From the Archive", body)
+        self.assertIn("Popular Systems", body)
 
     def test_article_lane_prefers_theme_over_generic_services_tag(self):
         selected = {
