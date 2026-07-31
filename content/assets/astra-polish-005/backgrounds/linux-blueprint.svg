@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480">
+<rect width="720" height="480" fill="#eef3fa"/>
+<g fill="none" stroke="#294172" stroke-opacity=".12">
+<path d="M30 80H210V180H360V90H660M120 420V310H280V230H500V360H680"/>
+<circle cx="210" cy="180" r="14"/><circle cx="500" cy="360" r="14"/>
+</g><g font-family="monospace" font-size="18" fill="#294172" fill-opacity=".16">
+<text x="46" y="54">$ systemctl status</text><text x="392" y="446">node → service → proof</text>
+</g></svg>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="96" viewBox="0 0 340 96">
+<rect x="3" y="3" width="334" height="90" rx="45" fill="#e6f4ee" stroke="#28775d" stroke-width="5"/>
+<path d="M37 48l16 16 31-34" fill="none" stroke="#28775d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="105" y="60" font-family="sans-serif" font-size="29" font-weight="850" fill="#185640">KNOWN GOOD</text>
+</svg>

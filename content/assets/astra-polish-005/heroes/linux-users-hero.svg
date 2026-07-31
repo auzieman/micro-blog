@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="700" viewBox="0 0 1600 700">
+<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#13233a"/><stop offset="1" stop-color="#294172"/></linearGradient></defs>
+<rect width="1600" height="700" fill="url(#g)"/>
+<g opacity=".18" stroke="#cce3ff"><path d="M0 120H1600M0 260H1600M0 400H1600M0 540H1600M180 0V700M420 0V700M660 0V700M900 0V700M1140 0V700M1380 0V700"/></g>
+<path d="M80 540C300 420 420 500 620 350S980 270 1130 160s280-70 390-120" fill="none" stroke="#71dbc4" stroke-width="10" opacity=".75"/>
+<text x="100" y="200" font-family="sans-serif" font-size="44" font-weight="750" fill="#a9bedb">LINUX USERS</text>
+<text x="100" y="300" font-family="sans-serif" font-size="86" font-weight="900" fill="#ffffff">Field notes become</text>
+<text x="100" y="395" font-family="sans-serif" font-size="86" font-weight="900" fill="#ffffff">repeatable engineering.</text>
+</svg>

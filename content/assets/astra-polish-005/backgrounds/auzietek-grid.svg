@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480">
+<rect width="720" height="480" fill="#edf4f4"/>
+<g stroke="#155e75" stroke-opacity=".09" stroke-width="1">
+<path d="M0 40H720M0 100H720M0 160H720M0 220H720M0 280H720M0 340H720M0 400H720M60 0V480M140 0V480M220 0V480M300 0V480M380 0V480M460 0V480M540 0V480M620 0V480M700 0V480"/>
+</g><g fill="#0f766e" fill-opacity=".18"><circle cx="140" cy="100" r="5"/><circle cx="380" cy="280" r="5"/><circle cx="620" cy="160" r="5"/></g>
+</svg>
