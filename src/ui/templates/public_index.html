@@ -130,9 +130,12 @@
     body.theme-linux-pro {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
+        linear-gradient(90deg, rgba(23, 33, 38, 0.035) 1px, transparent 1px),
+        linear-gradient(rgba(23, 33, 38, 0.025) 1px, transparent 1px),
         radial-gradient(circle at 15% 8%, rgba(41, 65, 114, 0.16), transparent 24rem),
         radial-gradient(circle at 84% 18%, rgba(168, 0, 48, 0.08), transparent 20rem),
         linear-gradient(135deg, #f8fbff 0%, #edf3fb 52%, #e8edf5 100%);
+      background-size: 44px 44px, 44px 44px, auto, auto, auto;
     }
     body.theme-retro {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -204,6 +207,10 @@
       align-items: start;
       padding: 1.25rem;
     }
+    body.theme-linux-pro .frame {
+      width: min(calc(100% - clamp(1rem, 3vw, 2.5rem)), 1440px);
+      padding: 1rem 0 2.5rem;
+    }
     .brand-rail {
       display: none;
     }
@@ -273,6 +280,74 @@
     .rail-note span { display: block; }
     .page-column {
       min-width: 0;
+    }
+    .linux-mag-nav {
+      display: none;
+    }
+    body.theme-linux-pro .linux-mag-nav {
+      display: block;
+      overflow: hidden;
+      margin: 0 0 1rem;
+      border-radius: 18px;
+      border: 1px solid rgba(38, 50, 56, 0.22);
+      background:
+        linear-gradient(135deg, rgba(23, 33, 38, 0.98), rgba(38, 50, 56, 0.96)),
+        repeating-linear-gradient(90deg, rgba(158, 203, 117, 0.08) 0 1px, transparent 1px 12px);
+      box-shadow: 0 0.8rem 2.2rem rgba(23, 33, 38, 0.12);
+      color: #f4f7f2;
+    }
+    .linux-mag-mast {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: end;
+      padding: 1.05rem 1.2rem;
+    }
+    .linux-mag-logo {
+      font-weight: 900;
+      font-size: clamp(1.45rem, 3vw, 2.25rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .linux-mag-kicker {
+      margin-top: 0.22rem;
+      color: #9ecb75;
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92rem;
+    }
+    .linux-mag-search {
+      min-width: min(22rem, 38vw);
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid rgba(207, 216, 220, 0.28);
+      background: rgba(255, 255, 255, 0.08);
+      color: #dbe7dd;
+      font-size: 0.92rem;
+    }
+    .linux-mag-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem;
+      padding: 0.45rem 0.8rem;
+      background: rgba(38, 50, 56, 0.88);
+      border-top: 1px solid rgba(207, 216, 220, 0.12);
+    }
+    .linux-mag-links a {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      padding: 0.55rem 0.7rem;
+      border-radius: 8px;
+      color: #f4f7f2;
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .linux-mag-links a:hover,
+    .linux-mag-links a:focus-visible {
+      background: rgba(158, 203, 117, 0.16);
+      color: #ffffff;
     }
     .layout-well {
       width: min(100%, var(--wide-width));
@@ -848,6 +923,18 @@
       grid-template-columns: minmax(240px, 285px) minmax(0, 1fr);
       gap: 1.1rem;
     }
+    body.theme-linux-pro .content-shell {
+      padding: clamp(0.9rem, 2vw, 1.25rem);
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 241, 232, 0.9));
+      border-color: rgba(38, 50, 56, 0.16);
+    }
+    body.theme-linux-pro .content-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+      gap: clamp(1rem, 2.4vw, 2rem);
+      align-items: start;
+    }
     .sidebar,
     .article-panel {
       background: var(--glass-strong);
@@ -861,6 +948,21 @@
       max-height: calc(100vh - 2rem);
       display: flex;
       flex-direction: column;
+    }
+    body.theme-linux-pro .sidebar {
+      order: 2;
+      gap: 0.85rem;
+      max-height: calc(100vh - 2rem);
+      background:
+        linear-gradient(180deg, rgba(238, 240, 234, 0.96), rgba(255, 255, 255, 0.94));
+      border-color: rgba(64, 82, 71, 0.22);
+      box-shadow: 0 0.8rem 2.2rem rgba(23, 33, 38, 0.08);
+    }
+    body.theme-linux-pro .article-panel {
+      order: 1;
+      max-width: none;
+      border-color: rgba(64, 82, 71, 0.18);
+      box-shadow: 0 0.8rem 2.2rem rgba(23, 33, 38, 0.08);
     }
     .sidebar h2,
     .article-panel h2 {
@@ -932,6 +1034,44 @@
       margin-bottom: 0.2rem;
     }
     .stat strong { font-size: 1.35rem; }
+    .linux-rail-module {
+      display: none;
+    }
+    body.theme-linux-pro .linux-rail-module {
+      display: block;
+      padding: 0.85rem;
+      border-radius: 14px;
+      border: 1px solid rgba(64, 82, 71, 0.18);
+      background: rgba(255, 255, 255, 0.72);
+    }
+    .linux-rail-module h3 {
+      margin: 0 0 0.45rem;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #405247;
+    }
+    .linux-rail-module p {
+      margin: 0.35rem 0 0;
+      color: #405247;
+      line-height: 1.45;
+      font-size: 0.9rem;
+    }
+    .linux-topic-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    .linux-topic-cloud a,
+    .linux-topic-cloud span {
+      display: inline-flex;
+      padding: 0.28rem 0.48rem;
+      border-radius: 999px;
+      background: #263238;
+      color: #f4f7f2;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
     .post-list {
       display: grid;
       gap: 0.4rem;
@@ -1144,6 +1284,22 @@
       background: #11212c;
       color: #e4f0f5;
       border-radius: 14px;
+    }
+    body.theme-linux-pro .article-body pre,
+    body.theme-linux-pro .article-body .codehilite {
+      max-width: min(100%, 980px);
+      background: #151b1e;
+      color: #d8e6d0;
+      border: 1px solid rgba(158, 203, 117, 0.18);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    body.theme-linux-pro .article-body blockquote {
+      margin-left: 0;
+      padding: 0.9rem 1rem;
+      border-left: 0.3rem solid #9ecb75;
+      border-radius: 0 12px 12px 0;
+      background: #eef0ea;
+      color: #263238;
     }
     .article-body .codehilite {
       margin: 1rem 0;
@@ -1372,6 +1528,32 @@
       .static-point-grid { grid-template-columns: 1fr; }
       .resource-grid { grid-template-columns: 1fr; }
       .content-grid { grid-template-columns: 1fr; }
+      body.theme-linux-pro .content-grid { grid-template-columns: 1fr; }
+      body.theme-linux-pro .sidebar {
+        order: 2;
+        position: static;
+        max-height: none;
+      }
+      body.theme-linux-pro .article-panel { order: 1; }
+      body.theme-linux-pro .linux-mag-mast {
+        display: block;
+        padding: 0.9rem;
+      }
+      body.theme-linux-pro .linux-mag-search {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        margin-top: 0.7rem;
+      }
+      body.theme-linux-pro .linux-mag-links {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      body.theme-linux-pro .linux-mag-links a {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
       .sidebar {
         position: static;
         max-height: none;
@@ -1508,6 +1690,27 @@
     <div class="message">{{ message }}</div>
     {% endif %}
 
+    {% if active_theme == 'linux-pro' %}
+    <nav class="linux-mag-nav" aria-label="Linux Users magazine navigation">
+      <div class="linux-mag-mast">
+        <div>
+          <div class="linux-mag-logo">Linux Users</div>
+          <div class="linux-mag-kicker">practical systems • real labs • useful scars</div>
+        </div>
+        <div class="linux-mag-search" aria-label="Search placeholder">Search the lab notebook…</div>
+      </div>
+      <div class="linux-mag-links">
+        <a href="/blog?lane=linux">Home</a>
+        <a href="/blog?tag=linux&lane=linux">Linux</a>
+        <a href="/blog?tag=docker&lane=linux">Containers</a>
+        <a href="/blog?tag=ansible&lane=linux">DevOps</a>
+        <a href="/blog?tag=observability&lane=linux">Observability</a>
+        <a href="https://blackknight.auzietek.com/">BKC Proof</a>
+        <a href="https://beta.auzietek.com/">Auzietek</a>
+      </div>
+    </nav>
+    {% endif %}
+
     <section class="masthead scroll-reveal {% if not is_homepage %}interior{% endif %}{% if show_article_section and not static_page and not is_homepage %} compact{% endif %}">
       <div class="beta-strip"><span class="beta-badge">Public beta</span><span>Field-tested work graduates from the lab into public articles here.</span></div>
       {% if show_article_section and not static_page and not is_homepage %}
@@ -1630,7 +1833,13 @@
     <section class="content-shell scroll-reveal">
       <div class="content-grid">
         <aside class="sidebar">
-          <h2>Recent Articles</h2>
+          <h2>{% if active_theme == 'linux-pro' %}Field Index{% else %}Recent Articles{% endif %}</h2>
+          {% if active_theme == 'linux-pro' %}
+          <section class="linux-rail-module" aria-label="Current lab build">
+            <h3>Current Lab Build</h3>
+            <p>Linux Users articles are being shaped from real Auzietek and BlackKnightController lab work: PXE, swarms, OpenStack, ESXi, monitoring, and recovery notes.</p>
+          </section>
+          {% endif %}
           {% if total > 0 %}
           <div class="toolbar">
             <div>
@@ -1678,6 +1887,24 @@
             <a href="/blog?page={{ 1 if page <= 1 else page - 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Previous</a>
             <a href="/blog?page={{ total_pages if page >= total_pages else page + 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Next</a>
           </div>
+          {% endif %}
+          {% if active_theme == 'linux-pro' %}
+          <section class="linux-rail-module" aria-label="Linux Users topics">
+            <h3>Topics</h3>
+            <div class="linux-topic-cloud">
+              <a href="/blog?tag=debian&lane=linux">Debian</a>
+              <a href="/blog?tag=docker&lane=linux">Docker</a>
+              <a href="/blog?tag=ansible&lane=linux">Ansible</a>
+              <a href="/blog?tag=kubernetes&lane=linux">K3s</a>
+              <a href="/blog?tag=monitoring&lane=linux">Monitoring</a>
+              <a href="/blog?tag=esxi&lane=linux">ESXi</a>
+            </div>
+          </section>
+          <section class="linux-rail-module" aria-label="Continue the build">
+            <h3>Continue the Build</h3>
+            <p><a href="https://github.com/auzieman/auzietek-linux-lab-guides">Companion guide repo</a></p>
+            <p><a href="https://blackknight.auzietek.com/">BlackKnightController proof lane</a></p>
+          </section>
           {% endif %}
         </aside>
 

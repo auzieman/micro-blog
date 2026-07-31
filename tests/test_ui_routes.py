@@ -379,14 +379,26 @@ Mounted body from private content payload.
         self.assertIn('class="theme-midnight"', body)
 
     def test_linux_users_lab_host_selects_linux_lane(self):
-        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
-        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+        payload = {"items": [], "total": 1, "page": 1, "page_size": 10}
+        selected = {
+            "slug": "linux-find-regex",
+            "title": "Linux find regex",
+            "summary": "Linux summary",
+            "html_body": "<p>Linux body</p>",
+            "theme_variant": "linux-pro",
+            "tags": ["linux"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [selected], selected, None)) as mocked_fetch:
             response = self.client.get("/blog", headers={"Host": "linux-users.lab.auzietek.com"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mocked_fetch.call_args[0][3], "linux")
         body = response.get_data(as_text=True)
-        self.assertIn("<title>Linux Users | Infrastructure automation and practical systems support</title>", body)
+        self.assertIn("<title>Linux find regex | Linux Users</title>", body)
         self.assertIn('class="theme-linux-pro"', body)
+        self.assertIn("linux-mag-nav", body)
+        self.assertIn("practical systems", body)
+        self.assertIn("Current Lab Build", body)
+        self.assertIn("Companion guide repo", body)
 
     def test_lane_public_post_filters_post_list_by_lane_tag(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -470,6 +482,39 @@ Mounted body from private content payload.
         self.assertIn("<loc>https://linux-users.auzietek.com/blog</loc>", sitemap)
         self.assertIn("https://linux-users.auzietek.com/post/linux-find-regex", sitemap)
         self.assertNotIn("retro-muirc", sitemap)
+
+    def test_public_host_rss_is_limited_to_authoritative_lane(self):
+        posts = [
+            {
+                "slug": "linux-find-regex",
+                "title": "Linux find regex",
+                "summary": "Linux summary",
+                "html_body": "<p>Linux body</p>",
+                "theme_variant": "linux-pro",
+                "tags": ["linux"],
+                "published_at": "2026-04-24T12:00:00+00:00",
+                "updated_at": "2026-04-24T12:00:00+00:00",
+            },
+            {
+                "slug": "retro-muirc",
+                "title": "Retro MuIRC",
+                "summary": "Retro summary",
+                "html_body": "<p>Retro body</p>",
+                "theme_variant": "retro",
+                "tags": ["retro"],
+                "published_at": "2026-04-24T12:00:00+00:00",
+                "updated_at": "2026-04-24T12:00:00+00:00",
+            },
+        ]
+        with mock.patch.object(ui_app, "fetch_all_public_posts", return_value=posts):
+            response = self.client.get("/rss.xml", headers={"Host": "linux-users.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        rss = response.get_data(as_text=True)
+        self.assertIn("<title>Linux Users</title>", rss)
+        self.assertIn("https://linux-users.auzietek.com/post/linux-find-regex", rss)
+        self.assertIn("Linux body", rss)
+        self.assertNotIn("retro-muirc", rss)
+        self.assertNotIn("Retro body", rss)
 
     def test_auzietek_sitemap_includes_static_pages(self):
         with mock.patch.object(ui_app, "fetch_all_public_posts", return_value=[]):

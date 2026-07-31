@@ -1702,8 +1702,12 @@ def robots():
 @app.get("/rss.xml")
 @app.get("/feed.xml")
 def rss_feed():
-    posts = fetch_all_public_posts()
-    xml = build_rss_xml(posts, SITE_URL, SITE_NAME, SITE_DESCRIPTION)
+    lane_key, lane, host_lane_selected = resolve_request_lane(None)
+    site_url = current_request_site_url(host_lane_selected)
+    posts = filter_posts_for_lane(fetch_all_public_posts(), lane_key)
+    site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
+    site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
+    xml = build_rss_xml(posts, site_url, site_name, site_description)
     return Response(xml, mimetype="application/rss+xml")
 
 
