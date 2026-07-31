@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-label="">
+  <rect width="960" height="360" fill="none"/>
+  <g opacity=".18">
+    <path d="M0 300h960M0 252h960M0 204h960M0 156h960M0 108h960" stroke="#fff8ec" stroke-width="2"/>
+    <path d="M80 0v360M160 0v360M240 0v360M320 0v360M400 0v360M480 0v360M560 0v360M640 0v360M720 0v360M800 0v360M880 0v360" stroke="#fff8ec" stroke-width="2"/>
+  </g>
+  <g opacity=".35">
+    <path d="M70 292c120-112 240-112 360 0s240 112 360 0" fill="none" stroke="#d45722" stroke-width="8" stroke-linecap="round"/>
+    <path d="M70 316c120-112 240-112 360 0s240 112 360 0" fill="none" stroke="#1f4f8f" stroke-width="8" stroke-linecap="round"/>
+    <path d="M70 340c120-112 240-112 360 0s240 112 360 0" fill="none" stroke="#7c3aed" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 90" role="img" aria-label="">
+  <rect width="960" height="90" fill="none"/>
+  <g opacity=".86">
+    <path d="M0 0h960v90H0z" fill="#161b30"/>
+    <g>
+      <rect x="0" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="90" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="180" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="270" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="360" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="450" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="540" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="630" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="720" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="810" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="900" y="0" width="45" height="45" fill="#fff8ec"/>
+      <rect x="45" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="135" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="225" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="315" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="405" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="495" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="585" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="675" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="765" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="855" y="45" width="45" height="45" fill="#fff8ec"/>
+      <rect x="945" y="45" width="45" height="45" fill="#fff8ec"/>
+    </g>
+  </g>
+</svg>

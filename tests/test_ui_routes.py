@@ -312,12 +312,18 @@ class UIRouteTests(unittest.TestCase):
 
     def test_linux_and_retro_theme_artwork_slots_are_payload_assets(self):
         template = (ui_app.UI_SRC / "templates" / "public_index.html").read_text()
-        self.assertIn('/content-files/assets/theme/lu-circuit-field.svg', template)
-        self.assertIn('/content-files/assets/theme/lu-rack-silhouette.svg', template)
-        self.assertIn('/content-files/assets/theme/lu-icon-strip.svg', template)
-        self.assertIn('/content-files/assets/theme/ru-grid-field.svg', template)
-        self.assertIn('/content-files/assets/theme/ru-checker-ribbon.svg', template)
-        self.assertIn('/content-files/assets/theme/ru-icon-strip.svg', template)
+        asset_paths = [
+            "/content-files/assets/theme/lu-circuit-field.svg",
+            "/content-files/assets/theme/lu-rack-silhouette.svg",
+            "/content-files/assets/theme/lu-icon-strip.svg",
+            "/content-files/assets/theme/ru-grid-field.svg",
+            "/content-files/assets/theme/ru-checker-ribbon.svg",
+            "/content-files/assets/theme/ru-icon-strip.svg",
+        ]
+        for asset_path in asset_paths:
+            self.assertIn(asset_path, template)
+            content_path = PROJECT_ROOT / "content" / asset_path.removeprefix("/content-files/")
+            self.assertTrue(content_path.exists(), f"missing theme asset {content_path}")
         self.assertIn("@media print", template)
 
     def test_static_page_overrides_load_from_content_mount(self):

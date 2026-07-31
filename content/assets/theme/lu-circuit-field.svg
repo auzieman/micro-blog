@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-label="">
+  <defs>
+    <linearGradient id="fade" x1="0" x2="1">
+      <stop offset="0" stop-color="#9ecb75" stop-opacity=".12"/>
+      <stop offset=".5" stop-color="#6ab0d8" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#9ecb75" stop-opacity=".08"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="360" fill="none"/>
+  <g fill="none" stroke="url(#fade)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M52 68h158v52h120v72h96"/>
+    <path d="M116 256h144v-62h118v-76h124v48h116"/>
+    <path d="M522 72h112v70h94v90h184"/>
+    <path d="M630 296v-78h96v-44h88"/>
+    <path d="M70 172h80m458 0h82m-236 86h122"/>
+  </g>
+  <g fill="#9ecb75" opacity=".35">
+    <circle cx="52" cy="68" r="7"/>
+    <circle cx="210" cy="120" r="7"/>
+    <circle cx="426" cy="192" r="7"/>
+    <circle cx="116" cy="256" r="7"/>
+    <circle cx="502" cy="118" r="7"/>
+    <circle cx="630" cy="296" r="7"/>
+    <circle cx="912" cy="232" r="7"/>
+  </g>
+  <g fill="#6ab0d8" opacity=".18">
+    <rect x="704" y="72" width="152" height="18" rx="9"/>
+    <rect x="704" y="102" width="112" height="18" rx="9"/>
+    <rect x="704" y="132" width="180" height="18" rx="9"/>
+  </g>
+</svg>
