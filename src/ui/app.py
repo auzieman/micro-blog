@@ -1040,7 +1040,7 @@ def resolve_request_lane(explicit_lane: str | None) -> tuple[str | None, dict | 
 
 def effective_site_url(host_lane_selected: bool) -> str:
     if host_lane_selected:
-        return request.url_root.rstrip("/")
+        return canonical_site_url_for_host(request_host())
     return SITE_URL
 
 
@@ -1067,6 +1067,146 @@ def lane_host_for_current_zone(lane_key: str) -> str | None:
     return None
 
 
+STATIC_PAGE_SEO = {
+    "welcome": {
+        "title": "Auzietek | Practical Infrastructure Automation and AIOps",
+        "description": "Auzietek helps small teams make infrastructure more natural, predictable, and clean with repeatable automation, evidence, and human-led AIOps.",
+    },
+    "services": {
+        "title": "Infrastructure Automation Services for Small Teams | Auzietek",
+        "description": "Practical infrastructure automation, lab rebuilds, observability, documentation, and AIOps guidance for small teams and hands-on operators.",
+    },
+    "thinktank": {
+        "title": "Auzietek ThinkTank | Human-Centered Systems and Future Infrastructure",
+        "description": "Auzietek ThinkTank connects RACS, AuziX, Company Mind, human-first automation, and future infrastructure ideas to evidence-backed experiments.",
+    },
+    "principles": {
+        "title": "Auzietek Principles | Evidence-Led, Human-Centered Automation",
+        "description": "Auzietek principles for human-first engineering, progressive trust, explicit boundaries, durable evidence, and simpler operational systems.",
+    },
+    "articles": {
+        "title": "Auzietek Articles | Field Notes, Tutorials, and Lab Proof",
+        "description": "Field notes, tutorials, screenshots, migration stories, and proof-backed articles from Auzietek, BlackKnightController, Linux Users, and Retro Users.",
+    },
+    "aiops": {
+        "title": "Human-Led AIOps and Operational Automation | Auzietek",
+        "description": "A practical AIOps model built around resource context, bounded action, human approval, validation, receipts, and operational evidence.",
+    },
+    "business-case": {
+        "title": "The Business Case for Practical Infrastructure Automation | Auzietek",
+        "description": "A grounded business case for reducing fragile manual operations with repeatable infrastructure automation, evidence, and human-led AI assistance.",
+    },
+    "friends": {
+        "title": "Auzietek Friends and Community Links | Practical Technology Partners",
+        "description": "Auzietek friends, neighbors, partner links, and community references connected to practical infrastructure, repair, and technology work.",
+    },
+}
+
+
+def canonical_scheme_for_host(host: str) -> str:
+    if host.endswith(".auzietek.com") and not host.endswith(".lab.auzietek.com"):
+        return "https"
+    return request.scheme
+
+
+def canonical_site_url_for_host(host: str) -> str:
+    return f"{canonical_scheme_for_host(host)}://{host}"
+
+
+def current_request_site_url(host_lane_selected: bool = False) -> str:
+    if host_lane_selected or request_has_authoritative_lane_host():
+        return canonical_site_url_for_host(request_host())
+    return SITE_URL
+
+
+def page_key_for_static_page(static_page: dict | None, active_page: str | None = None) -> str | None:
+    if active_page:
+        return active_page
+    if not static_page:
+        return None
+    page_path = static_page.get("path")
+    for key, page in AUZIETEK_PAGES.items():
+        if page.get("path") == page_path:
+            return key
+    return None
+
+
+def json_ld_script(payload: dict | list[dict]) -> str:
+    return json.dumps(payload, separators=(",", ":"))
+
+
+def organization_schema(site_url: str) -> dict:
+    return {
+        "@type": "Organization",
+        "@id": f"{site_url}/#organization",
+        "name": "Auzietek",
+        "url": site_url,
+    }
+
+
+def website_schema(site_url: str, site_name: str, site_description: str) -> dict:
+    return {
+        "@type": "WebSite",
+        "@id": f"{site_url}/#website",
+        "name": site_name,
+        "description": site_description,
+        "url": site_url,
+        "publisher": {"@id": f"{site_url}/#organization"},
+    }
+
+
+def breadcrumb_schema(site_url: str, items: list[tuple[str, str]]) -> dict:
+    return {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": index,
+                "name": label,
+                "item": f"{site_url}{path}",
+            }
+            for index, (label, path) in enumerate(items, start=1)
+        ],
+    }
+
+
+def static_page_json_ld(static_page: dict, page_key: str, site_url: str, site_name: str, site_description: str) -> str:
+    page_url = f"{site_url}{static_page.get('path') or request.path}"
+    graph = [
+        organization_schema(site_url),
+        website_schema(site_url, site_name, site_description),
+        {
+            "@type": "WebPage",
+            "@id": f"{page_url}#webpage",
+            "url": page_url,
+            "name": STATIC_PAGE_SEO.get(page_key, {}).get("title") or static_page.get("title"),
+            "description": STATIC_PAGE_SEO.get(page_key, {}).get("description") or static_page.get("body"),
+            "isPartOf": {"@id": f"{site_url}/#website"},
+        },
+        breadcrumb_schema(site_url, [("Auzietek", "/"), (static_page.get("label") or page_key.title(), static_page.get("path") or request.path)]),
+    ]
+    if page_key == "services":
+        graph.append(
+            {
+                "@type": "Service",
+                "name": "Infrastructure automation and AIOps services",
+                "provider": {"@id": f"{site_url}/#organization"},
+                "areaServed": "United States",
+                "serviceType": "Infrastructure automation, observability, documentation, and operations guidance",
+                "url": page_url,
+            }
+        )
+    return json_ld_script({"@context": "https://schema.org", "@graph": graph})
+
+
+def lane_home_json_ld(site_url: str, lane: dict) -> str:
+    graph = [
+        organization_schema(site_url),
+        website_schema(site_url, lane.get("site_name", SITE_NAME), lane.get("description", SITE_DESCRIPTION)),
+    ]
+    return json_ld_script({"@context": "https://schema.org", "@graph": graph})
+
+
 def redirect_for_lane_mismatch(selected: dict | None, active_lane: str | None, host_lane_selected: bool):
     selected_lane = article_lane_key(selected)
     if not selected_lane or not active_lane or selected_lane == active_lane:
@@ -1074,15 +1214,15 @@ def redirect_for_lane_mismatch(selected: dict | None, active_lane: str | None, h
     query = {"lane": selected_lane}
     host = lane_host_for_current_zone(selected_lane) if host_lane_selected else None
     if host:
-        return redirect(f"{request.scheme}://{host}{url_for('public_post', slug=selected['slug'])}?{urlencode(query)}#article-start", code=302)
+        return redirect(f"{canonical_site_url_for_host(host)}{url_for('public_post', slug=selected['slug'])}?{urlencode(query)}#article-start", code=302)
     return redirect(f"{url_for('public_post', slug=selected['slug'])}?{urlencode(query)}#article-start", code=302)
 
 
 def href_for_lane(lane_key: str, host_lane_selected: bool = False) -> str:
     host = lane_host_for_current_zone(lane_key) if host_lane_selected else None
     if host:
-        scheme = "https" if host.endswith(".auzietek.com") and not host.endswith(".lab.auzietek.com") else request.scheme
-        return f"{scheme}://{host}/" if lane_key in {"auzietek", "blackknight"} else f"{scheme}://{host}/blog"
+        site_url = canonical_site_url_for_host(host)
+        return f"{site_url}/" if lane_key in {"auzietek", "blackknight"} else f"{site_url}/blog"
     return f"/blog?{urlencode({'lane': lane_key})}"
 
 
@@ -1284,16 +1424,20 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
     site_headline = lane.get("headline", SITE_HEADLINE) if lane else SITE_HEADLINE
     resolved_theme = active_theme or (lane.get("theme") if lane else None) or (selected.get("theme_variant") if selected else DEFAULT_THEME_VARIANT)
     if static_page:
+        page_key = page_key_for_static_page(static_page, active_page) or "page"
+        page_seo = STATIC_PAGE_SEO.get(page_key, {})
         metadata = {
-            "title": f"{static_page['title']} | {site_name}",
-            "description": static_page.get("body") or site_description,
+            "title": page_seo.get("title") or f"{static_page['title']} | {site_name}",
+            "description": page_seo.get("description") or static_page.get("body") or site_description,
             "canonical_url": f"{resolved_site_url}{static_page.get('path') or request.path}",
             "og_image_url": DEFAULT_OG_IMAGE or None,
             "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
+            "og_type": "website" if page_key == "welcome" else "article",
         }
-        json_ld = ""
+        json_ld = static_page_json_ld(static_page, page_key, resolved_site_url, site_name, site_description)
     elif selected:
         metadata = article_public_metadata(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
+        metadata["og_type"] = "article"
         json_ld = article_json_ld(selected, resolved_site_url, site_name, DEFAULT_OG_IMAGE or None)
     else:
         metadata = {
@@ -1302,8 +1446,9 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
             "canonical_url": f"{resolved_site_url}/blog",
             "og_image_url": DEFAULT_OG_IMAGE or None,
             "twitter_card": "summary_large_image" if DEFAULT_OG_IMAGE else "summary",
+            "og_type": "website" if is_homepage else "article",
         }
-        json_ld = ""
+        json_ld = lane_home_json_ld(resolved_site_url, lane) if lane and is_homepage else ""
     total_pages = max(1, (payload["total"] + payload["page_size"] - 1) // payload["page_size"])
     return {
         "posts": posts,
@@ -1339,6 +1484,7 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "canonical_url": metadata["canonical_url"],
         "meta_og_image": metadata["og_image_url"],
         "meta_twitter_card": metadata["twitter_card"],
+        "meta_og_type": metadata["og_type"],
         "json_ld": json_ld,
         "preview_mode": preview_mode,
         "tag": tag,
@@ -1441,7 +1587,7 @@ def public_index():
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
     is_lane_homepage = request.path == "/"
     static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and is_lane_homepage else None
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=is_lane_homepage, show_article_section=request.path == "/blog", host_lane_selected=host_lane_selected))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=is_lane_homepage, show_article_section=request.path == "/blog" and bool(selected or posts), host_lane_selected=host_lane_selected))
 
 
 @app.get("/thinktank")
@@ -1523,13 +1669,22 @@ def public_post(slug: str):
 @app.get("/sitemap.xml")
 def sitemap():
     posts = fetch_all_public_posts()
-    xml = build_sitemap_xml(posts, SITE_URL)
+    lane_key, lane, host_lane_selected = resolve_request_lane(None)
+    site_url = current_request_site_url(host_lane_selected)
+    canonical_posts = filter_posts_for_lane(posts, lane_key)
+    static_paths = []
+    if lane_key == "auzietek":
+        static_paths = [page.get("path") or "/" for page in AUZIETEK_PAGES.values()]
+    elif lane:
+        static_paths = ["/", "/blog"]
+    xml = build_sitemap_xml(canonical_posts, site_url, static_paths=static_paths)
     return Response(xml, mimetype="application/xml")
 
 
 @app.get("/robots.txt")
 def robots():
-    text = f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"
+    site_url = current_request_site_url()
+    text = f"User-agent: *\nAllow: /\nSitemap: {site_url}/sitemap.xml\n"
     return Response(text, mimetype="text/plain")
 
 

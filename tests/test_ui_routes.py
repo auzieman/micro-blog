@@ -170,7 +170,8 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(mocked_fetch.call_args[0][4], "blackknightcontroller-recovery-weekend-repeatable-lab")
         body = response.get_data(as_text=True)
         self.assertIn("<title>BlackKnightController | Infrastructure automation and practical systems support</title>", body)
-        self.assertIn("BlackKnight Articles", body)
+        self.assertNotIn("No article is available yet", body)
+        self.assertNotIn("BlackKnight Articles", body)
         self.assertIn('class="theme-midnight"', body)
 
     def test_auzietek_lane_keeps_business_front_door(self):
@@ -182,7 +183,8 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(mocked_fetch.call_args[0][4], "infrastructure-automation-that-stays-repeatable")
         body = response.get_data(as_text=True)
         self.assertIn("<title>Auzietek | Infrastructure automation and practical systems support</title>", body)
-        self.assertIn("Auzietek Articles", body)
+        self.assertNotIn("No article is available yet", body)
+        self.assertNotIn("Auzietek Articles", body)
 
     def test_auzietek_thinktank_page_renders_static_page_and_related_tag(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -191,9 +193,37 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mocked_fetch.call_args[0][3], "think-tank")
         body = response.get_data(as_text=True)
+        self.assertIn("<title>Auzietek ThinkTank | Human-Centered Systems and Future Infrastructure</title>", body)
+        self.assertIn('property="og:type" content="article"', body)
+        self.assertIn('"@type":"BreadcrumbList"', body)
+        self.assertNotIn("No article is available yet", body)
+        self.assertNotIn("Total 0", body)
         self.assertIn("Ideas with a path toward useful systems.", body)
         self.assertIn('href="/thinktank" class="active"', body)
         self.assertIn("RACS remains alive", body)
+
+    def test_auzietek_root_emits_homepage_metadata_and_website_schema(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)):
+            response = self.client.get("/", headers={"Host": "beta.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>Auzietek | Practical Infrastructure Automation and AIOps</title>", body)
+        self.assertIn('link rel="canonical" href="https://beta.auzietek.com/"', body)
+        self.assertIn('property="og:type" content="website"', body)
+        self.assertIn('"@type":"WebSite"', body)
+        self.assertIn('"@type":"Organization"', body)
+        self.assertNotIn("No article is available yet", body)
+
+    def test_services_page_emits_service_schema(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)):
+            response = self.client.get("/services", headers={"Host": "beta.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("<title>Infrastructure Automation Services for Small Teams | Auzietek</title>", body)
+        self.assertIn('"@type":"Service"', body)
+        self.assertIn('link rel="canonical" href="https://beta.auzietek.com/services"', body)
 
     def test_root_defaults_to_auzietek_when_host_has_no_lane(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -394,6 +424,42 @@ Mounted body from private content payload.
         self.assertIn("<urlset", sitemap_response.get_data(as_text=True))
         self.assertEqual(rss_response.status_code, 200)
         self.assertIn("<rss", rss_response.get_data(as_text=True))
+
+    def test_public_host_robots_and_sitemap_use_canonical_host_urls(self):
+        posts = [
+            {
+                "slug": "linux-find-regex",
+                "title": "Linux find regex",
+                "summary": "Summary",
+                "theme_variant": "linux-pro",
+                "tags": ["linux"],
+            },
+            {
+                "slug": "retro-muirc",
+                "title": "Retro MuIRC",
+                "summary": "Summary",
+                "theme_variant": "retro",
+                "tags": ["retro"],
+            },
+        ]
+        with mock.patch.object(ui_app, "fetch_all_public_posts", return_value=posts):
+            robots_response = self.client.get("/robots.txt", headers={"Host": "linux-users.auzietek.com"})
+            sitemap_response = self.client.get("/sitemap.xml", headers={"Host": "linux-users.auzietek.com"})
+        self.assertIn("Sitemap: https://linux-users.auzietek.com/sitemap.xml", robots_response.get_data(as_text=True))
+        sitemap = sitemap_response.get_data(as_text=True)
+        self.assertIn("<loc>https://linux-users.auzietek.com/</loc>", sitemap)
+        self.assertIn("<loc>https://linux-users.auzietek.com/blog</loc>", sitemap)
+        self.assertIn("https://linux-users.auzietek.com/post/linux-find-regex", sitemap)
+        self.assertNotIn("retro-muirc", sitemap)
+
+    def test_auzietek_sitemap_includes_static_pages(self):
+        with mock.patch.object(ui_app, "fetch_all_public_posts", return_value=[]):
+            response = self.client.get("/sitemap.xml", headers={"Host": "beta.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        sitemap = response.get_data(as_text=True)
+        self.assertIn("<loc>https://beta.auzietek.com/</loc>", sitemap)
+        self.assertIn("<loc>https://beta.auzietek.com/thinktank</loc>", sitemap)
+        self.assertIn("<loc>https://beta.auzietek.com/business-case</loc>", sitemap)
 
     def test_google_oauth_guardrail_redirects_when_not_configured(self):
         with mock.patch.object(ui_app, "GOOGLE_CLIENT_ID", ""), mock.patch.object(ui_app, "GOOGLE_CLIENT_SECRET", ""):

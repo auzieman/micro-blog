@@ -117,10 +117,26 @@ def article_json_ld(article: dict[str, Any], site_url: str, site_name: str, defa
     return json.dumps(payload, separators=(",", ":"))
 
 
-def build_sitemap_xml(posts: list[dict[str, Any]], site_url: str) -> str:
+def build_sitemap_xml(posts: list[dict[str, Any]], site_url: str, static_paths: list[str] | None = None) -> str:
     lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    seen = set()
+    for path in static_paths or []:
+        normalized_path = "/" + path.strip("/")
+        if normalized_path == "/":
+            canonical = site_url.rstrip("/") + "/"
+        else:
+            canonical = urljoin(site_url.rstrip("/") + "/", normalized_path.lstrip("/"))
+        if canonical in seen:
+            continue
+        seen.add(canonical)
+        lines.append("  <url>")
+        lines.append(f"    <loc>{escape(canonical)}</loc>")
+        lines.append("  </url>")
     for post in posts:
         canonical = canonical_post_url(site_url, post["slug"], post.get("canonical_url"))
+        if canonical in seen:
+            continue
+        seen.add(canonical)
         updated = post.get("updated_at") or post.get("published_at")
         lines.append("  <url>")
         lines.append(f"    <loc>{escape(canonical)}</loc>")
