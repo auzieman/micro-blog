@@ -260,7 +260,7 @@ services:
     volumes:
       - ./content:/content:ro
     ports:
-      - "8081:8080"
+      - "${BETA_UI_BIND_PORT:-8081}:8080"
     depends_on:
       blog-api:
         condition: service_started
