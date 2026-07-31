@@ -312,7 +312,11 @@ class UIRouteTests(unittest.TestCase):
 
     def test_linux_and_retro_theme_artwork_slots_are_payload_assets(self):
         template = (ui_app.UI_SRC / "templates" / "public_index.html").read_text()
-        asset_paths = [
+        referenced_asset_paths = [
+            "/content-files/assets/theme/linux-users-brand-board.png",
+            "/content-files/assets/theme/retro-users-brand-board.png",
+        ]
+        supporting_asset_paths = [
             "/content-files/assets/theme/lu-circuit-field.svg",
             "/content-files/assets/theme/lu-rack-silhouette.svg",
             "/content-files/assets/theme/lu-icon-strip.svg",
@@ -320,8 +324,9 @@ class UIRouteTests(unittest.TestCase):
             "/content-files/assets/theme/ru-checker-ribbon.svg",
             "/content-files/assets/theme/ru-icon-strip.svg",
         ]
-        for asset_path in asset_paths:
+        for asset_path in referenced_asset_paths:
             self.assertIn(asset_path, template)
+        for asset_path in referenced_asset_paths + supporting_asset_paths:
             content_path = PROJECT_ROOT / "content" / asset_path.removeprefix("/content-files/")
             self.assertTrue(content_path.exists(), f"missing theme asset {content_path}")
         self.assertIn("@media print", template)
