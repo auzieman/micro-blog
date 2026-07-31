@@ -195,16 +195,26 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn('href="/thinktank" class="active"', body)
         self.assertIn("RACS remains alive", body)
 
-    def test_root_welcome_stays_auzietek_even_from_linux_host(self):
+    def test_root_defaults_to_auzietek_when_host_has_no_lane(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
         with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
-            response = self.client.get("/", headers={"Host": "linux-users.lab.auzietek.com"})
+            response = self.client.get("/", headers={"Host": "localhost"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mocked_fetch.call_args[0][3], "services")
         body = response.get_data(as_text=True)
         self.assertIn('class="theme-auzietek"', body)
         self.assertIn("What can Auzietek do for you?", body)
         self.assertIn('href="/" class="active"', body)
+
+    def test_root_respects_non_auzietek_host_lane(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/", headers={"Host": "blackknight.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "blackknightcontroller")
+        body = response.get_data(as_text=True)
+        self.assertIn('class="theme-midnight"', body)
+        self.assertIn("What can BlackKnightController do for you?", body)
 
     def test_auzietek_articles_page_can_show_all_recent_articles(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}

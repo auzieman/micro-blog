@@ -1391,11 +1391,10 @@ def public_index():
     result = "success"
     page = int(request.args.get("page", "1"))
     page_size = int(request.args.get("page_size", "10"))
-    if request.path == "/" and not request.args.get("lane"):
+    lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
+    if request.path == "/" and not request.args.get("lane") and not lane:
         lane_key, lane = resolve_lane("auzietek")
         host_lane_selected = True
-    else:
-        lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
     tag = request.args.get("tag")
     if lane and not tag:
         tag = lane["tag"]
