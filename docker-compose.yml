@@ -181,7 +181,7 @@ services:
     volumes:
       - ./content:/content
     ports:
-      - "8080:8080"
+      - "${BLOG_API_HOST_PORT:-18080}:8080"
     depends_on:
       rabbitmq:
         condition: service_healthy
