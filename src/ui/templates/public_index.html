@@ -802,6 +802,32 @@
       color: #effcff;
       font-weight: 850;
     }
+    body.theme-auzietek .resource-card a,
+    body.theme-linux-pro .resource-card a,
+    body.theme-retro .resource-card a {
+      background: var(--accent);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(15, 55, 75, 0.12);
+    }
+    body.theme-auzietek .resource-card a:hover,
+    body.theme-linux-pro .resource-card a:hover,
+    body.theme-retro .resource-card a:hover,
+    body.theme-auzietek .resource-card a:focus-visible,
+    body.theme-linux-pro .resource-card a:focus-visible,
+    body.theme-retro .resource-card a:focus-visible {
+      background: #0f3f52;
+      color: #ffffff;
+      text-decoration: none;
+    }
+    body.theme-linux-pro .resource-card a:hover,
+    body.theme-linux-pro .resource-card a:focus-visible {
+      background: #1d315b;
+    }
+    body.theme-retro .resource-card a:hover,
+    body.theme-retro .resource-card a:focus-visible {
+      background: #8f2d08;
+    }
     .content-shell {
       padding: 1rem;
     }

@@ -190,9 +190,20 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mocked_fetch.call_args[0][3], "think-tank")
         body = response.get_data(as_text=True)
-        self.assertIn("Ideas that connect systems, people, and better futures.", body)
+        self.assertIn("Ideas with a path toward useful systems.", body)
         self.assertIn('href="/thinktank" class="active"', body)
-        self.assertIn("RACS explores sustainable", body)
+        self.assertIn("RACS remains alive", body)
+
+    def test_root_welcome_stays_auzietek_even_from_linux_host(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get("/", headers={"Host": "linux-users.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "services")
+        body = response.get_data(as_text=True)
+        self.assertIn('class="theme-auzietek"', body)
+        self.assertIn("What can Auzietek do for you?", body)
+        self.assertIn('href="/" class="active"', body)
 
     def test_auzietek_articles_page_can_show_all_recent_articles(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -201,7 +212,45 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(mocked_fetch.call_args[0][3])
         body = response.get_data(as_text=True)
-        self.assertIn("Field notes rewritten into reusable engineering guidance.", body)
+        self.assertIn("Field notes, walkthroughs, and proof-backed teaching material.", body)
+        self.assertNotIn("<h2>Recent Articles</h2>", body)
+
+    def test_resource_card_links_have_light_theme_contrast_rules(self):
+        template = (ui_app.UI_SRC / "templates" / "public_index.html").read_text()
+        self.assertIn("body.theme-auzietek .resource-card a", template)
+        self.assertIn("body.theme-linux-pro .resource-card a", template)
+        self.assertIn("body.theme-retro .resource-card a", template)
+        self.assertIn("color: #ffffff", template)
+
+    def test_principles_page_contains_evidence_and_boundaries(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)):
+            response = self.client.get("/principles", headers={"Host": "auzietek.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("Evidence before action", body)
+        self.assertIn("Progressive trust and explicit boundaries", body)
+        self.assertIn("BlackKnightController is the practical edge", body)
+
+    def test_aiops_page_explains_bounded_operating_loop(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)):
+            response = self.client.get("/aiops", headers={"Host": "auzietek.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("signal", body)
+        self.assertIn("Bootstrap CLI versus controller", body)
+        self.assertIn("Receipts as handoff", body)
+
+    def test_business_case_page_labels_benchmarks_and_assumptions(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)):
+            response = self.client.get("/business-case", headers={"Host": "auzietek.lab.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("Public benchmarks, carefully used", body)
+        self.assertIn("Assumption, not a guarantee", body)
+        self.assertIn("Uptime Institute Annual Outage Analysis 2025", body)
 
     def test_blackknight_lab_host_selects_blackknight_lane(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}

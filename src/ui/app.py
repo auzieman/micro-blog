@@ -414,6 +414,24 @@ AUZIETEK_PAGES = {
         "html_content": """
             <p>Auzietek is built around human-first engineering: technology should reduce friction, preserve dignity, and make serious systems work easier to understand.</p>
             <p>We value demonstrated skill over credentials alone, practical evidence over theater, and flexible work that leaves room for a real life.</p>
+            <h3>Human-centered automation</h3>
+            <p>Automation should make people more capable, not more replaceable. A good system removes avoidable friction, keeps the human operator oriented, and makes the next action easier to understand. In BlackKnightController that means pipeline names, resource relationships, receipts, screenshots, and run state all live close to the work instead of being scattered across shell history and memory.</p>
+            <h3>Evidence before action</h3>
+            <p>The lab has taught this the hard way: a port answering, a host booting, or a dashboard loading is not the same as a finished deployment. BKC receipts now record what was checked, what changed, and what did not happen. That evidence trail keeps the operator, Codex, Astra, and future maintainers aligned.</p>
+            <h3>Progressive trust and explicit boundaries</h3>
+            <p>Auzietek's preferred model is progressive trust. Read-only inspection comes first. Low-risk content changes can move faster. Lab bring-up needs approval. Destructive PXE rebuilds, DNS changes, certificate changes, and production cutovers require explicit scope. This is not bureaucracy for its own sake; it is how an AI-assisted operations loop stays useful without becoming reckless.</p>
+            <h3>Deterministic procedures before open-ended exploration</h3>
+            <p>Exploration is valuable, but it should graduate into deterministic procedure. Once a Debian installer path, ESXi swarm bring-up, or micro-blog content deployment is proven, the next run should use a pipeline or documented workflow instead of re-solving the same problem live. That principle directly responds to the troubleshooting spirals the lab exposed: preserve known-good fragments and stop breaking working hunks.</p>
+            <h3>Infrastructure as knowledge</h3>
+            <p>A server is not only metal. It is BIOS state, network position, DHCP identity, storage layout, service role, credentials boundary, monitoring path, and story. Treating infrastructure as knowledge means capturing those relationships as resources and fragments, then linking them to the actions that depend on them.</p>
+            <h3>Composable and replaceable systems</h3>
+            <p>Auzietek favors modular pieces: SSH, IPMI, Docker, OpenStack APIs, ESXi APIs, DNS APIs, NFS mounts, Git receipts, and small web surfaces. Tools should be replaceable. If Ansible, OpenVox, Docker Swarm, K3s, or a direct shell path is the right expression for a lesson, the system should be able to teach that path without pretending one control plane owns every truth.</p>
+            <h3>Local-first where practical</h3>
+            <p>The lab can run privately, wake larger hosts only when needed, and use local models or private backchannels where that makes sense. Managed services are still useful, but the operator should understand where the work runs, where secrets live, and what happens if the internet link goes away.</p>
+            <h3>Graceful failure and human handoff</h3>
+            <p>A good automation system should know when to stop. If the evidence does not match the expected state, the workflow should record the failure, narrow the likely cause, and hand back a clear next decision instead of burning hours in an unbounded loop.</p>
+            <h3>Stewardship of older systems</h3>
+            <p>Retro computing is not a side gimmick. Old systems expose constraints modern stacks often hide. AmigaOS projects, AuziX ideas, and long-lived Linux habits all reinforce the same discipline: understand the machine, preserve the working pattern, and keep useful knowledge alive long enough for the next generation to build on it.</p>
             <h3>How we work</h3>
             <ul>
               <li>Make engineering accessible, exciting, and repeatable instead of turning it into ceremony.</li>
@@ -425,6 +443,7 @@ AUZIETEK_PAGES = {
             </ul>
             <h3>Why it matters</h3>
             <p>If the company succeeds, part of that success should flow outward: education, disaster relief, community labs, broader access to technology, and practical support for people who are usually priced out of advanced tools.</p>
+            <p>BlackKnightController is the practical edge of these principles: wake the hardware, inspect the state, run the bounded action, validate the result, preserve the receipt, and make the next operator stronger.</p>
         """,
         "points": [
             "Make engineering accessible, exciting, and repeatable instead of turning it into ceremony.",
@@ -564,6 +583,25 @@ AUZIETEK_PAGES = {
         "html_content": """
             <p>Auzietek's AIOps direction is grounded in human-led systems work: stable tool contracts, evidence retrieval, graph context, operational memory, and clear permissions before action.</p>
             <p>The point is better collaboration, not magic. A model can help gather context, compare evidence, draft scripts, and update documentation, but durable systems still need explicit tools, validation, and human judgment.</p>
+            <h3>The operating loop</h3>
+            <p>The useful loop is intentionally plain:</p>
+            <pre><code>signal
+  -> context
+  -> bounded action
+  -> validation
+  -> receipt
+  -> next approval</code></pre>
+            <p>A signal might be a failed route, an unhealthy stack, a new Git backchannel prompt, or a human asking for a lab bring-up. Context comes from BKC resources, pipeline fragments, Git receipts, logs, dashboards, and direct checks. The action must be mapped and bounded: inspect, power on, deploy a specific stack, sync content, or write a receipt. Validation proves the result before the system asks for the next step.</p>
+            <h3>Bootstrap CLI versus controller</h3>
+            <p>The bootstrap CLI should be small and boring: enough to wake the lab, check core routes, or call a known BKC endpoint when the larger control plane is asleep. BlackKnightController is the richer controller: inventory, resources, graph relationships, pipelines, templates, API integrations, receipts, and UI views. Keeping those roles separate prevents the emergency tool from becoming another tangled control plane.</p>
+            <h3>Receipts as handoff</h3>
+            <p>A healthy environment receipt is the line between infrastructure bring-up and higher-level orchestration. Once the receipt says server1, server2, IPFire, the ESXi swarm, the edge route, and the relevant services are reachable, the next workflow can safely talk about content, workloads, or demos. Without that receipt, the operator is guessing which layer failed.</p>
+            <h3>Constrained recovery</h3>
+            <p>Constrained recovery is how Auzietek avoids open-ended troubleshooting and token waste. If a pipeline step fails, the next action should narrow the fault, preserve the finding, and either repair the workflow or ask for a decision. The system should not endlessly mutate working code while chasing the wrong side of the failure.</p>
+            <h3>Progressive trust</h3>
+            <p>Trust is earned in layers. Read-only checks can run freely. Lab canaries can run with scoped approval. Destructive rebuilds, public DNS, certificates, and production promotion require a named approval and a receipt. Human override stays first-class: the operator can pause, reject, retry, or ask for a safer path.</p>
+            <h3>Local and private AI assistance</h3>
+            <p>Some assistance can run locally or inside the lab: summarizing receipts, proposing graph layouts, drafting content from approved source material, or classifying pipeline state. Internet-hosted models are useful, but sensitive execution should pass through explicit tool boundaries and private context rather than open-ended prompts.</p>
             <div class="resource-grid" aria-label="Auzietek AIOps proof screenshots">
               <article class="resource-card">
                 <span class="category">Operational memory</span>
@@ -578,6 +616,8 @@ AUZIETEK_PAGES = {
                 <img src="/content-files/assets/bkc/bkc-integrations.png" alt="BlackKnightController integrations screen" loading="lazy" />
               </article>
             </div>
+            <h3>Why Black Knight matters here</h3>
+            <p>BlackKnightController gives the model a safer body: named resources, known actions, fragments, pipeline steps, and receipts. That structure matters more than personality or model choice. It lets the human and the assistant move quickly while still being able to answer, "What did we know, what did we do, and what proved it worked?"</p>
         """,
         "points": [
             "Humans steer intent; AI helps gather context, draft steps, and validate outcomes.",
@@ -596,12 +636,22 @@ AUZIETEK_PAGES = {
             <p>Auzietek's model is still emerging, but the economics are not abstract. Many infrastructure costs come from repeated discovery, fragile handoffs, unclear ownership, and fixes that never make it back into a reusable operating pattern.</p>
             <p>BlackKnightController is designed to turn that work into executable evidence: pipeline steps, fragments, host state, diagrams, validation checks, and notes that stay near the system they describe.</p>
             <p>The claim is intentionally conservative: do not count magic. Count hours not re-spent, rebuilds that finish faster, onboarding that needs fewer heroic explanations, and migrations that leave proof behind.</p>
+            <h3>The problems being addressed</h3>
+            <p>Small teams often pay for complexity in quiet ways: fragmented tooling, repeated administration, slow environment bring-up, weak evidence trails, brittle handoffs, and expensive expert attention spent rediscovering facts that should have been preserved.</p>
+            <p>The lab examples are intentionally mundane: boot hardware, install a base OS, bring up OpenStack or ESXi, seed a Docker Swarm, expose a service, validate a route, and capture a receipt. These are ordinary operations tasks. The value appears when ordinary tasks become repeatable and explainable.</p>
             <h3>Traditional operating cost</h3>
             <p>In a conventional environment, skilled labor is often spent rediscovering state, comparing scattered notes, rebuilding one-off systems, and translating between tickets, shell history, diagrams, and tribal memory. That labor is expensive even when everyone is doing their best.</p>
+            <h3>Public benchmarks, carefully used</h3>
+            <p>External benchmarks are not a promise about any one customer, but they show why operational clarity matters. Uptime Institute's public 2025 outage analysis says more than half of respondents reported their most recent significant, serious, or severe outage cost more than $100,000, with one in five above $1 million. Flexera's 2026 State of the Cloud material reports estimated wasted cloud spend at 29%. IBM's 2026 breach report lists a global average breach cost of $4.99 million.</p>
+            <p>Those figures are broad market signals. Auzietek's narrower claim is simpler: if a team can reduce rediscovery, avoid preventable mistakes, recover faster, and prove what changed, the economics can improve without pretending automation eliminates judgment.</p>
             <h3>Typical AIOps risk</h3>
             <p>Many AIOps efforts improve visibility but still leave operators with another disconnected platform. If the system cannot explain what changed, prove what worked, and preserve the reusable action, it can become another tool to babysit.</p>
             <h3>The Auzietek / BKC model</h3>
             <p>The goal is a leaner loop: prompt, inspect, act through stable tool boundaries, validate, and commit the working fragment back into the pipeline or documentation. Token spend becomes a metered assist for engineering work, not a blank check for vague automation.</p>
+            <h3>Illustrative small-team scenario</h3>
+            <p>Assumption, not a guarantee: a small environment loses six senior-engineer hours each month to repeated discovery around rebuilds, drift, DNS/proxy routing, and service validation. At an illustrative loaded cost of $125 per hour, that is $750 per month of avoidable rework.</p>
+            <p>If a BKC-style workflow cuts that repeated discovery by half, the direct labor savings would be about $375 per month before counting reduced interruption, faster demos, better onboarding, or fewer deployment mistakes. If the team spends $50 to $150 per month in model/API usage and a modest amount of maintenance time, the business question becomes concrete: did the saved hours, cleaner evidence, and lower change risk exceed the operating cost?</p>
+            <p>The answer must be measured per environment. That is why receipts, timings, screenshots, and repeatable deployments matter more than a glossy ROI percentage.</p>
             <h3>Where value should show up</h3>
             <ul>
               <li>Fewer repeated research hours for common infrastructure actions.</li>
@@ -609,12 +659,17 @@ AUZIETEK_PAGES = {
               <li>Lower onboarding cost because context, evidence, and operating steps are connected.</li>
               <li>Reduced rework when known-good fragments are preserved and protected.</li>
               <li>Clearer customer conversations because demonstrations are backed by running systems.</li>
+              <li>Improved auditability because approvals, actions, and receipts are preserved.</li>
+              <li>Lower change risk because deterministic procedures replace fragile improvisation.</li>
             </ul>
+            <h3>Evidence Auzietek can already show</h3>
+            <p>The current lab receipts show the pattern in miniature: lab bring-up, ESXi swarm restoration, micro-blog content promotion, image smoke checks, and Git-backed backchannel receipts. The work is still young, but the operating model is visible: bounded action, validation, receipt, next approval.</p>
             <h3>Conservative assumptions</h3>
             <p>The model should be judged against ordinary labor economics: engineer hours, incident time, deployment duration, documentation quality, avoided regressions, and service reliability. It should not depend on replacing entire teams or pretending every task can be automated safely.</p>
             <p>The strongest investment case is not that AI removes operators. It is that good operators, clean tools, and durable operational memory can compound faster than ad hoc consulting, manual runbooks, or isolated dashboards.</p>
             <h3>Reasonable investor lens</h3>
             <p>The near-term opportunity is to prove repeatability in visible, boring numbers: how long a rebuild takes, how many manual steps disappear, how often known-good fragments prevent regressions, and whether token spend is smaller than the labor it helps avoid.</p>
+            <p>Sources for external benchmark context: <a href="https://intelligence.uptimeinstitute.com/resource/annual-outage-analysis-2025">Uptime Institute Annual Outage Analysis 2025</a>, <a href="https://info.flexera.com/CM-REPORT-State-of-the-Cloud">Flexera State of the Cloud 2026</a>, and <a href="https://www.ibm.com/reports/data-breach">IBM Cost of a Data Breach Report 2026</a>.</p>
         """,
         "points": [
             "Speculative product direction, concrete cost categories.",
@@ -1237,7 +1292,11 @@ def public_index():
     result = "success"
     page = int(request.args.get("page", "1"))
     page_size = int(request.args.get("page_size", "10"))
-    lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
+    if request.path == "/" and not request.args.get("lane"):
+        lane_key, lane = resolve_lane("auzietek")
+        host_lane_selected = True
+    else:
+        lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
     tag = request.args.get("tag")
     if lane and not tag:
         tag = lane["tag"]
