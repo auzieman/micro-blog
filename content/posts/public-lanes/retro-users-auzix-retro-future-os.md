@@ -63,6 +63,8 @@ The work is speculative, but not imaginary. Local notes show boot images,
 installer paths, package receipts, browser checkpoints, strict-root audits, and
 KVM-first test loops.
 
+![AuziX lab deployment proof from the BlackKnightController run history](/content-files/assets/retro/auzix/proof/auzix-lab-demo.png)
+
 That distinction matters. Auzietek can talk about future computing ideas
 because the ideas are being pushed through real build artifacts and real
 validation evidence.
@@ -77,5 +79,7 @@ how to reason about operating-system shape:
 - prefer small, inspectable services;
 - preserve receipts that describe intent;
 - test in a fast VM loop before chasing harder hardware.
+
+![AuziX working-session proof trail](/content-files/assets/retro/auzix/proof/auzix-working-session.png)
 
 Repo: [AuziX on GitHub](https://github.com/auzieman/AuziX).

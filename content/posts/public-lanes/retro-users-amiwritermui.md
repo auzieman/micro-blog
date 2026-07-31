@@ -7,7 +7,7 @@ theme_variant: retro
 status: published
 seo_title: AmiWriterMUI AmigaOS 4.1 editor
 seo_description: A retro computing note about building a small AmigaOS 4.1 MUI editor with Codex and learning from classic UI constraints.
-hero_image_url: /content-files/assets/retro/projects/amiwriterreact.png
+hero_image_url: /content-files/assets/retro/projects/amiwriterreact/amiwriterreact-editor.png
 ---
 
 AmiWriterMUI is a small editor experiment for AmigaOS 4.1 using MUI-style
@@ -58,7 +58,7 @@ small change, test it, preserve the fragment, and improve the next run.
 - Theme switching and recolor experiments.
 - A growing README and concept notes so the work can be repeated.
 
-![AmiWriter-style Amiga editor screenshot](/content-files/assets/retro/projects/amiwriterreact.png)
+![AmiWriter-style Amiga editor screenshot](/content-files/assets/retro/projects/amiwriterreact/amiwriterreact-editor.png)
 
 The screenshots matter because this work is not just a retro-themed writing
 exercise. It is the evidence that the build loop produced visible software on a

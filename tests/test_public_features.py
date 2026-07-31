@@ -1,5 +1,6 @@
 import unittest
 import importlib.util
+import re
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -60,6 +61,42 @@ class PublicFeatureTests(unittest.TestCase):
         self.assertIn("<title>Micro Blog</title>", xml)
         self.assertIn("<link>https://blog.example/post/demo-post</link>", xml)
         self.assertIn("<content:encoded><![CDATA[<p>Hello</p>]]></content:encoded>", xml)
+
+    def test_retro_content_assets_are_real_images_not_html(self):
+        retro_root = PROJECT_ROOT / "content" / "assets" / "retro"
+        self.assertTrue(retro_root.exists(), "retro asset root should exist")
+        image_magic = {
+            ".png": b"\x89PNG\r\n\x1a\n",
+            ".jpg": b"\xff\xd8\xff",
+            ".jpeg": b"\xff\xd8\xff",
+            ".gif": b"GIF",
+            ".svg": b"<",
+        }
+        for path in retro_root.rglob("*"):
+            if path.suffix.lower() not in image_magic:
+                continue
+            head = path.read_bytes()[:256].lstrip()
+            with self.subTest(path=str(path.relative_to(PROJECT_ROOT))):
+                if path.suffix.lower() == ".svg":
+                    self.assertIn(b"<svg", head[:128].lower())
+                else:
+                    self.assertTrue(
+                        head.startswith(image_magic[path.suffix.lower()]),
+                        f"{path} does not look like a {path.suffix} image",
+                    )
+                    self.assertNotIn(b"<html", head.lower())
+
+    def test_public_lane_referenced_content_files_exist(self):
+        post_root = PROJECT_ROOT / "content" / "posts" / "public-lanes"
+        refs = []
+        for post in post_root.glob("*.md"):
+            text = post.read_text()
+            refs.extend((post, ref) for ref in re.findall(r"/content-files/(assets/[^)'\"\s>]+)", text))
+        self.assertGreater(len(refs), 0)
+        for post, ref in refs:
+            target = PROJECT_ROOT / "content" / ref
+            with self.subTest(post=post.name, ref=ref):
+                self.assertTrue(target.exists(), f"{post.name} references missing {ref}")
 
 
 if __name__ == "__main__":

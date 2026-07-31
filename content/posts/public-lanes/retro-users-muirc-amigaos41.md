@@ -8,6 +8,7 @@ status: published
 seo_title: MuIRC AmigaOS 4.1 IRC client
 seo_description: A retro computing article about building a small AmigaOS 4.1 IRC client with Codex and preserving classic-platform engineering lessons.
 canonical_url: https://auzietek.com/index.php/node/43
+hero_image_url: /content-files/assets/retro/projects/muirc/muirc-main.png
 ---
 
 MuIRC is a small MUI-based IRC client for AmigaOS 4.1. It started as a minimal
@@ -18,7 +19,7 @@ could support more networks later.
 Retro work has a way of forcing honesty. APIs are smaller. Toolchains are more
 particular. UI choices are visible. A careless assumption shows up quickly.
 
-![MuIRC current state](/content-files/assets/retro/projects/muirc.png)
+![MuIRC current state](/content-files/assets/retro/projects/muirc/muirc-main.png)
 
 ## Why this belongs in the retro lane
 
@@ -44,6 +45,13 @@ larger and the layers are thicker.
 - Ident responder on port `113`.
 - Basic CTCP `VERSION` response.
 
+![MuIRC version check on the AmigaOS target](/content-files/assets/retro/projects/muirc/muirc-version-check.png)
+
+The version check screenshot is the sort of small receipt that matters in retro
+work. It proves the binary that was just built is the binary being exercised on
+the target system. On modern infrastructure that same habit becomes build IDs,
+container digests, pipeline run IDs, and deployment receipts.
+
 ## How the UI is shaped
 
 The UI is assembled with MUI objects: connection fields across the top, a
@@ -67,6 +75,12 @@ The cross-build path stays simple:
 sudo docker run --rm -v /home/auzieman/Projects:/Projects \
   rolfkopman/os4env /bin/bash -lc "cd /Projects/MuIRC && make clean && make"
 ```
+
+![MuIRC icon set and Workbench integration proof](/content-files/assets/retro/projects/muirc/muirc-icons.png)
+
+Even the icon pass belongs in the engineering story. A classic desktop tool is
+not only its socket code. It has to appear on the system in a way that feels
+native enough that a user trusts it.
 
 ## Assisted development as a patient pair programmer
 

@@ -7,9 +7,12 @@ theme_variant: retro
 status: published
 seo_title: Retro computing lessons for modern engineers
 seo_description: Retro systems such as Amiga and Atari-era machines can teach modern engineers about constraints, interfaces, reliability, and thoughtful design.
+hero_image_url: /content-files/assets/retro/retro-computing-workbench-header.png
 ---
 
 Retro computing is not just nostalgia with nicer lighting.
+
+![Retro computing workbench with classic machines, terminals, and bench tools](/content-files/assets/retro/retro-computing-workbench-header.png)
 
 Classic systems are useful because the constraints are visible. Memory matters.
 Disk speed matters. Video modes matter. A bad assumption shows up quickly
@@ -42,4 +45,3 @@ The style should feel playful, but the takeaway should still be useful.
 
 Good retro engineering is not living in the past. It is learning from systems
 that had to be understandable because they had no room to be wasteful.
-

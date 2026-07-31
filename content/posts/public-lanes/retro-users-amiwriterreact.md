@@ -7,6 +7,7 @@ theme_variant: retro
 status: published
 seo_title: AmiWriterReact ReAction editor for AmigaOS 4.x
 seo_description: A retro computing article about building a ReAction-style text editor for AmigaOS 4.x and applying classic engineering lessons to modern work.
+hero_image_url: /content-files/assets/retro/projects/amiwriterreact/amiwriterreact-editor.png
 ---
 
 AmiWriterReact is the sibling experiment to AmiWriterMUI: another small editor,
@@ -15,7 +16,7 @@ layers are close enough to touch.
 
 That closeness is valuable.
 
-![AmiWriterReact screenshot](/content-files/assets/retro/projects/amiwriterreact.png)
+![AmiWriterReact screenshot](/content-files/assets/retro/projects/amiwriterreact/amiwriterreact-editor.png)
 
 When the stack is smaller, design decisions feel more immediate. The program
 either responds cleanly or it does not. The file either saves correctly or it
