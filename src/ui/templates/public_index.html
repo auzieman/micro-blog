@@ -335,12 +335,36 @@
     }
     .linux-mag-search {
       min-width: min(22rem, 38vw);
-      padding: 0.75rem 0.9rem;
+      padding: 0.5rem;
       border-radius: 10px;
       border: 1px solid rgba(207, 216, 220, 0.28);
       background: rgba(255, 255, 255, 0.08);
       color: #dbe7dd;
       font-size: 0.92rem;
+    }
+    .linux-mag-search form {
+      display: flex;
+      gap: 0.45rem;
+      margin: 0;
+    }
+    .linux-mag-search input {
+      min-width: 0;
+      flex: 1;
+      border: 0;
+      border-radius: 8px;
+      padding: 0.55rem 0.65rem;
+      background: rgba(255, 255, 255, 0.94);
+      color: #102035;
+      font: inherit;
+    }
+    .linux-mag-search button {
+      border: 0;
+      border-radius: 8px;
+      padding: 0.55rem 0.72rem;
+      background: #9ecb75;
+      color: #102035;
+      font-weight: 800;
+      cursor: pointer;
     }
     .linux-mag-artline,
     .retro-mag-artline {
@@ -1419,6 +1443,11 @@
       color: var(--ink);
       font-weight: 700;
     }
+    .pager a.disabled {
+      opacity: 0.48;
+      pointer-events: none;
+      cursor: default;
+    }
     .article-panel {
       padding: 1.4rem 1.5rem 1.8rem;
       min-height: 72vh;
@@ -2045,7 +2074,14 @@
           <div class="linux-mag-logo">Linux Users</div>
           <div class="linux-mag-kicker">practical systems • real labs • useful scars</div>
         </div>
-        <div class="linux-mag-search" aria-label="Search placeholder">Search the lab notebook…</div>
+        <div class="linux-mag-search" aria-label="Search the lab notebook">
+          <form method="get" action="/blog">
+            <input type="search" name="q" value="{{ query or '' }}" placeholder="Search the lab notebook…" />
+            {% if active_lane %}<input type="hidden" name="lane" value="{{ active_lane }}" />{% endif %}
+            {% if active_theme %}<input type="hidden" name="theme" value="{{ active_theme }}" />{% endif %}
+            <button type="submit">Search</button>
+          </form>
+        </div>
       </div>
       <div class="linux-mag-artline" aria-hidden="true"></div>
       <div class="linux-mag-links">
@@ -2245,6 +2281,7 @@
                   {% endfor %}
                 </select>
                 {% if tag %}<input type="hidden" name="tag" value="{{ tag }}" />{% endif %}
+                {% if query %}<input type="hidden" name="q" value="{{ query }}" />{% endif %}
                 {% if active_theme %}<input type="hidden" name="theme" value="{{ active_theme }}" />{% endif %}
                 {% if active_lane %}<input type="hidden" name="lane" value="{{ active_lane }}" />{% endif %}
                 <button type="submit">Refresh</button>
@@ -2259,7 +2296,7 @@
 
           <div class="post-list">
             {% for post in posts %}
-            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/post/{{ post.slug }}?page={{ page }}&page_size={{ page_size }}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}#article-start">
+            <a class="post-card {% if selected and selected.slug == post.slug %}active{% endif %}" href="/post/{{ post.slug }}?page={{ page }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}#article-start">
               <h3>{{ post.title }}</h3>
               {% if post.published_at or post.updated_at %}
               <p>{{ (post.published_at or post.updated_at)[:10] }}</p>
@@ -2278,8 +2315,13 @@
 
           {% if total > 0 %}
           <div class="pager">
+            {% if previous_post or next_post %}
+            <a class="{% if not previous_post %}disabled{% endif %}" href="{% if previous_post %}/post/{{ previous_post.slug }}?page={{ page }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}#article-start{% else %}#{% endif %}">Previous</a>
+            <a class="{% if not next_post %}disabled{% endif %}" href="{% if next_post %}/post/{{ next_post.slug }}?page={{ page }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}#article-start{% else %}#{% endif %}">Next</a>
+            {% else %}
             <a href="/blog?page={{ 1 if page <= 1 else page - 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Previous</a>
             <a href="/blog?page={{ total_pages if page >= total_pages else page + 1 }}&page_size={{ page_size }}{% if tag %}&tag={{ tag }}{% endif %}{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Next</a>
+            {% endif %}
           </div>
           {% endif %}
           {% if active_theme == 'linux-pro' %}

@@ -1361,6 +1361,33 @@ def filter_posts_for_lane(posts: list[dict], lane_key: str | None) -> list[dict]
     return [post for post in posts if article_lane_key(post) == lane_key]
 
 
+def filter_posts_by_query(posts: list[dict], query: str | None) -> list[dict]:
+    term = (query or "").strip().lower()
+    if not term:
+        return posts
+    searchable_fields = ("title", "summary", "markdown_body", "html_body", "seo_description")
+    matches = []
+    for post in posts:
+        haystack = " ".join(str(post.get(field) or "") for field in searchable_fields).lower()
+        tags = " ".join(str(tag) for tag in post.get("tags", [])).lower()
+        if term in haystack or term in tags:
+            matches.append(post)
+    return matches
+
+
+def neighboring_posts(posts: list[dict], selected: dict | None) -> tuple[dict | None, dict | None]:
+    if not selected:
+        return None, None
+    selected_slug = selected.get("slug")
+    slugs = [post.get("slug") for post in posts]
+    if selected_slug not in slugs:
+        return None, None
+    index = slugs.index(selected_slug)
+    previous_post = posts[index - 1] if index > 0 else None
+    next_post = posts[index + 1] if index + 1 < len(posts) else None
+    return previous_post, next_post
+
+
 def fetch_public_payload(page: int, page_size: int, slug: str | None, tag: str | None, featured_slug: str | None = None, lane_key: str | None = None):
     payload = {"items": [], "total": 0, "page": page, "page_size": page_size}
     posts = []
@@ -1413,7 +1440,7 @@ def fetch_admin_revisions(article_id: str):
     return response.json()["items"]
 
 
-def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None, is_homepage=False, show_article_section=None, host_lane_selected=False):
+def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, query=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None, is_homepage=False, show_article_section=None, host_lane_selected=False):
     resolved_site_url = (site_url or SITE_URL).rstrip("/")
     site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
     site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
@@ -1461,6 +1488,7 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         }
         json_ld = lane_home_json_ld(resolved_site_url, lane) if lane and is_homepage else ""
     total_pages = max(1, (payload["total"] + payload["page_size"] - 1) // payload["page_size"])
+    previous_post, next_post = neighboring_posts(posts, selected)
     return {
         "posts": posts,
         "selected": selected,
@@ -1499,6 +1527,9 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "json_ld": json_ld,
         "preview_mode": preview_mode,
         "tag": tag,
+        "query": query,
+        "previous_post": previous_post,
+        "next_post": next_post,
     }
 
 
@@ -1579,6 +1610,7 @@ def public_index():
         lane_key, lane = resolve_lane("auzietek")
         host_lane_selected = True
     tag = request.args.get("tag")
+    query = request.args.get("q")
     if lane and not tag:
         tag = lane["tag"]
     theme = (lane.get("theme") if lane and host_lane_selected else None) or request.args.get("theme") or (lane.get("theme") if lane else None)
@@ -1586,6 +1618,10 @@ def public_index():
     with event_scope(logger, "ui.public_index", page=page, page_size=page_size, tag=tag, theme=theme, lane=lane_key) as log:
         try:
             payload, posts, selected, _redirect_slug = fetch_public_payload(page, page_size, None, tag, lane.get("featured_slug") if lane else None, lane_key)
+            if query:
+                posts = filter_posts_by_query(filter_posts_for_lane(fetch_all_public_posts(), lane_key), query)
+                payload = {**payload, "items": posts, "total": len(posts), "page": 1, "page_size": max(len(posts), 1)}
+                selected = posts[0] if posts else None
         except Exception as exc:
             result = "error"
             log.exception("UI public index failed")
@@ -1598,7 +1634,7 @@ def public_index():
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
     is_lane_homepage = request.path == "/"
     static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and is_lane_homepage else None
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=is_lane_homepage, show_article_section=request.path == "/blog" and bool(selected or posts), host_lane_selected=host_lane_selected))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, query=query, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=is_lane_homepage, show_article_section=request.path == "/blog" and bool(selected or posts), host_lane_selected=host_lane_selected))
 
 
 @app.get("/thinktank")
@@ -1624,6 +1660,7 @@ def auzietek_page():
     page = int(request.args.get("page", "1"))
     page_size = int(request.args.get("page_size", "10"))
     tag = request.args.get("tag")
+    query = request.args.get("q")
     if not tag and static_page.get("tag") is not None:
         tag = static_page.get("tag")
     theme = lane.get("theme")
@@ -1641,7 +1678,7 @@ def auzietek_page():
             message = str(exc)
         finally:
             telemetry.api(request.path, "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key, is_homepage=False, show_article_section=False, host_lane_selected=True))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, query=query, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key, is_homepage=False, show_article_section=False, host_lane_selected=True))
 
 
 @app.get("/post/<slug>")
@@ -1649,9 +1686,10 @@ def public_post(slug: str):
     started = time.perf_counter()
     result = "success"
     page = 1
-    page_size = 10
+    page_size = 100
     lane_key, lane, host_lane_selected = resolve_request_lane(request.args.get("lane"))
     tag = request.args.get("tag")
+    query = request.args.get("q")
     if lane and not tag:
         tag = lane["tag"]
     theme = (lane.get("theme") if lane and host_lane_selected else None) or request.args.get("theme") or (lane.get("theme") if lane else None)
@@ -1674,7 +1712,7 @@ def public_post(slug: str):
             raise
         finally:
             telemetry.api("/post/{slug}", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), host_lane_selected=host_lane_selected))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, tag=tag, query=query, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), host_lane_selected=host_lane_selected))
 
 
 @app.get("/sitemap.xml")
