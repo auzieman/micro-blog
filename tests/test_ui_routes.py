@@ -170,7 +170,7 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(mocked_fetch.call_args[0][4], "blackknightcontroller-recovery-weekend-repeatable-lab")
         body = response.get_data(as_text=True)
         self.assertIn("<title>BlackKnightController | Infrastructure automation and practical systems support</title>", body)
-        self.assertIn("What is BlackKnightController?", body)
+        self.assertIn("BlackKnight Articles", body)
         self.assertIn('class="theme-midnight"', body)
 
     def test_auzietek_lane_keeps_business_front_door(self):
@@ -182,7 +182,7 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(mocked_fetch.call_args[0][4], "infrastructure-automation-that-stays-repeatable")
         body = response.get_data(as_text=True)
         self.assertIn("<title>Auzietek | Infrastructure automation and practical systems support</title>", body)
-        self.assertIn("Practical infrastructure automation", body)
+        self.assertIn("Auzietek Articles", body)
 
     def test_auzietek_thinktank_page_renders_static_page_and_related_tag(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -216,6 +216,34 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn('class="theme-midnight"', body)
         self.assertIn("What can BlackKnightController do for you?", body)
 
+    def test_authoritative_host_ignores_cross_lane_query(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
+            response = self.client.get(
+                "/blog?lane=retro&theme=retro",
+                headers={"Host": "linux-users.auzietek.com"},
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mocked_fetch.call_args[0][3], "linux")
+        body = response.get_data(as_text=True)
+        self.assertIn('class="theme-linux-pro"', body)
+        self.assertIn("Linux Users", body)
+
+    def test_fqdn_lane_nav_links_use_sibling_hosts(self):
+        payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)):
+            response = self.client.get("/blog", headers={"Host": "linux-users.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn('href="https://blackknight.auzietek.com/"', body)
+        self.assertIn('href="https://retro-users.auzietek.com/blog"', body)
+        self.assertNotIn('href="/blog?lane=retro"', body)
+
+    def test_static_auzietek_page_redirects_from_other_lane_host(self):
+        response = self.client.get("/thinktank", headers={"Host": "linux-users.auzietek.com"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.location, "https://beta.auzietek.com/thinktank")
+
     def test_auzietek_articles_page_can_show_all_recent_articles(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
         with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [], None, None)) as mocked_fetch:
@@ -229,6 +257,9 @@ class UIRouteTests(unittest.TestCase):
     def test_resource_card_links_have_light_theme_contrast_rules(self):
         template = (ui_app.UI_SRC / "templates" / "public_index.html").read_text()
         self.assertIn("body.theme-auzietek .resource-card a", template)
+        self.assertIn("body.theme-linux-pro .resource-card a", template)
+        self.assertIn("body.theme-retro .resource-card a", template)
+        self.assertIn("color: #ffffff", template)
 
     def test_static_page_overrides_load_from_content_mount(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -255,9 +286,6 @@ Mounted body from private content payload.
         self.assertEqual(overrides["principles"]["title"], "Mounted Principles")
         self.assertEqual(overrides["principles"]["points"], ["Mounted point one", "Mounted point two"])
         self.assertIn("<h2>Mounted heading</h2>", overrides["principles"]["html_content"])
-        self.assertIn("body.theme-linux-pro .resource-card a", template)
-        self.assertIn("body.theme-retro .resource-card a", template)
-        self.assertIn("color: #ffffff", template)
 
     def test_principles_page_contains_evidence_and_boundaries(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}

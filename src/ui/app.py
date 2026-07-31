@@ -5,6 +5,7 @@ import json
 import os
 import time
 import uuid
+from pathlib import Path
 from urllib.parse import urlencode
 
 import markdown
@@ -26,6 +27,7 @@ from blog_shared import (
 configure_logging()
 logger = logging.getLogger("microblog.ui")
 telemetry = BlogTelemetry("blog-ui")
+UI_SRC = Path(__file__).resolve().parent
 
 
 def coerce_bool(value, default: bool = False) -> bool:
@@ -41,7 +43,7 @@ def coerce_bool(value, default: bool = False) -> bool:
     return default
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=str(UI_SRC / "templates"), static_folder=str(UI_SRC / "static"))
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "change-me-for-real-deployments")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
@@ -837,13 +839,18 @@ THEME_LANE_MAP = {lane["theme"]: key for key, lane in LANE_CONFIG.items()}
 
 MICROSITE_LANE_BY_NAME = {
     "www.auzietek.com": "auzietek",
+    "beta.auzietek.com": "auzietek",
+    "auzietek.lab.auzietek.com": "auzietek",
     "auzietek": "auzietek",
     "blackknight.auzietek.com": "blackknight",
+    "blackknight.lab.auzietek.com": "blackknight",
     "blackknight": "blackknight",
     "linux-users.auzietek.com": "linux",
+    "linux-users.lab.auzietek.com": "linux",
     "linux users": "linux",
     "linux-users": "linux",
     "retro-users.auzietek.com": "retro",
+    "retro-users.lab.auzietek.com": "retro",
     "retro users": "retro",
     "retro-users": "retro",
 }
@@ -926,6 +933,19 @@ def _load_json_object(raw_value: str, fallback: dict) -> dict:
 
 def request_host() -> str:
     return request.host.split(":", 1)[0].strip().lower()
+
+
+def configured_host_lane_map() -> dict:
+    return _load_json_object(HOST_LANE_MAP_JSON, DEFAULT_HOST_LANE_MAP)
+
+
+def lane_for_request_host() -> tuple[str | None, dict | None]:
+    host_lane = configured_host_lane_map().get(request_host())
+    return resolve_lane(host_lane)
+
+
+def request_has_authoritative_lane_host() -> bool:
+    return bool(lane_for_request_host()[1])
 
 
 def client_ip() -> str:
@@ -1011,13 +1031,11 @@ def route_label_for_request() -> str:
 
 
 def resolve_request_lane(explicit_lane: str | None) -> tuple[str | None, dict | None, bool]:
+    host_lane_key, host_lane = lane_for_request_host()
+    if host_lane:
+        return host_lane_key, host_lane, True
     lane_key, lane = resolve_lane(explicit_lane)
-    if lane:
-        return lane_key, lane, False
-    host_map = _load_json_object(HOST_LANE_MAP_JSON, DEFAULT_HOST_LANE_MAP)
-    host_lane = host_map.get(request_host())
-    lane_key, lane = resolve_lane(host_lane)
-    return lane_key, lane, bool(lane)
+    return lane_key, lane, False
 
 
 def effective_site_url(host_lane_selected: bool) -> str:
@@ -1060,7 +1078,15 @@ def redirect_for_lane_mismatch(selected: dict | None, active_lane: str | None, h
     return redirect(f"{url_for('public_post', slug=selected['slug'])}?{urlencode(query)}#article-start", code=302)
 
 
-def lane_nav_links(active_lane: str | None, active_theme: str | None, active_page: str | None = None) -> list[dict]:
+def href_for_lane(lane_key: str, host_lane_selected: bool = False) -> str:
+    host = lane_host_for_current_zone(lane_key) if host_lane_selected else None
+    if host:
+        scheme = "https" if host.endswith(".auzietek.com") and not host.endswith(".lab.auzietek.com") else request.scheme
+        return f"{scheme}://{host}/" if lane_key in {"auzietek", "blackknight"} else f"{scheme}://{host}/blog"
+    return f"/blog?{urlencode({'lane': lane_key})}"
+
+
+def lane_nav_links(active_lane: str | None, active_theme: str | None, active_page: str | None = None, host_lane_selected: bool = False) -> list[dict]:
     if active_lane == "auzietek":
         return [
             {"label": page["label"], "href": page["path"], "active": key == active_page}
@@ -1068,7 +1094,7 @@ def lane_nav_links(active_lane: str | None, active_theme: str | None, active_pag
         ] + [{"label": "RSS", "href": "/rss.xml", "active": False}]
     links = []
     for key, lane in LANE_CONFIG.items():
-        href = f"/blog?{urlencode({'lane': key})}"
+        href = href_for_lane(key, host_lane_selected)
         links.append({"label": lane["label"], "href": href, "active": key == active_lane})
     links.append({"label": "All Posts", "href": f"/blog?{urlencode({'theme': active_theme})}" if active_theme else "/blog", "active": active_lane is None})
     links.append({"label": "RSS", "href": "/rss.xml", "active": False})
@@ -1247,7 +1273,7 @@ def fetch_admin_revisions(article_id: str):
     return response.json()["items"]
 
 
-def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None, is_homepage=False, show_article_section=None):
+def build_public_context(selected, posts, payload, message=None, active_theme=None, preview_mode=False, tag=None, lane_key=None, lane=None, site_url=None, static_page=None, active_page=None, is_homepage=False, show_article_section=None, host_lane_selected=False):
     resolved_site_url = (site_url or SITE_URL).rstrip("/")
     site_name = lane.get("site_name", SITE_NAME) if lane else SITE_NAME
     site_description = lane.get("description", SITE_DESCRIPTION) if lane else SITE_DESCRIPTION
@@ -1300,7 +1326,7 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "site_positioning": site_positioning,
         "site_audience": site_audience,
         "site_headline": site_headline,
-        "site_nav_links": lane_nav_links(lane_key, resolved_theme, active_page) if lane else _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
+        "site_nav_links": lane_nav_links(lane_key, resolved_theme, active_page, host_lane_selected) if lane else _load_json_list(SITE_NAV_LINKS_JSON, DEFAULT_SITE_NAV_LINKS),
         "microsites": normalize_microsites(_load_json_list(MICROSITES_JSON, DEFAULT_MICROSITES)),
         "lane_landing": lane.get("landing") if lane else None,
         "lane_hero_image_url": lane.get("hero_image_url") if lane else "",
@@ -1398,7 +1424,7 @@ def public_index():
     tag = request.args.get("tag")
     if lane and not tag:
         tag = lane["tag"]
-    theme = request.args.get("theme") or (lane.get("theme") if lane else None)
+    theme = (lane.get("theme") if lane and host_lane_selected else None) or request.args.get("theme") or (lane.get("theme") if lane else None)
     message = request.args.get("message")
     with event_scope(logger, "ui.public_index", page=page, page_size=page_size, tag=tag, theme=theme, lane=lane_key) as log:
         try:
@@ -1415,7 +1441,7 @@ def public_index():
             telemetry.api("/blog", "GET", result, (time.perf_counter() - started) * 1000.0)
     is_lane_homepage = request.path == "/"
     static_page = AUZIETEK_PAGES.get("welcome") if lane_key == "auzietek" and is_lane_homepage else None
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=is_lane_homepage, show_article_section=request.path == "/blog"))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), static_page=static_page, active_page="welcome" if static_page else None, is_homepage=is_lane_homepage, show_article_section=request.path == "/blog", host_lane_selected=host_lane_selected))
 
 
 @app.get("/thinktank")
@@ -1432,13 +1458,18 @@ def auzietek_page():
     static_page = AUZIETEK_PAGES.get(page_key)
     if not static_page:
         abort(404)
+    host_lane_key, _host_lane = lane_for_request_host()
+    if host_lane_key and host_lane_key != "auzietek":
+        host = lane_host_for_current_zone("auzietek") or PUBLIC_HOST_BY_LANE["auzietek"]
+        scheme = "https" if host.endswith(".auzietek.com") and not host.endswith(".lab.auzietek.com") else request.scheme
+        return redirect(f"{scheme}://{host}{request.path}", code=302)
     lane_key, lane = resolve_lane("auzietek")
     page = int(request.args.get("page", "1"))
     page_size = int(request.args.get("page_size", "10"))
     tag = request.args.get("tag")
     if not tag and static_page.get("tag") is not None:
         tag = static_page.get("tag")
-    theme = request.args.get("theme") or lane.get("theme")
+    theme = lane.get("theme")
     message = request.args.get("message")
     with event_scope(logger, "ui.auzietek_page", page=page, page_size=page_size, tag=tag, theme=theme, page_key=page_key) as log:
         try:
@@ -1453,7 +1484,7 @@ def auzietek_page():
             message = str(exc)
         finally:
             telemetry.api(request.path, "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key, is_homepage=False, show_article_section=False))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, message=message, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(True), static_page=static_page, active_page=page_key, is_homepage=False, show_article_section=False, host_lane_selected=True))
 
 
 @app.get("/post/<slug>")
@@ -1466,11 +1497,13 @@ def public_post(slug: str):
     tag = request.args.get("tag")
     if lane and not tag:
         tag = lane["tag"]
-    theme = request.args.get("theme") or (lane.get("theme") if lane else None)
+    theme = (lane.get("theme") if lane and host_lane_selected else None) or request.args.get("theme") or (lane.get("theme") if lane else None)
     with event_scope(logger, "ui.public_post", slug=slug, tag=tag, theme=theme, lane=lane_key) as log:
         try:
             payload, posts, selected, redirect_slug = fetch_public_payload(page, page_size, slug, tag, None, lane_key)
             if redirect_slug and redirect_slug != slug:
+                if host_lane_selected:
+                    return redirect(url_for("public_post", slug=redirect_slug), code=301)
                 return redirect(url_for("public_post", slug=redirect_slug, theme=theme, lane=lane_key), code=301)
             if not selected:
                 abort(404)
@@ -1484,7 +1517,7 @@ def public_post(slug: str):
             raise
         finally:
             telemetry.api("/post/{slug}", "GET", result, (time.perf_counter() - started) * 1000.0)
-    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected)))
+    return render_template("public_index.html", **build_public_context(selected, posts, payload, active_theme=theme, tag=tag, lane_key=lane_key, lane=lane, site_url=effective_site_url(host_lane_selected), host_lane_selected=host_lane_selected))
 
 
 @app.get("/sitemap.xml")
