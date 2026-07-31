@@ -72,6 +72,47 @@ The conservative business case is straightforward: reduce rediscovery, reduce
 rework, shorten rebuilds, preserve operational knowledge, and make client
 environments easier to teach, migrate, and support.
 
+## What this can do for a client
+
+Auzietek is not asking a client to buy a science project because the diagrams
+look fun. The practical service path is smaller and more grounded:
+
+- map what is already running;
+- identify the few fragile places that create the most support pain;
+- turn repeatable fixes into scripts, templates, or pipelines;
+- validate those actions against real hosts and services;
+- leave behind screenshots, runbooks, and operating fragments the team can
+  reuse.
+
+That can start as a lab rebuild, a small-office virtualization cleanup, a Docker
+Swarm or Kubernetes review, a DNS/certificate audit, or a migration plan for an
+aging host. The same loop applies: preserve evidence, reduce mystery, make the
+next run calmer.
+
+## Why the UI matters
+
+The UI is not only decoration. A clear view changes the conversation.
+
+![BlackKnightController pipeline detail and edit view](/content-files/assets/bkc/bkc-pipeline-detail-edit.png)
+
+When the pipeline editor shows JSON, shell fragments, resources, and run status
+in one place, it becomes easier to decide whether a fix is actually ready to
+promote. When the graph view shows a service hanging off a hypervisor, a switch,
+an edge route, and a monitoring dashboard, it becomes easier to teach another
+person what exists without forcing them to reconstruct the whole lab from
+terminal scrollback.
+
+The long-term product value is this connected operating memory:
+
+```text
+resource
+  -> relationship
+  -> action
+  -> evidence
+  -> known-good fragment
+  -> public or private teaching material
+```
+
 ## What comes next
 
 The next public pass should keep expanding the magazine-and-repo pattern:

@@ -338,6 +338,7 @@ AUZIETEK_PAGES = {
         "html_content": """
             <p>Auzietek helps you make technology more natural, predictable, and clean: fewer mystery systems, fewer one-off fixes, clearer automation, better observability, and engineering guidance your team can reuse.</p>
             <p>The public beta is backed by running lab work, not stock theater. BlackKnightController captures infrastructure resources, pipeline steps, service relationships, and operational evidence so teams can see what changed and why it matters.</p>
+            <p>The practical offer is simple: bring us the messy system, the fragile migration, the recurring support pain, or the idea that has outgrown shell history. We help turn it into a map, a repeatable path, and teaching material your team can actually use.</p>
             <div class="static-point-grid">
               <div class="static-point-card">Assess and clean up Linux, virtualization, container, and network environments.</div>
               <div class="static-point-card">Build repeatable deployment paths from bare metal to application services.</div>
@@ -366,6 +367,13 @@ AUZIETEK_PAGES = {
                 <p><a href="/post/lab-pipelines-as-product-proof">Read the lab proof story</a></p>
               </article>
             </div>
+            <h3>What can Auzietek help with?</h3>
+            <ul>
+              <li>Small-office or lab virtualization cleanup across Proxmox, ESXi, OpenStack, and container hosts.</li>
+              <li>Repeatable bare-metal provisioning with IPMI, PXE, DHCP, DNS, edge routing, and validation.</li>
+              <li>Operational documentation that keeps commands, screenshots, decisions, and evidence together.</li>
+              <li>Human-led AIOps patterns where AI helps engineers move faster without hiding the truth of the system.</li>
+            </ul>
         """,
         "points": [
             "Assess and clean up Linux, virtualization, container, and network environments.",
@@ -438,6 +446,7 @@ AUZIETEK_PAGES = {
         "html_content": """
             <p>Articles are where Auzietek turns real work into public guidance: practical walkthroughs, migration notes, troubleshooting patterns, product thinking, and retro engineering stories that help engineers and clients see how the work is actually done.</p>
             <p>The goal is not to publish polished guesses. The goal is to preserve useful evidence: commands, screenshots, diagrams, caveats, repo links, and the decisions that made a messy system become repeatable.</p>
+            <p>Think of the site like a modern version of a good computing magazine: the article explains the lesson, the screenshots show the work, and GitHub becomes the floppy disk or CD in the back of the issue when the topic deserves runnable files.</p>
             <div class="resource-grid" aria-label="Auzietek article lane guide">
               <article class="resource-card">
                 <span class="category">Auzietek</span>
@@ -492,6 +501,13 @@ AUZIETEK_PAGES = {
             <p>Auzietek is moving toward a magazine-and-repo pattern: the article explains the idea, the screenshots prove the work existed, and GitHub carries the runnable artifacts when the topic deserves a full tutorial kit.</p>
             <p>The first curated companion repo is <a href="https://github.com/auzieman/auzietek-linux-lab-guides">Auzietek Linux Lab Guides</a>, with small ESXi, Docker Swarm, Ansible/Grafana, and Puppet/OpenVox planning examples.</p>
             <p>That matters for advanced topics. If we modernize an older Puppet article toward OpenVox, or turn a BKC bare-metal pipeline into an Ansible companion, the public article should either link to the real guide repo or clearly say the repo is the next build target.</p>
+            <h3>Near-term editorial lanes</h3>
+            <ul>
+              <li><strong>Auzietek:</strong> company direction, service pages, business case, human-first engineering, and practical AIOps.</li>
+              <li><strong>BlackKnightController:</strong> product proof, UI evidence, pipeline walkthroughs, and infrastructure automation stories.</li>
+              <li><strong>Linux Users:</strong> field-tested Linux lessons with code, caveats, and companion repos where useful.</li>
+              <li><strong>Retro Users:</strong> Amiga, AuziX, preservation, emulation, and the engineering discipline classic systems still teach.</li>
+            </ul>
         """,
         "points": [
             "Auzietek articles explain the company direction, service model, and human-first operating principles.",
@@ -510,6 +526,13 @@ AUZIETEK_PAGES = {
         "html_content": """
             <p>Auzietek is a fit for small teams, founders, MSP-style environments, and practical operators who need cleaner operations, repeatable deployments, service migration, observability, and automation an engineer can still reason about at 2 AM.</p>
             <p>The service model is evidence-first: assess the current environment, turn working fixes into reusable fragments, and leave behind diagrams, pipelines, runbooks, and validation checks instead of mystery hero work.</p>
+            <h3>Typical starting points</h3>
+            <ul>
+              <li><strong>Infrastructure recovery:</strong> rebuild damaged or drifting environments from known-good fragments.</li>
+              <li><strong>Virtualization move-in:</strong> stand up Proxmox, ESXi, OpenStack, Docker Swarm, or K3s paths with clear ownership and edge routing.</li>
+              <li><strong>Observability cleanup:</strong> connect service health, host metrics, logs, dashboards, and evidence without drowning the team in tool noise.</li>
+              <li><strong>Automation mentoring:</strong> turn a working BKC pipeline into manual, Ansible, or OpenVox/Puppet-style material for engineers who need to learn the pattern.</li>
+            </ul>
             <div class="resource-grid" aria-label="Auzietek service proof screenshots">
               <article class="resource-card">
                 <span class="category">Infrastructure map</span>
@@ -572,6 +595,7 @@ AUZIETEK_PAGES = {
         "html_content": """
             <p>Auzietek's model is still emerging, but the economics are not abstract. Many infrastructure costs come from repeated discovery, fragile handoffs, unclear ownership, and fixes that never make it back into a reusable operating pattern.</p>
             <p>BlackKnightController is designed to turn that work into executable evidence: pipeline steps, fragments, host state, diagrams, validation checks, and notes that stay near the system they describe.</p>
+            <p>The claim is intentionally conservative: do not count magic. Count hours not re-spent, rebuilds that finish faster, onboarding that needs fewer heroic explanations, and migrations that leave proof behind.</p>
             <h3>Traditional operating cost</h3>
             <p>In a conventional environment, skilled labor is often spent rediscovering state, comparing scattered notes, rebuilding one-off systems, and translating between tickets, shell history, diagrams, and tribal memory. That labor is expensive even when everyone is doing their best.</p>
             <h3>Typical AIOps risk</h3>

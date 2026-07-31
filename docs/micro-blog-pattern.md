@@ -392,3 +392,47 @@ review backup/restore
 ```
 
 Do not mix these unless a cleanup item blocks deployment validation.
+
+## Fresh deploy content promotion guardrail
+
+For filming and real promotion, prefer a fresh deployment over hand-patching a
+running micro-blog instance.
+
+The direct lab content push is useful as a canary or repair move, but the
+repeatable workflow should look like this:
+
+```text
+repo state selected
+  -> build and tag images from that repo state
+  -> create or refresh the target stack filesystem/content mount
+  -> copy content/assets to shared storage or every node-local content path
+  -> deploy the stack from the pinned stack file
+  -> run /admin/bootstrap/filesystem-sync for posts/public-lanes
+  -> verify canonical public slugs contain expected new sections
+  -> detect/adopt legacy canonical records when old imports predate source_id
+  -> run image-byte smoke checks
+  -> record receipt
+```
+
+This avoids the specific failure mode we hit during the content polish pass:
+a Markdown file can import successfully under a stable filesystem `source_id`
+while the public URL still serves an older database record with the same
+canonical slug.
+
+The pipeline should validate content, not only HTTP status. Example proof
+strings:
+
+```text
+/post/linux-find-regex-without-the-three-line-command
+  -> "A note for scripts"
+
+/post/amiwritermui-amigaos41-editor-codex
+  -> "Why this belongs beside the infrastructure work"
+
+/post/lab-pipelines-as-product-proof
+  -> "What this can do for a client"
+```
+
+In other words: fresh deploy first, content sync second, canonical-slug proof
+third. The live canary may be patched to unblock review, but filming should show
+the repeatable path.

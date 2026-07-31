@@ -159,6 +159,25 @@ The regex version is usually easier to:
 - expand with one more extension;
 - teach to a newer engineer.
 
+## A note for scripts
+
+If this command is going into automation, make the assumptions visible:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! find --version 2>/dev/null | grep -qi 'gnu findutils'; then
+  echo "This script expects GNU findutils." >&2
+  exit 2
+fi
+
+find ./downloads -type f -regextype egrep -iregex '.*\.(gz|zip|tar|rar|7z)'
+```
+
+That is not glamorous, but it prevents the next person from learning about
+regex portability during an outage or migration window.
+
 ## A useful operator rule
 
 If a command looks like it is repeating the same idea three or four times, pause

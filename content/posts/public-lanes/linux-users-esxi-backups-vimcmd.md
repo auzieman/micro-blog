@@ -128,6 +128,64 @@ edges:
 The commands may shift between ESXi generations, but the shape of the work is
 still useful.
 
+## A small modernized skeleton
+
+For a teaching repo, I would split the work into boring pieces instead of one
+giant clever script:
+
+```text
+inventory/
+  hosts.txt
+  guests/
+    esx01.txt
+
+scripts/
+  list-vms.sh
+  snapshot-guest.sh
+  copy-guest.sh
+  restore-test.sh
+
+manifests/
+  2026-07-31/
+    esx01-web01.json
+```
+
+The first script should only prove that host access and VM discovery are sane:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+host="${1:?usage: list-vms.sh esx-host}"
+
+ssh "$host" 'vim-cmd vmsvc/getallvms' |
+  awk 'NR == 1 { next } { print $1, $2, $3 }'
+```
+
+Then add exact-name selection. Then add state capture. Then add the snapshot or
+copy behavior. This is slower to write than one heroic shell file, but much
+easier to teach, test, and hand to another operator.
+
+## Snapshot thinking, not vendor worship
+
+The storage idea is the part worth preserving. A ZFS, LVM, TrueNAS, or NetApp
+style snapshot gives you a stable view of changing data without immediately
+duplicating every block. Clones can appear quickly because only changed blocks
+need new storage.
+
+That is why this pattern keeps coming back in labs:
+
+```text
+quiet or quiesce guest
+  -> snapshot or suspend boundary
+  -> copy from stable storage view
+  -> resume normal service
+  -> test restore somewhere isolated
+```
+
+That flow is still relevant for people running ESXi 8, especially when their
+budget does not include the backup stack they would prefer to buy.
+
 ## Why this belongs in the modern lane
 
 BlackKnightController now treats hypervisors through APIs, SSH, IPMI, and
