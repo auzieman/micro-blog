@@ -372,6 +372,14 @@ The Flask UI now knows these hostnames as lane aliases so nginx can proxy them
 without landing visitors in the wrong lane while redirect/certificate work is
 being finalized.
 
+2026-08-01 receipt: nginx on the Auzietek VPS has HTTP redirect handling ready
+for the new names. `www.blackknightcontroller.com` already resolves to
+`74.208.45.165` and redirects to the BlackKnight lane. The newly purchased root
+domains were visible through the IONOS DNS API, but write attempts returned
+`401 UNAUTHORIZED`, so their parking A/AAAA records remain pending until IONOS
+finishes provisioning or the DNS API authorization catches up. Do not treat that
+as an nginx or Flask failure.
+
 ## Cutover boundary
 
 Do not point `auzietek.com` or `www.auzietek.com` at the micro-blog deployment
