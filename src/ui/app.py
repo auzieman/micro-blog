@@ -482,6 +482,19 @@ AUZIETEK_PAGES = {
             "If the company succeeds, direct meaningful resources toward education, disaster relief, community labs, and broader access to technology.",
         ],
     },
+    "legacy": {
+        "path": "/legacy",
+        "label": "Legacy",
+        "tag": "principles",
+        "eyebrow": "Origin and identity",
+        "title": "Legacy, marks, and direction.",
+        "body": "Auzietek connects Morgan engineering heritage, organic technology, BlackKnightController, and human-first automation into a practical operating direction.",
+        "points": [
+            "Morgan engineering lineage informs the Auzietek emphasis on useful systems, practical craft, and seeing the next edge early.",
+            "The griffin, shield, circuit, vine, and metal direction belongs as a coherent brand story rather than scattered decoration.",
+            "BlackKnightController is the modern proof line: relationships, pipelines, receipts, and infrastructure that becomes easier to reason about.",
+        ],
+    },
     "articles": {
         "path": "/articles",
         "label": "Articles",
@@ -1107,6 +1120,10 @@ STATIC_PAGE_SEO = {
         "title": "Auzietek Principles | Evidence-Led, Human-Centered Automation",
         "description": "Auzietek principles for human-first engineering, progressive trust, explicit boundaries, durable evidence, and simpler operational systems.",
     },
+    "legacy": {
+        "title": "Auzietek Legacy, Marks, and Direction | Organic Technology and BlackKnight",
+        "description": "Auzietek's emerging identity connects Morgan engineering heritage, organic technology, BlackKnightController, Company Mind, and practical human-first automation.",
+    },
     "articles": {
         "title": "Auzietek Articles | Field Notes, Tutorials, and Lab Proof",
         "description": "Field notes, tutorials, screenshots, migration stories, and proof-backed articles from Auzietek, BlackKnightController, Linux Users, and Retro Users.",
@@ -1662,6 +1679,7 @@ def public_index():
 
 @app.get("/thinktank")
 @app.get("/principles")
+@app.get("/legacy")
 @app.get("/articles")
 @app.get("/services")
 @app.get("/aiops")
