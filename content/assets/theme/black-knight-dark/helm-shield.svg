@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 380" role="img" aria-labelledby="t">
+<title id="t">Black Knight alien plate helm shield</title>
+<path d="M160 12 292 62v112c0 88-48 151-132 194C76 325 28 262 28 174V62Z" fill="#0f1a20" stroke="#55cbd5" stroke-width="9"/>
+<g fill="none" stroke="#eef7f8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M160 58c-55 22-78 61-72 116l19 87 53 51 53-51 19-87c6-55-17-94-72-116Z"/>
+<path d="m102 167 58 37 58-37M160 69v235M110 132l50 35 50-35"/>
+<path d="M115 225h31M174 225h31"/>
+</g>
+<g stroke="#55cbd5" stroke-width="5"><path d="M64 319 239 48M81 48l175 271"/></g>
+</svg>

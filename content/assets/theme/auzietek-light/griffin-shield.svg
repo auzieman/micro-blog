@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 380" role="img" aria-labelledby="t">
+<title id="t">Auzietek griffin circuit shield concept</title>
+<path d="M160 12 292 62v112c0 88-48 151-132 194C76 325 28 262 28 174V62Z" fill="#f5f6f6" stroke="#171a1c" stroke-width="10"/>
+<g fill="none" stroke="#171a1c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+<path d="M105 246c20-43 28-94 12-132 22-31 72-35 91-3-28-7-45 3-49 23 31 4 54 24 63 55-27-18-50-24-70-17 11 32 7 62-12 91"/>
+<path d="M150 150c-31 7-50 30-56 67m70-75c27 18 48 48 55 86"/>
+<path d="M128 115 93 80M115 153 67 139M142 199 83 239M173 112l32-39M190 167l52-25M184 224l49 42"/>
+</g>
+<g fill="#1b7a76"><circle cx="93" cy="80" r="7"/><circle cx="67" cy="139" r="7"/><circle cx="83" cy="239" r="7"/><circle cx="205" cy="73" r="7"/><circle cx="242" cy="142" r="7"/><circle cx="233" cy="266" r="7"/></g>
+</svg>
