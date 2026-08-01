@@ -93,3 +93,70 @@ BKC should eventually wrap the capture path as a pipeline step:
 
 That gives the operator a clean `view -> png -> docs/site` path without manual
 screenshot drift.
+
+## What the captures are useful for
+
+The same image can serve several purposes when it is captured deliberately:
+
+- a README can show the exact pipeline or graph view it describes;
+- a public article can prove the lab state behind the story;
+- a video deck can reuse the current interface instead of stale mockups;
+- a pipeline receipt can preserve what the operator saw during validation;
+- a bug report can compare before and after states without vague memory.
+
+That is why the capture path should live near BlackKnightController rather than
+as a random desktop habit. The image is not decoration. It is evidence with a
+source route, timestamp, selector, and intended audience.
+
+## Example capture manifest
+
+A useful manifest should stay boring. The goal is to describe what to open and
+what counts as ready:
+
+```json
+[
+  {
+    "name": "resources-company-mind",
+    "path": "/resources",
+    "width": 1920,
+    "height": 1400,
+    "wait_for": "#beta-cy",
+    "capture_selector": ".graph-panel"
+  },
+  {
+    "name": "pipeline-detail-edit",
+    "path": "/pipelines/blackknight-pipeline-demo",
+    "width": 1920,
+    "height": 1400,
+    "wait_for": ".pipeline-step-editor",
+    "capture_selector": "main"
+  }
+]
+```
+
+The selector is the contract. If the UI changes and the selector disappears,
+the capture fails loudly instead of publishing a blank or misleading image.
+
+## Why this helps AI-assisted operations
+
+AI assistance works better when it is grounded. Text logs, JSON state, and API
+responses are useful, but visual context can reveal layout problems, missing
+relationships, stale nodes, broken cards, and confusing operator paths.
+
+In the recent UI work, screenshots exposed things the code alone did not make
+obvious: graph nodes that looked like smudges, stale Proxmox islands, crowded
+side rails, weak contrast, broken article media, and proof cards pointing at
+bad slugs. Those screenshots shortened the feedback loop.
+
+The long-term BKC pattern is simple:
+
+```text
+operator asks
+  -> BKC opens the view
+  -> capture records the evidence
+  -> Codex/Astra/human review the same artifact
+  -> fix lands in code or content
+  -> capture proves the change
+```
+
+That is not a gimmick. It is the visual side of configuration as code.

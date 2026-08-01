@@ -59,3 +59,59 @@ environment in a resource graph.
 
 That is the real product story: not a perfect demo, but a system that can learn
 from the messy demo and become more reliable on the next run.
+
+## The timeline that made the pattern real
+
+The weekend did not start as a polished demo. It started with a corrupted
+workstation, a running BlackKnightController stack in Docker Swarm, an NFS share
+on ns1, and enough recovered project state to ask a better question: could the
+control plane help reconstruct the work instead of depending on one developer
+machine?
+
+The answer was yes, but not magically. The useful sequence looked more like
+field engineering than a brochure:
+
+```text
+recover reachable BKC
+  -> verify swarm, ns1, and NFS state
+  -> reconnect SSH keys and Docker contexts
+  -> compare local repo state to running services
+  -> rebuild bare-metal pipelines
+  -> validate hypervisor installs
+  -> publish the findings back into articles, fragments, and screenshots
+```
+
+That loop is the product. BlackKnightController is not valuable because it
+claims to automate everything. It is valuable because the system gives the
+operator somewhere durable to put the truth once the truth is discovered.
+
+## What changed after the first painful run
+
+The recovery weekend also exposed a failure mode that traditional scripts do
+not solve by themselves: the automation can drift away from the known-good
+manual fix. A server can PXE boot correctly, install packages, and still fail
+to boot from disk because a firmware mode or boot order assumption changed.
+
+The corrected BlackKnight pattern became stricter:
+
+- every destructive installer gets a declared target;
+- BIOS or UEFI mode is treated as input evidence, not background trivia;
+- PXE one-shot state is disarmed before local-disk boot validation;
+- first boot is not assumed until SSH identity and deployment markers match;
+- known-good fragments are named, preserved, and reused instead of casually
+  rewritten during a troubleshooting spiral.
+
+That sounds mundane, but it is the difference between a fun lab trick and a
+repeatable operations platform.
+
+## Why this belongs on the public site
+
+Most infrastructure products show the happy path. This story matters because
+it shows the scar tissue: damaged workstation state, rebuilt SSH paths, edge
+networking, hypervisor installs, Grafana views, Portainer checks, Horizon
+sessions, ESXi compromises, and the eventual move from “we did it once” to “we
+can do it again.”
+
+That is a better trust signal than a perfect animation. The lab proved that BKC
+can help an operator recover context, rebuild targets, preserve findings, and
+turn the whole weekend into reusable material for the next engineer.

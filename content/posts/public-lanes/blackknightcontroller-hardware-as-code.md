@@ -62,3 +62,57 @@ nearest truthful boundary:
 - did the public edge route to it?
 
 Good automation does not remove these questions. It answers them faster.
+
+## The physical-first model
+
+Most infrastructure tools start after the operating system exists. That is fine
+for software configuration, but it skips the part of the story where many lab
+and small-office failures actually live.
+
+BlackKnightController treats the machine before the OS as a first-class object:
+
+```text
+physical_machine
+  -> controlled_by -> bmc
+  -> has_interface -> network_interface
+  -> attached_to -> switch_port
+  -> uses -> provisioning_profile
+  -> booted_from -> image_asset
+  -> produces -> validation_evidence
+```
+
+That model lets a Dell server, an iDRAC, a switch port, a DHCP lease, a PXE
+profile, and an installer receipt belong to the same story. The hostname may
+not exist yet. SSH may not exist yet. The machine is still manageable because
+BKC can reason from power, network, firmware, and boot evidence.
+
+## The ordinary steps are the superpower
+
+The core actions are intentionally normal:
+
+- ask IPMI or Redfish for power state;
+- set the next boot device when the hardware allows it;
+- render an iPXE or installer profile from inventory;
+- serve kernel, initrd, ISO, preseed, answer, or kickstart assets;
+- observe DHCP, HTTP, console, and first-boot SSH evidence;
+- run the post-install checks that prove the target is ready.
+
+That is why the model travels. A shell script, Python script, config file,
+preseed, cloud-init document, or ESXi first-boot helper can all be treated as a
+template: render it with known inputs, ship it, run it, validate it, and keep
+the receipt.
+
+## What “hardware as code” should not mean
+
+Hardware as code should not mean pretending hardware is risk-free. It should
+mean the destructive parts are explicit and reviewable.
+
+For a lab or rebuild target, wiping disks is a normal installation act. For a
+production target, the same action should require stronger identity checks,
+backups, approval gates, and probably a human pause. The point is not fear; the
+point is matching the guardrail to the environment.
+
+BlackKnightController’s job is to keep that distinction visible. The pipeline
+should say what it will erase, how the target was identified, what firmware
+mode it expects, what evidence proves success, and what fragment is known-good
+enough to reuse.

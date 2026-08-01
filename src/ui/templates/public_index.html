@@ -1865,6 +1865,28 @@
       color: #e5f3f9;
       box-shadow: var(--shadow);
     }
+    body.theme-auzietek .masthead h1,
+    body.theme-midnight .masthead h1 {
+      font-size: clamp(2.05rem, 4.2vw, 3.15rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+    body.theme-auzietek .static-page-panel h2,
+    body.theme-midnight .lane-story h2 {
+      font-size: clamp(1.65rem, 3vw, 2.3rem);
+      line-height: 1.08;
+    }
+    body.theme-auzietek .article-title,
+    body.theme-midnight .article-title {
+      font-size: clamp(1.85rem, 3.2vw, 2.65rem);
+      line-height: 1.06;
+      letter-spacing: -0.035em;
+    }
+    body.theme-auzietek .article-body,
+    body.theme-midnight .article-body {
+      font-size: clamp(1rem, 1.08vw, 1.06rem);
+      line-height: 1.72;
+    }
     @media (max-width: 1180px) and (min-width: 981px) {
       body.theme-auzietek .frame {
         grid-template-columns: minmax(170px, 190px) minmax(0, 1fr);
@@ -1889,6 +1911,14 @@
       body.theme-auzietek .article-panel {
         padding-inline: clamp(1.1rem, 3vw, 2rem);
       }
+      body.theme-auzietek .masthead h1,
+      body.theme-midnight .masthead h1 {
+        font-size: clamp(1.8rem, 3.6vw, 2.45rem);
+      }
+      body.theme-auzietek .static-page-panel h2,
+      body.theme-midnight .lane-story h2 {
+        font-size: clamp(1.45rem, 2.7vw, 2rem);
+      }
     }
     @media (max-width: 980px) and (min-width: 721px) and (hover: hover) and (pointer: fine) {
       body {
@@ -1907,6 +1937,14 @@
       }
       body.theme-auzietek .article-panel {
         padding-inline: clamp(1.1rem, 3vw, 1.8rem);
+      }
+      body.theme-auzietek .masthead h1,
+      body.theme-midnight .masthead h1 {
+        font-size: clamp(1.65rem, 4.2vw, 2.15rem);
+      }
+      body.theme-auzietek .static-page-panel h2,
+      body.theme-midnight .lane-story h2 {
+        font-size: clamp(1.35rem, 3.6vw, 1.85rem);
       }
     }
     @media (max-width: 720px), (hover: none) and (pointer: coarse) {
@@ -2076,6 +2114,18 @@
       }
       .masthead-top { display: block; }
       h1, body.theme-auzietek h1 { font-size: clamp(1.7rem, 9vw, 2.3rem); line-height: 1.02; }
+      body.theme-auzietek .masthead h1,
+      body.theme-midnight .masthead h1 {
+        font-size: clamp(1.65rem, 8vw, 2.15rem);
+        line-height: 1.05;
+      }
+      body.theme-auzietek .static-page-panel h2,
+      body.theme-midnight .lane-story h2,
+      body.theme-auzietek .article-title,
+      body.theme-midnight .article-title {
+        font-size: clamp(1.45rem, 7vw, 1.95rem);
+        line-height: 1.08;
+      }
       .tagline { font-size: 0.98rem; }
       .mast-actions { display: grid; grid-template-columns: 1fr; margin-top: 0.85rem; }
       .button-link { width: 100%; }
@@ -2186,7 +2236,7 @@
         <a href="{{ nav_item.href }}" class="{% if nav_item.active %}active{% endif %}">{{ nav_item.label }}</a>
         {% endfor %}
       </nav>
-      <p class="rail-note"><strong>Business Beta</strong><span>Field-tested work graduates from the lab into public articles here.</span></p>
+      <p class="rail-note"><strong>Emerging venture</strong><span>Auzietek is being shaped from field-tested lab work, public writing, and practical operator tools.</span></p>
     </aside>
     <div class="page-column">
     {% if message %}
@@ -2244,7 +2294,7 @@
     {% endif %}
 
     <section class="masthead scroll-reveal {% if not is_homepage %}interior{% endif %}{% if show_article_section and not static_page and not is_homepage %} compact{% endif %}">
-      <div class="beta-strip"><span class="beta-badge">Public beta</span><span>Field-tested work graduates from the lab into public articles here.</span></div>
+      <div class="beta-strip"><span class="beta-badge">Lab proven</span><span>Auzietek is an emerging venture with LLC formation pending; the work shown here is real lab evidence, writing, and product direction.</span></div>
       {% if show_article_section and not static_page and not is_homepage %}
       <div class="section-heading">
         <h1>{{ active_lane_label }} Articles</h1>

@@ -99,3 +99,65 @@ different platforms -> consistent operator paths -> validated evidence
 
 The lab is not replacing every tool. It is connecting them into a shape an
 engineer can understand, repeat, and teach.
+
+## Why several control planes are normal
+
+Real environments rarely have one perfect control plane. Even a small lab can
+have Proxmox, ESXi, OpenStack, Docker Swarm, Portainer, Grafana, DNS, DHCP, a
+firewall, a managed switch, and hardware controllers. Commercial environments
+look the same, only with more names and more meetings.
+
+BlackKnightController does not need to defeat those tools. It needs to keep the
+operator-facing contract sane:
+
+```text
+where does this service live?
+how do I reach it from the workstation?
+what changed recently?
+which pipeline created or repaired it?
+what evidence says it is healthy?
+```
+
+That is why the lab edge became so important. Horizon, Proxmox, ESXi, Portainer,
+Grafana, OpenWebUI, micro-blog review sites, and future service demos all need
+friendly entry points. The edge can use direct proxying where HTTP is simple,
+NAT where the protocol needs it, and SSH jump paths where the management plane
+should stay private.
+
+## The move-in day pattern
+
+The more interesting work started after the hypervisors were installed. A bare
+hypervisor is only a parking lot. The lab needed to move in:
+
+```text
+known-good Debian base
+  -> clone guests
+  -> depersonalize identity
+  -> pin MAC and DHCP
+  -> install Docker
+  -> join managers and workers
+  -> expose Portainer agent
+  -> attach monitoring
+  -> publish operator URLs
+```
+
+That sequence is reusable. It can become an ESXi lane, an OpenStack lane, a K3s
+lane, or a small-office lane. The target APIs differ, but the operational
+story remains the same: create machines, give them stable identity, configure
+the service fabric, validate it, and publish how a human reaches it.
+
+## What still belongs in future passes
+
+The lab is intentionally alive. The next improvements are not mysterious:
+
+- stronger OpenStack tenant networking for workstation-native access;
+- richer Grafana dashboards for hypervisors, swarms, and edge services;
+- Portainer endpoint wiring for each swarm;
+- DNS and certificate rotation as pipelines;
+- optional firewall/VPN routing through IPFire or a similar edge appliance;
+- article-to-repo companion kits for people who want to reproduce pieces
+  without running BKC.
+
+That last point matters. BKC is the flagship, but the public material should
+also teach. A reader should be able to understand the pattern, then choose the
+tooling level that fits their environment.

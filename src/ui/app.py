@@ -364,7 +364,7 @@ AUZIETEK_PAGES = {
         "body": "Auzietek helps you make technology more natural, predictable, and clean: fewer mystery systems, fewer one-off fixes, clearer automation, better observability, and engineering guidance your team can reuse.",
         "html_content": """
             <p>Auzietek helps you make technology more natural, predictable, and clean: fewer mystery systems, fewer one-off fixes, clearer automation, better observability, and engineering guidance your team can reuse.</p>
-            <p>The public beta is backed by running lab work, not stock theater. BlackKnightController captures infrastructure resources, pipeline steps, service relationships, and operational evidence so teams can see what changed and why it matters.</p>
+            <p>Auzietek is an emerging venture backed by running lab work, not stock theater. The formal business shape is still forming, but BlackKnightController already captures infrastructure resources, pipeline steps, service relationships, and operational evidence so teams can see what changed and why it matters.</p>
             <p>The practical offer is simple: bring us the messy system, the fragile migration, the recurring support pain, or the idea that has outgrown shell history. We help turn it into a map, a repeatable path, and teaching material your team can actually use.</p>
             <div class="static-point-grid">
               <div class="static-point-card">Assess and clean up Linux, virtualization, container, and network environments.</div>
@@ -739,7 +739,7 @@ AUZIETEK_PAGES = {
                 "name": "Micro Blog",
                 "category": "Auzietek project",
                 "description": "A lightweight publishing system for turning lab work, imports, screenshots, and field notes into public articles without dragging a full CMS everywhere.",
-                "why": "This beta site is running on it now, which makes the site itself part of the evidence trail.",
+                "why": "This site is running on it now, which makes the publishing system itself part of the evidence trail.",
                 "url": "https://github.com/auzieman/micro-blog",
                 "disclosure": "Auzietek-owned project.",
             },

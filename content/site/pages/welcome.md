@@ -6,11 +6,11 @@ tag: services
 eyebrow: Auzietek
 ---
 
-# What Auzietek Can Do For You
-
 Auzietek helps teams turn fragile infrastructure work into cleaner systems, repeatable operations, and evidence-backed automation.
 
-The public beta is not meant to be a stock brochure. It is a front door into real lab work: BlackKnightController, Linux field notes, retro-computing preservation, and the larger ThinkTank ideas that explain why this work matters.
+Auzietek is an emerging venture being built in the open from real lab work: BlackKnightController, Linux field notes, retro-computing preservation, and the larger ThinkTank ideas that explain why this work matters. The formal company shape is still forming, but the technical evidence is not theoretical.
+
+That distinction matters. This site should build trust without pretending to be larger than it is today: the work is active, the examples are real, the service direction is serious, and the operating model is still intentionally lean while the business foundation catches up.
 
 The practical promise is simple:
 
@@ -47,6 +47,10 @@ That matters because a host is not only a hostname. It has power state, BIOS sta
 When the resource graph, pipeline steps, and validation receipts stay close together, the next operator does not have to rediscover the same environment from scratch.
 
 ## What we can help with
+
+### Practical advisory and implementation
+
+For the right small team, founder, lab, MSP, or engineering group, Auzietek can help turn fragile operational work into something easier to repeat and explain. That may look like a cleanup engagement, a documented deployment pattern, a proof-of-concept, a migration runbook, or an internal tool that removes recurring toil.
 
 ### Infrastructure recovery and cleanup
 
@@ -85,7 +89,8 @@ Auzietek is not trying to make engineering more ceremonial. The point is to make
 
 Good automation should reduce the size of the problem. Good documentation should keep evidence near the decision. Good AI assistance should make operators more capable, not more confused.
 
+If the venture becomes the company it is aiming to be, that practical standard stays central: merit over credential theater, remote-first where it makes sense, healthy work practices, ethical automation, and a share of success directed back toward education, disaster relief, community labs, and broader access to advanced tools.
+
 That is the center of the work:
 
 > Solutions should be simpler than the problems that demanded them.
-
