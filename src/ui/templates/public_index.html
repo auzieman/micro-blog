@@ -623,6 +623,13 @@
       transform: rotate(18deg);
       pointer-events: none;
     }
+    body.theme-midnight .masthead {
+      background:
+        radial-gradient(circle at 16% 12%, rgba(112, 240, 255, 0.16), transparent 25rem),
+        radial-gradient(circle at 84% 18%, rgba(255, 79, 216, 0.13), transparent 22rem),
+        linear-gradient(135deg, rgba(5, 12, 21, 0.96), rgba(10, 17, 28, 0.9) 54%, rgba(4, 8, 15, 0.98));
+      border-color: rgba(112, 240, 255, 0.18);
+    }
     .masthead-top {
       display: flex;
       justify-content: space-between;
@@ -752,6 +759,68 @@
       background: linear-gradient(135deg, rgba(44, 132, 173, 0.94), rgba(133, 59, 190, 0.92));
       color: #f8fdff;
       box-shadow: 0 0 24px rgba(106, 176, 216, 0.2);
+    }
+    .bkc-brand-card {
+      display: none;
+    }
+    body.theme-midnight .bkc-brand-card {
+      display: grid;
+      grid-template-columns: minmax(5.5rem, 0.34fr) minmax(10rem, 0.66fr);
+      align-items: center;
+      gap: 0.8rem;
+      width: min(100%, 29rem);
+      padding: 0.75rem;
+      border-radius: 22px;
+      color: #effcff;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(112, 240, 255, 0.16), transparent 8rem),
+        linear-gradient(135deg, rgba(3, 8, 15, 0.98), rgba(16, 22, 38, 0.96));
+      border: 1px solid rgba(112, 240, 255, 0.26);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+        0 0 38px rgba(112, 240, 255, 0.12),
+        0 24px 60px rgba(0, 0, 0, 0.35);
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+    body.theme-midnight .bkc-brand-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(112,240,255,0), rgba(112,240,255,0.8), rgba(255,79,216,0.7), rgba(112,240,255,0));
+      opacity: 0.8;
+    }
+    body.theme-midnight .bkc-brand-card img {
+      display: block;
+      width: 100%;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #d8dedf, #9fa9ad);
+      border: 1px solid rgba(192, 192, 192, 0.42);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.34);
+      filter: saturate(0.88) contrast(1.08);
+    }
+    body.theme-midnight .bkc-brand-copy {
+      display: grid;
+      gap: 0.45rem;
+    }
+    body.theme-midnight .bkc-brand-copy strong {
+      color: #ffffff;
+      font-size: clamp(1rem, 1.55vw, 1.35rem);
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+    }
+    body.theme-midnight .bkc-brand-copy span {
+      color: rgba(234, 248, 255, 0.74);
+      font-size: 0.9rem;
+      line-height: 1.38;
+    }
+    body.theme-midnight .bkc-brand-copy a {
+      color: #9ff2ff;
+      font-weight: 850;
+      justify-self: start;
+      border-bottom: 1px solid rgba(112, 240, 255, 0.64);
     }
     .audience-strip {
       position: relative;
@@ -983,6 +1052,22 @@
         radial-gradient(circle at top left, rgba(112, 240, 255, 0.16), transparent 28rem),
         radial-gradient(circle at bottom right, rgba(255, 79, 216, 0.1), transparent 24rem),
         linear-gradient(180deg, rgba(7, 15, 24, 0.88), rgba(6, 10, 18, 0.97));
+    }
+    body.theme-midnight .lane-story {
+      position: relative;
+      overflow: hidden;
+    }
+    body.theme-midnight .lane-story::after {
+      content: "";
+      position: absolute;
+      right: -1.8rem;
+      top: 1rem;
+      width: 9rem;
+      height: 9rem;
+      background: url("/content-files/assets/brand/blackknight-shield.png") center center / contain no-repeat;
+      opacity: 0.13;
+      filter: invert(1) drop-shadow(0 0 18px rgba(112, 240, 255, 0.45));
+      pointer-events: none;
     }
     body.theme-midnight .lane-video-board {
       background:
@@ -2401,6 +2486,16 @@
             <strong>Organic technology. Practical infrastructure. Human-first AIOps.</strong>
             <span>The shield, vines, circuits, and BlackKnight proof line are part of the same direction: systems people can trust.</span>
             <a href="/legacy">Open the identity notes</a>
+          </div>
+        </aside>
+        {% endif %}
+        {% if active_lane == 'blackknight' %}
+        <aside class="bkc-brand-card" aria-label="BlackKnightController brand direction">
+          <img src="/content-files/assets/brand/blackknight-shield.png" alt="BlackKnightController shield and crossed swords mark" loading="lazy" />
+          <div class="bkc-brand-copy">
+            <strong>Guardian of relationships. Master of automation.</strong>
+            <span>BlackKnight turns lab discoveries into pipelines, receipts, diagrams, and repeatable infrastructure action.</span>
+            <a href="/post/blackknightcontroller-prompt-to-pipeline">Read the operating contract</a>
           </div>
         </aside>
         {% endif %}
