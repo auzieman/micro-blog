@@ -779,6 +779,12 @@
       color: #f8fdff;
       box-shadow: 0 0 24px rgba(106, 176, 216, 0.2);
     }
+    body.theme-midnight .button-link:hover,
+    body.theme-midnight .button-link:focus-visible {
+      border-color: rgba(255, 79, 216, 0.45);
+      box-shadow: 0 0 24px rgba(112, 240, 255, 0.12), inset 0 0 0 1px rgba(255, 79, 216, 0.08);
+      text-decoration: none;
+    }
     .bkc-brand-card {
       display: none;
     }
@@ -792,9 +798,10 @@
       border-radius: 22px;
       color: #effcff;
       background:
-        radial-gradient(circle at 18% 22%, rgba(112, 240, 255, 0.16), transparent 8rem),
-        linear-gradient(135deg, rgba(3, 8, 15, 0.98), rgba(16, 22, 38, 0.96));
-      border: 1px solid rgba(112, 240, 255, 0.26);
+        radial-gradient(circle at 18% 22%, rgba(112, 240, 255, 0.2), transparent 8rem),
+        radial-gradient(circle at 95% 18%, rgba(255, 79, 216, 0.13), transparent 7rem),
+        linear-gradient(135deg, rgba(3, 8, 15, 0.99), rgba(16, 22, 38, 0.97));
+      border: 1px solid rgba(112, 240, 255, 0.34);
       box-shadow:
         inset 0 0 0 1px rgba(255, 255, 255, 0.035),
         0 0 38px rgba(112, 240, 255, 0.12),
@@ -840,6 +847,104 @@
       font-weight: 850;
       justify-self: start;
       border-bottom: 1px solid rgba(112, 240, 255, 0.64);
+    }
+    .bkc-proof-console {
+      display: none;
+    }
+    body.theme-midnight .bkc-proof-console {
+      display: grid;
+      grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
+      gap: 0.75rem;
+      margin-top: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    body.theme-midnight .bkc-proof-lead,
+    body.theme-midnight .bkc-proof-tile {
+      border-radius: 20px;
+      border: 1px solid rgba(112, 240, 255, 0.18);
+      background:
+        radial-gradient(circle at 16% 12%, rgba(112, 240, 255, 0.1), transparent 14rem),
+        linear-gradient(135deg, rgba(5, 12, 22, 0.96), rgba(8, 12, 24, 0.98));
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.025),
+        0 20px 48px rgba(0,0,0,0.32);
+      overflow: hidden;
+      color: #eaf8ff;
+    }
+    body.theme-midnight .bkc-proof-lead {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 100%;
+    }
+    body.theme-midnight .bkc-proof-lead img,
+    body.theme-midnight .bkc-proof-tile img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(112, 240, 255, 0.14);
+      filter: saturate(1.18) contrast(1.08) brightness(0.92);
+    }
+    body.theme-midnight .bkc-proof-copy {
+      padding: 0.9rem;
+    }
+    body.theme-midnight .bkc-proof-copy span,
+    body.theme-midnight .bkc-proof-tile span {
+      display: inline-flex;
+      margin-bottom: 0.42rem;
+      padding: 0.22rem 0.48rem;
+      border-radius: 999px;
+      background: rgba(255, 79, 216, 0.12);
+      border: 1px solid rgba(255, 79, 216, 0.25);
+      color: #ffd7fb;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    body.theme-midnight .bkc-proof-copy h2 {
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(1.25rem, 2.4vw, 2rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+    body.theme-midnight .bkc-proof-copy p {
+      margin: 0.55rem 0 0;
+      color: rgba(234, 248, 255, 0.76);
+      line-height: 1.5;
+    }
+    body.theme-midnight .bkc-proof-copy a,
+    body.theme-midnight .bkc-proof-tile a {
+      display: inline-flex;
+      margin-top: 0.7rem;
+      color: #9ff2ff;
+      font-weight: 850;
+    }
+    body.theme-midnight .bkc-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+    body.theme-midnight .bkc-proof-tile {
+      display: grid;
+      align-content: start;
+    }
+    body.theme-midnight .bkc-proof-tile div {
+      padding: 0.75rem;
+    }
+    body.theme-midnight .bkc-proof-tile strong {
+      display: block;
+      color: #ffffff;
+      font-size: 0.98rem;
+      line-height: 1.18;
+    }
+    body.theme-midnight .bkc-proof-tile p {
+      margin: 0.4rem 0 0;
+      color: rgba(214, 232, 241, 0.72);
+      font-size: 0.86rem;
+      line-height: 1.4;
     }
     .audience-strip {
       position: relative;
@@ -2155,6 +2260,9 @@
       body.theme-midnight .masthead h1 {
         font-size: clamp(1.65rem, 4.2vw, 2.15rem);
       }
+      body.theme-midnight .bkc-proof-console {
+        grid-template-columns: 1fr;
+      }
       body.theme-auzietek .static-page-panel h2,
       body.theme-midnight .lane-story h2 {
         font-size: clamp(1.35rem, 3.6vw, 1.85rem);
@@ -2231,6 +2339,10 @@
       .audience-strip { grid-template-columns: 1fr; }
       .lane-landing { grid-template-columns: 1fr; }
       .lane-proof-grid { grid-template-columns: 1fr; }
+      body.theme-midnight .bkc-proof-console,
+      body.theme-midnight .bkc-proof-grid {
+        grid-template-columns: 1fr;
+      }
       .bkc-showcase { grid-template-columns: 1fr; }
       .static-point-grid { grid-template-columns: 1fr; }
       .resource-grid { grid-template-columns: 1fr; }
@@ -2559,6 +2671,57 @@
         </a>
         {% endfor %}
       </div>
+      {% if active_lane == 'blackknight' %}
+      <section class="bkc-proof-console" aria-label="BlackKnightController example work">
+        <article class="bkc-proof-lead">
+          <img src="/content-files/assets/bkc/bkc-company-mind-resources.png" alt="BlackKnightController Company Mind resource graph" loading="lazy" />
+          <div class="bkc-proof-copy">
+            <span>Live proof</span>
+            <h2>From prompt to pipeline to living infrastructure graph.</h2>
+            <p>The current lab rebuilt bare metal, OpenStack, Proxmox, ESXi, Docker swarms, edge routes, and observability while preserving evidence as articles, screenshots, and repeatable actions.</p>
+            <a href="/post/ui-captures-as-operational-evidence">Open the UI evidence story →</a>
+          </div>
+        </article>
+        <div class="bkc-proof-grid">
+          <article class="bkc-proof-tile">
+            <img src="/content-files/assets/bkc/bkc-pipeline-workbench.png" alt="BlackKnightController pipeline workbench" loading="lazy" />
+            <div>
+              <span>Pipeline</span>
+              <strong>Operator intent becomes staged, reviewable action.</strong>
+              <p>Prompts become SSH/API/templates plus receipts, not one-off shell archaeology.</p>
+              <a href="/post/blackknightcontroller-prompt-to-pipeline">Read the contract →</a>
+            </div>
+          </article>
+          <article class="bkc-proof-tile">
+            <img src="/content-files/assets/bkc/bkc-pipeline-paths-graph.png" alt="BlackKnightController pipeline paths graph" loading="lazy" />
+            <div>
+              <span>Bare metal</span>
+              <strong>PXE, IPMI, BIOS notes, and validation stay together.</strong>
+              <p>The hard-won fixes travel with the pipeline so the next run starts smarter.</p>
+              <a href="/post/blackknightcontroller-hardware-as-code">See hardware as code →</a>
+            </div>
+          </article>
+          <article class="bkc-proof-tile">
+            <img src="/content-files/assets/bkc/bkc-edge-ownership-graph.png" alt="BlackKnightController edge ownership graph" loading="lazy" />
+            <div>
+              <span>Move-in day</span>
+              <strong>OpenStack, ESXi, swarms, DNS, and edge services become one fabric.</strong>
+              <p>Relationships are visible enough for humans and AI agents to reason from the same map.</p>
+              <a href="/post/openstack-esxi-swarms-and-the-edge">Open the migration story →</a>
+            </div>
+          </article>
+          <article class="bkc-proof-tile">
+            <img src="/content-files/assets/bkc/bkc-pipeline-detail-edit.png" alt="BlackKnightController pipeline detail editor" loading="lazy" />
+            <div>
+              <span>Tutorial kit</span>
+              <strong>Pipelines become reusable teaching artifacts.</strong>
+              <p>JSON, shell, explanations, and evidence can turn into public guides without losing the real work.</p>
+              <a href="/post/blackknightcontroller-pipelines-as-tutorial-kits">Read the tutorial pattern →</a>
+            </div>
+          </article>
+        </div>
+      </section>
+      {% endif %}
       {% if lane_hero_image_url %}
       <figure class="lane-hero-panel">
         <img src="{{ lane_hero_image_url }}" alt="{{ active_lane_label }} atmosphere artwork" loading="lazy" />
