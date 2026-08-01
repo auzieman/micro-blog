@@ -70,5 +70,5 @@ The company is still emerging, with LLC formation pending, but the direction is 
 
 - Read [What Auzietek Can Do For You](/) for the practical service direction.
 - Read [Principles](/principles) for the human-first operating rules.
-- Visit [BlackKnightController](https://blackknight.auzietek.com/) for the product proof.
+- Visit [BlackKnightController](https://www.blackknightcontroller.com/) for the product proof.
 - Visit [ThinkTank](/thinktank) for the larger research arc: RACS, AuziX, Company Mind, and next-era computing.

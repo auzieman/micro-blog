@@ -129,5 +129,5 @@ That is the Auzietek way: not “you could do this,” but “we did this, here 
 proof, here is the lesson, and here is the path for doing it again.”
 
 Related:
-[BlackKnightController pipeline articles](https://blackknight.auzietek.com/blog),
+[BlackKnightController pipeline articles](https://www.blackknightcontroller.com/blog),
 [Auzietek Linux Lab Guides](https://github.com/auzieman/auzietek-linux-lab-guides).

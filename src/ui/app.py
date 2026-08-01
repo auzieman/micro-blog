@@ -100,7 +100,7 @@ _GEOIP_CACHE: dict[str, tuple[float, dict[str, str]]] = {}
 
 DEFAULT_SITE_NAV_LINKS = [
     {"label": "Services", "href": "/blog?tag=services"},
-    {"label": "BlackKnight", "href": "https://blackknight.auzietek.com"},
+    {"label": "BlackKnight", "href": "https://www.blackknightcontroller.com"},
     {"label": "Linux Users", "href": "https://linux-users.auzietek.com"},
     {"label": "Retro Users", "href": "https://retro-users.auzietek.com"},
     {"label": "Labs", "href": "/blog?tag=lab"},
@@ -120,7 +120,7 @@ DEFAULT_MICROSITES = [
         "label": "BlackKnight",
         "role": "Product and platform journal",
         "summary": "BKC demos, hardware automation, pipeline evidence, and operator-facing patterns.",
-        "href": "https://blackknight.auzietek.com/",
+        "href": "https://www.blackknightcontroller.com/",
     },
     {
         "name": "linux-users.auzietek.com",
@@ -391,14 +391,14 @@ AUZIETEK_PAGES = {
                 <h3>Company Mind workbench</h3>
                 <p>A resource graph view that connects hosts, services, pipelines, and operational context.</p>
                 <img src="/content-files/assets/bkc/bkc-company-mind-resources.png" alt="BlackKnightController Company Mind resource workbench" loading="lazy" />
-                <p><a href="https://blackknight.auzietek.com/post/ui-captures-as-operational-evidence">See UI evidence capture</a></p>
+                <p><a href="https://www.blackknightcontroller.com/post/ui-captures-as-operational-evidence">See UI evidence capture</a></p>
               </article>
               <article class="resource-card">
                 <span class="category">Pipeline evidence</span>
                 <h3>Prompt to pipeline</h3>
                 <p>Infrastructure work becomes reusable pipeline action instead of disappearing into shell history.</p>
                 <img src="/content-files/assets/bkc/bkc-pipeline-workbench.png" alt="BlackKnightController pipeline workbench" loading="lazy" />
-                <p><a href="https://blackknight.auzietek.com/post/blackknightcontroller-prompt-to-pipeline">Read the operating contract</a></p>
+                <p><a href="https://www.blackknightcontroller.com/post/blackknightcontroller-prompt-to-pipeline">Read the operating contract</a></p>
               </article>
               <article class="resource-card">
                 <span class="category">Product proof</span>
@@ -531,7 +531,7 @@ AUZIETEK_PAGES = {
                 <span class="category">BlackKnightController</span>
                 <h3>Infrastructure automation evidence</h3>
                 <p>PXE, IPMI, OpenStack, Proxmox, ESXi, Docker Swarm, edge routing, screenshots, and pipeline fragments from the working lab.</p>
-                <p><a href="https://blackknight.auzietek.com/blog">Read BlackKnight articles</a></p>
+                <p><a href="https://www.blackknightcontroller.com/blog">Read BlackKnight articles</a></p>
               </article>
               <article class="resource-card">
                 <span class="category">Linux Users</span>
@@ -560,14 +560,14 @@ AUZIETEK_PAGES = {
                 <h3>From recovery to repeatable lab</h3>
                 <p>A candid field story about damaged workstation state, recovered control-plane context, and why evidence belongs near the pipeline.</p>
                 <img src="/content-files/assets/bkc/bkc-inventory-console.png" alt="BlackKnightController inventory console" loading="lazy" />
-                <p><a href="https://blackknight.auzietek.com/post/blackknightcontroller-recovery-weekend-repeatable-lab">Read the recovery story</a></p>
+                <p><a href="https://www.blackknightcontroller.com/post/blackknightcontroller-recovery-weekend-repeatable-lab">Read the recovery story</a></p>
               </article>
               <article class="resource-card">
                 <span class="category">BlackKnightController</span>
                 <h3>Pipelines as tutorial kits</h3>
                 <p>Validated BKC pipelines can become public articles, repo examples, manual guides, Ansible companions, and OpenVox/Puppet-style teaching material.</p>
                 <img src="/content-files/assets/bkc/bkc-pipeline-detail-edit.png" alt="BlackKnightController pipeline detail and edit view" loading="lazy" />
-                <p><a href="https://blackknight.auzietek.com/post/blackknightcontroller-pipelines-as-tutorial-kits">Read the tutorial pattern</a></p>
+                <p><a href="https://www.blackknightcontroller.com/post/blackknightcontroller-pipelines-as-tutorial-kits">Read the tutorial pattern</a></p>
               </article>
             </div>
             <h3>How articles become trustworthy</h3>
