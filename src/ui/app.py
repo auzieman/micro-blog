@@ -352,6 +352,20 @@ DEFAULT_HOST_LANE_MAP = {
     "blackknight.auzietek.com": "blackknight",
     "linux-users.auzietek.com": "linux",
     "retro-users.auzietek.com": "retro",
+    "blackknightcontroller.com": "blackknight",
+    "www.blackknightcontroller.com": "blackknight",
+    "blackknightcontrollerweb.online": "blackknight",
+    "www.blackknightcontrollerweb.online": "blackknight",
+    "auzietech.com": "auzietek",
+    "www.auzietech.com": "auzietek",
+    "auzietech.net": "auzietek",
+    "www.auzietech.net": "auzietek",
+    "auzietech.info": "auzietek",
+    "www.auzietech.info": "auzietek",
+    "auzietech.online": "auzietek",
+    "www.auzietech.online": "auzietek",
+    "auzietech.store": "auzietek",
+    "www.auzietech.store": "auzietek",
 }
 
 AUZIETEK_PAGES = {

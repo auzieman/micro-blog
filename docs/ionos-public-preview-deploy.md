@@ -109,6 +109,16 @@ kb.auzietek.com                      A 74.208.45.165   Kanboard
 mon.auzietek.com / mon1.auzietek.com A 74.208.45.165   Grafana/monitoring
 dtlab.auzietek.com                   A 74.208.45.165   redirect to GitHub profile
 
+blackknightcontroller.com            pending/parking until IONOS lock clears
+www.blackknightcontroller.com        A 74.208.45.165   redirect/product lane
+blackknightcontrollerweb.online      pending/new domain, candidate redirect/product lane
+
+auzietech.com                        pending/new domain, candidate Auzietek redirect
+auzietech.net                        pending/new domain, candidate Auzietek redirect
+auzietech.info                       pending/new domain, candidate Auzietek redirect
+auzietech.online                     pending/new domain, candidate Auzietek redirect
+auzietech.store                      pending/new domain, candidate Auzietek redirect or merch/lab future
+
 auzietek.lab.auzietek.com            CNAME swarm1.lab.auzietek.com
 blackknight.lab.auzietek.com         CNAME swarm1.lab.auzietek.com
 linux-users.lab.auzietek.com         CNAME swarm1.lab.auzietek.com
@@ -295,7 +305,7 @@ leave less-important history in the legacy archive
 Static Auzietek pages in micro-blog should remain singular page views. Blog
 browsing belongs under `/blog`, lane domains, or article routes.
 
-## New BlackKnightController domain
+## New domains and redirect posture
 
 `blackknightcontroller.com` exists as a separate IONOS DNS zone. During the
 first pass, the API allowed creating:
@@ -332,8 +342,47 @@ the Auzietek VPS. HTTPS for the new domain still needs a dedicated certificate;
 the current `*.auzietek.com` certificate does not cover
 `blackknightcontroller.com`.
 
+The newer AuzieTech spellings and `blackknightcontrollerweb.online` should be
+treated as brand-protection and routing names until there is a deliberate use
+case. The safe first behavior is HTTP/HTTPS redirect after DNS and certificate
+coverage are ready:
+
+```text
+blackknightcontroller.com
+www.blackknightcontroller.com
+blackknightcontrollerweb.online
+www.blackknightcontrollerweb.online
+  -> https://blackknight.auzietek.com/
+
+auzietech.com
+www.auzietech.com
+auzietech.net
+www.auzietech.net
+auzietech.info
+www.auzietech.info
+auzietech.online
+www.auzietech.online
+auzietech.store
+www.auzietech.store
+  -> https://beta.auzietek.com/ during preview
+  -> https://www.auzietek.com/ after production cutover
+```
+
+The Flask UI now knows these hostnames as lane aliases so nginx can proxy them
+without landing visitors in the wrong lane while redirect/certificate work is
+being finalized.
+
 ## Cutover boundary
 
 Do not point `auzietek.com` or `www.auzietek.com` at the micro-blog deployment
 until content review, admin security review, backup/rollback, and certificate
 validation are complete.
+
+When the cutover is approved, keep the old Drupal site available as a legacy
+archive rather than silently destroying history. Candidate shape:
+
+```text
+legacy.auzietek.com  -> old Drupal/archive host or static export
+auzietek.com         -> canonical new Auzietek site
+www.auzietek.com     -> canonical new Auzietek site
+```

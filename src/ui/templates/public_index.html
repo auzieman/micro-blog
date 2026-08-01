@@ -388,7 +388,9 @@
       text-transform: uppercase;
     }
     .linux-mag-search {
-      min-width: min(22rem, 38vw);
+      width: min(24rem, 100%);
+      min-width: min(16rem, 34vw);
+      max-width: 100%;
       padding: 0.5rem;
       border-radius: 10px;
       border: 1px solid rgba(207, 216, 220, 0.28);
@@ -398,7 +400,8 @@
       box-shadow: 0 0.35rem 1.2rem rgba(0, 0, 0, 0.14);
     }
     .linux-mag-search form {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 0.45rem;
       margin: 0;
     }
@@ -1537,8 +1540,11 @@
       position: sticky;
       top: 1rem;
       max-height: calc(100vh - 2rem);
+      overflow: auto;
+      overscroll-behavior: contain;
       display: flex;
       flex-direction: column;
+      scrollbar-gutter: stable;
     }
     body.theme-linux-pro .sidebar {
       order: 2;
@@ -1759,9 +1765,13 @@
       width: clamp(7.5rem, 18vw, 10.5rem);
       max-width: 100%;
       height: auto;
-      box-shadow: none;
-      border-radius: 0;
+      padding: 0.18rem 0.24rem;
+      background: rgba(244, 247, 242, 0.82);
+      border: 1px solid rgba(38, 50, 56, 0.12);
+      box-shadow: 0 0.35rem 0.9rem rgba(17, 35, 70, 0.08);
+      border-radius: 999px;
       margin: 0;
+      filter: saturate(0.94) contrast(1.02);
     }
     body.theme-retro .retro-rail-module {
       display: block;
@@ -1817,6 +1827,35 @@
       color: #fff8ec;
       font-size: 0.76rem;
       font-weight: 850;
+    }
+    .external-link-list {
+      display: grid;
+      gap: 0.38rem;
+      margin-top: 0.55rem;
+    }
+    .external-link-list a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      min-height: 42px;
+      padding: 0.48rem 0.58rem;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.42);
+      border: 1px solid rgba(75, 49, 83, 0.12);
+      color: #24345f;
+      font-weight: 850;
+      line-height: 1.25;
+    }
+    .external-link-list a::after {
+      content: "↗";
+      opacity: 0.7;
+    }
+    body.theme-retro .external-link-list a:hover,
+    body.theme-retro .external-link-list a:focus-visible {
+      background: #24345f;
+      color: #fff8ec;
+      text-decoration: none;
     }
     .post-list {
       display: grid;
@@ -2967,6 +3006,16 @@
             <h3>Continue the Archive</h3>
             <p><a href="https://github.com/auzieman">Auzie GitHub projects</a></p>
             <p><a href="https://www.youtube.com/playlist?list=PLzZDgKo1qG2ECpD0ZHQYKTGIuNsXMgNb7">Retro video playlist</a></p>
+          </section>
+          <section class="retro-rail-module" aria-label="Preservation and emulation links">
+            <h3>Preservation and Emulation</h3>
+            <p>A few external waypoints for readers who want the wider Amiga and retro-computing ecosystem.</p>
+            <div class="external-link-list">
+              <a href="https://www.a-eon.com/" target="_blank" rel="noopener">A-EON Technology</a>
+              <a href="https://www.hyperion-entertainment.com/" target="_blank" rel="noopener">Hyperion Entertainment</a>
+              <a href="https://amigakit.amiga.store/" target="_blank" rel="noopener">AmigaKit store</a>
+              <a href="https://www.amikit.amiga.sk/" target="_blank" rel="noopener">AmiKit emulation</a>
+            </div>
           </section>
           <section class="retro-rail-module" aria-label="Popular retro systems">
             <h3>Popular Systems</h3>

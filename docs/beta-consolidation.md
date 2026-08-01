@@ -37,11 +37,25 @@ linux-users.auzietek.com
 
 retro-users.auzietek.com
   Amiga, retro systems, preservation, and classic-computing experiments
+
+blackknightcontroller.com / www.blackknightcontroller.com
+blackknightcontrollerweb.online / www.blackknightcontrollerweb.online
+  product-name domains; redirect or proxy to the BlackKnight lane once DNS and
+  certificates are clean
+
+auzietech.com / auzietech.net / auzietech.info / auzietech.online / auzietech.store
+  brand-protection and alternate spelling domains; redirect to beta during
+  preview, then to the canonical Auzietek business site after production
+  cutover
 ```
 
 Keep `www.auzietek.com` business-forward. Use the microsites to hold deeper
 product journals, tutorials, and lab-heavy material so the main site does not
 feel like a catch-all archive.
+
+When the main cutover happens, keep the older Drupal estate reachable as a
+legacy archive, likely `legacy.auzietek.com`, until the useful articles,
+screenshots, and redirects have all been accounted for.
 
 ## Source material
 

@@ -198,9 +198,10 @@ class UIRouteTests(unittest.TestCase):
         self.assertIn('"@type":"BreadcrumbList"', body)
         self.assertNotIn("No article is available yet", body)
         self.assertNotIn("Total 0", body)
-        self.assertIn("Ideas with a path toward useful systems.", body)
+        self.assertIn("Ideas with a Path Toward Useful Systems", body)
         self.assertIn('href="/thinktank" class="active"', body)
-        self.assertIn("RACS remains alive", body)
+        self.assertIn("RACS: automation pointed at human need", body)
+        self.assertIn("AuziX and next-era computing", body)
 
     def test_auzietek_root_emits_homepage_metadata_and_website_schema(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -233,7 +234,7 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(mocked_fetch.call_args[0][3], "services")
         body = response.get_data(as_text=True)
         self.assertIn('class="theme-auzietek"', body)
-        self.assertIn("What can Auzietek do for you?", body)
+        self.assertIn("What Auzietek Can Do For You", body)
         self.assertIn('href="/" class="active"', body)
 
     def test_root_respects_non_auzietek_host_lane(self):
@@ -300,7 +301,8 @@ class UIRouteTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(mocked_fetch.call_args[0][3])
         body = response.get_data(as_text=True)
-        self.assertIn("Field notes, walkthroughs, and proof-backed teaching material.", body)
+        self.assertIn("Articles, Proof, and Tutorial Lanes", body)
+        self.assertIn("Current proof spotlight", body)
         self.assertNotIn("<h2>Recent Articles</h2>", body)
 
     def test_resource_card_links_have_light_theme_contrast_rules(self):
@@ -364,8 +366,8 @@ Mounted body from private content payload.
         self.assertEqual(response.status_code, 200)
         body = response.get_data(as_text=True)
         self.assertIn("Evidence before action", body)
-        self.assertIn("Progressive trust and explicit boundaries", body)
-        self.assertIn("BlackKnightController is the practical edge", body)
+        self.assertIn("Progressive trust", body)
+        self.assertIn("Clear boundaries between coordination and implementation", body)
 
     def test_aiops_page_explains_bounded_operating_loop(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -374,8 +376,8 @@ Mounted body from private content payload.
         self.assertEqual(response.status_code, 200)
         body = response.get_data(as_text=True)
         self.assertIn("signal", body)
-        self.assertIn("Bootstrap CLI versus controller", body)
-        self.assertIn("Receipts as handoff", body)
+        self.assertIn("Deterministic procedures, bounded troubleshooting", body)
+        self.assertIn("write a receipt", body)
 
     def test_business_case_page_labels_benchmarks_and_assumptions(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
@@ -383,9 +385,9 @@ Mounted body from private content payload.
             response = self.client.get("/business-case", headers={"Host": "auzietek.lab.auzietek.com"})
         self.assertEqual(response.status_code, 200)
         body = response.get_data(as_text=True)
-        self.assertIn("Public benchmarks, carefully used", body)
-        self.assertIn("Assumption, not a guarantee", body)
-        self.assertIn("Uptime Institute Annual Outage Analysis 2025", body)
+        self.assertIn("A practical value model", body)
+        self.assertIn("Cost comparison framework", body)
+        self.assertIn("BlackKnightController posture", body)
 
     def test_blackknight_lab_host_selects_blackknight_lane(self):
         payload = {"items": [], "total": 0, "page": 1, "page_size": 10}
