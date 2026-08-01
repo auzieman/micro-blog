@@ -390,7 +390,16 @@ When the cutover is approved, keep the old Drupal site available as a legacy
 archive rather than silently destroying history. Candidate shape:
 
 ```text
-legacy.auzietek.com  -> old Drupal/archive host or static export
-auzietek.com         -> canonical new Auzietek site
-www.auzietek.com     -> canonical new Auzietek site
+legacy.auzietek.com  -> old Drupal/archive host
+auzietek.com         -> canonical new micro-blog Auzietek site
+www.auzietek.com     -> canonical new micro-blog Auzietek site
 ```
+
+
+2026-08-01 production cutover receipt: `auzietek.com`, `www.auzietek.com`,
+and `ipv4.auzietek.com` now proxy to the micro-blog UI on the Auzietek VPS.
+`legacy.auzietek.com` was created in IONOS DNS and proxies to the old Drupal
+backend. Smoke checks returned HTTP 200 for canonical, www, legacy, beta,
+BlackKnight, Linux Users, and Retro Users lanes. The current wildcard/root
+certificate covers `auzietek.com`, `www.auzietek.com`, and
+`legacy.auzietek.com`.
