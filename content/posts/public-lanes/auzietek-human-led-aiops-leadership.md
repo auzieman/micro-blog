@@ -13,11 +13,9 @@ hero_image_url: /content-files/assets/brand/auzietek-company-mind-concept.png
 This week at Auzietek, the lab crossed a useful line.
 
 The story was not only “we built another thing.” The story was that the work
-started to document itself: BlackKnightController views became screenshots,
+started to document itself: BlackKnightController views became evidence,
 pipelines became explainable, lab content became reviewable, and the public
-site started carrying more of the evidence trail.
-
-![Auzietek weekly update page captured from the lab canary](/content-files/assets/bkc/lab-review-20260802/auzietek-weekly-update-article.png)
+site started carrying the stronger product story instead of only polished copy.
 
 ## What changed this week
 
@@ -28,7 +26,7 @@ The lab moved several threads forward at once:
 - Draw.io exports became useful enough for review and planning.
 - The lab edge page gained direct review links.
 - Micro-blog content can now be refreshed through the filesystem import loop.
-- Public Auzietek and BlackKnight content started using live lab screenshots as
+- Public Auzietek and BlackKnight content started using product screenshots as
   proof instead of decorative filler.
 
 That matters because infrastructure work often fails in the same quiet way.
@@ -55,12 +53,12 @@ between people, tools, and operational memory.
 The current lab loop looks like this:
 
 ```text
-source content / pipeline change
-  -> deploy to lab canary
-  -> capture screenshots
+pipeline / UI / content change
+  -> deploy to the OpenStack or ESXi lab target
+  -> capture BKC views and route proof
   -> review with Auzie, Codex, and Astra
-  -> update the article or pipeline
-  -> sync/import again
+  -> update the pipeline, article, or UI fragment
+  -> sync/import/deploy again
   -> promote only after the evidence reads cleanly
 ```
 
@@ -68,7 +66,11 @@ The important part is that micro-blog can accept the same content update more
 than once. A revision is not a crisis. The lab can refresh, re-import, and show
 the new state without hand-editing the database.
 
-![Lab edge page with article review links](/content-files/assets/bkc/lab-review-20260802/lab-edge-review-links.png)
+The stronger proof, though, is not a screenshot of the public website. It is
+the BKC UI showing the actual operating surface: resources, inventory,
+pipelines, integrations, evidence, and the relationships between them.
+
+![BlackKnightController OpenStack pipeline workbench](/content-files/assets/bkc/openstack-bkc/bkc-pipelines.png)
 
 ## The business problem is usually not one command
 
@@ -89,7 +91,7 @@ BlackKnightController is Auzietek's practical answer to that problem. It turns
 repeatable work into pipelines, keeps evidence near the action, and gives a
 human-readable shape to the systems being operated.
 
-![BlackKnightController Company Mind resource workbench](/content-files/assets/bkc/bkc-company-mind-resources.png)
+![BlackKnightController OpenStack-hosted resource workbench](/content-files/assets/bkc/openstack-bkc/bkc-beta-resources.png)
 
 ## AI is strongest when grounded
 
@@ -120,22 +122,20 @@ Trust comes from proof:
 - the graph shows the resource relationship;
 - the reusable fragment explains why this pattern should not regress.
 
-![BlackKnightController pipeline detail and edit view](/content-files/assets/bkc/bkc-pipeline-detail-edit.png)
+![BlackKnightController pipeline detail and edit view](/content-files/assets/bkc/openstack-bkc/bkc-pipeline-detail-edit.png)
 
 That evidence is useful for operators, clients, junior engineers, and future
 assistants. It turns a one-time fix into an organizational memory.
 
-## Mobile and layout review are part of the evidence
+![BlackKnightController inventory console](/content-files/assets/bkc/openstack-bkc/bkc-inventory.png)
 
-The public site is not “done” because it looks good on a wide monitor. This
-week also reinforced a practical front-end lesson: phone-width captures catch
-different problems than desktop review.
+## Website proof should be concise
 
-![Auzietek weekly update mobile capture](/content-files/assets/bkc/lab-review-20260802/auzietek-weekly-update-mobile.png)
-
-The goal is not to chase every pixel forever. The goal is to keep the page
-honest enough that a real visitor can read it and a real operator can trust the
-review path.
+For public site review, a single front-door screenshot per lane is usually
+enough: Auzietek, BlackKnightController, Linux Users, and Retro Users. The
+deeper screenshots should belong to the product story: the BKC views, pipeline
+highlights, run evidence, and diagrams that show how the lab is actually being
+operated.
 
 ## Cleaner operations are a leadership choice
 

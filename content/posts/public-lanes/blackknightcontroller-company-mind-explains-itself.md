@@ -7,7 +7,7 @@ theme_variant: midnight
 status: published
 seo_title: BlackKnightController Company Mind infrastructure explainer
 seo_description: See how BlackKnightController connects resource graphs, pipelines, run evidence, local Ollama explainers, and Draw.io exports into a repeatable infrastructure operating loop.
-hero_image_url: /content-files/assets/bkc/bkc-company-mind-resources.png
+hero_image_url: /content-files/assets/bkc/openstack-bkc/bkc-beta-resources.png
 ---
 
 BlackKnightController started as a practical lab controller: power hosts on,
@@ -21,13 +21,7 @@ relationships, pipeline intent, latest run evidence, screenshots, local model
 explanations, and editable diagrams live close enough together that a human can
 trust the story.
 
-![BlackKnightController Company Mind resource workbench](/content-files/assets/bkc/bkc-company-mind-resources.png)
-
-The public review page below was captured from the lab canary after the article
-and edge links were refreshed. The screenshot is not decoration; it is proof
-that the publishing loop can show the current operational story.
-
-![BlackKnightController Company Mind article captured from the lab canary](/content-files/assets/bkc/lab-review-20260802/bkc-company-mind-article.png)
+![BlackKnightController OpenStack-hosted resource workbench](/content-files/assets/bkc/openstack-bkc/bkc-beta-resources.png)
 
 ## The loop that matters
 
@@ -60,18 +54,19 @@ way:
 - what proof says the step worked;
 - what fragment should be preserved for the next operator.
 
-![BlackKnightController pipeline workbench](/content-files/assets/bkc/bkc-pipeline-workbench.png)
+![BlackKnightController OpenStack pipeline workbench](/content-files/assets/bkc/openstack-bkc/bkc-pipelines.png)
 
 The pipeline cockpit now has enough structure to support an operator brief. A
 local Ollama model can summarize what a pipeline is intended to do, what is
 risky, what should be ready before running, and what proof should exist after.
 BKC still owns the action boundary. The model helps explain the terrain.
 
-On a phone-width capture, the same article has to stay readable. That is part
-of the evidence too: the public story should not only work on the operator's
-big monitor.
+![BlackKnightController pipeline detail and edit view](/content-files/assets/bkc/openstack-bkc/bkc-pipeline-detail-edit.png)
 
-![BlackKnightController Company Mind mobile capture](/content-files/assets/bkc/lab-review-20260802/bkc-company-mind-mobile.png)
+The detail view is where a pipeline stops being a label and becomes something
+an engineer can audit. Stage definitions, JSON fragments, shell snippets,
+notes, and run intent should be readable enough that the operator can review
+the plan before pushing the button.
 
 ## Latest runs should teach too
 
@@ -99,7 +94,7 @@ fragments answer: what should we remember?
 The Draw.io export matters because it turns operational state into an artifact
 people can carry into documentation, review, training, or a meeting.
 
-![BlackKnightController pipeline paths graph](/content-files/assets/bkc/bkc-pipeline-paths-graph.png)
+![BlackKnightController pipeline paths graph](/content-files/assets/bkc/openstack-bkc/bkc-beta-pipeline-graph.png)
 
 The first diagrams are not final poster art. They are editable evidence. A
 pipeline explainer can become a diagram. A latest run can become a stage map. A
@@ -124,7 +119,7 @@ workbench for operational relationships:
 - DNS and certificates;
 - pipelines that affect each layer.
 
-![BlackKnightController edge ownership graph](/content-files/assets/bkc/bkc-edge-ownership-graph.png)
+![BlackKnightController edge ownership graph](/content-files/assets/bkc/openstack-bkc/bkc-beta-edge-graph.png)
 
 That is why layout matters. If a graph is only a cloud of nodes, it is
 decoration. If it shows ownership, edge paths, health, stale resources, and the
