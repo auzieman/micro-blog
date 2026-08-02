@@ -61,12 +61,45 @@ local Ollama model can summarize what a pipeline is intended to do, what is
 risky, what should be ready before running, and what proof should exist after.
 BKC still owns the action boundary. The model helps explain the terrain.
 
+## Local models belong near the lab
+
+The Ollama worker is intentionally local. That choice is not only about privacy,
+although privacy matters. It is also about latency, survivability, and context.
+If the lab is rebuilding hosts, shifting DNS, or testing an internal route, the
+assistant that explains the state should be able to see the same grounded
+evidence the operator sees.
+
+In the current pass, BKC can ask a local model for several small but useful
+jobs:
+
+- explain a pipeline in operator language;
+- summarize the latest run instead of dumping raw logs;
+- suggest a first-pass graph layout;
+- produce a Draw.io-friendly scene that a human can edit;
+- help turn field evidence into article, runbook, or training material.
+
+This is not presented as finished magic. The model output still needs review.
+The value is that a rough explanation appears close to the button, close to the
+run, and close to the evidence.
+
 ![BlackKnightController pipeline detail and edit view](/content-files/assets/bkc/openstack-bkc/bkc-pipeline-detail-edit.png)
 
 The detail view is where a pipeline stops being a label and becomes something
 an engineer can audit. Stage definitions, JSON fragments, shell snippets,
 notes, and run intent should be readable enough that the operator can review
 the plan before pushing the button.
+
+The same thinking applies to the graph buttons. A graph should not trap the
+operator in a tiny widget. The useful actions are becoming explicit:
+
+- zoom to the graph when the relationship view is the work;
+- ask Ollama for a layout when the graph gets too dense;
+- export Draw.io when the current state should become documentation;
+- open the related resource, pipeline, latest run, or evidence fragment.
+
+Those buttons are small, but they mark an important product direction: BKC is
+not only showing data. It is helping the operator turn data into the next safe
+action.
 
 ## Latest runs should teach too
 
@@ -104,6 +137,31 @@ That gives an engineer a clean handoff:
 
 ```text
 BKC view -> generated diagram -> human polish -> docs / article / video
+```
+
+Here is a first-pass example from the IONOS and lab-edge work. It is not meant
+to be a final architecture poster. It is a proof that BKC can take inventory,
+relationships, operator notes, and model guidance, then produce an editable
+artifact instead of another disposable chat answer.
+
+![First-pass editable IONOS and lab edge diagram](/content-files/assets/bkc/diagrams/ionos-lab-edge-story-preview.png)
+
+The paired Draw.io source is preserved as an artifact too:
+[download the editable diagram](/content-files/assets/bkc/diagrams/ionos-lab-edge-story.drawio).
+
+The model-side layout summary looked roughly like this:
+
+```text
+Diagram for Auzietek and BlackKnightController lab edge, public IONOS site,
+BKC control loop, backup/maintenance lanes, and telemetry path.
+
+Lane order:
+operator -> lab -> ionos -> public -> evidence
+
+Important emphasis:
+human/Astra/Codex approvals flow through bkc-channel;
+BKC talks to lab DNS, edge services, IONOS inventory, backup, and telemetry;
+public visitors resolve DNS, hit nginx, and feed public dashboard evidence.
 ```
 
 ## Why the graph changed the story

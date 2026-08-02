@@ -24,6 +24,8 @@ The lab moved several threads forward at once:
 - BlackKnightController's resource workbench became the main `/resources` view.
 - Pipeline and latest-run pages gained local explainer paths.
 - Draw.io exports became useful enough for review and planning.
+- The local Ollama worker started assisting with pipeline explanations and
+  first-pass graph layouts.
 - The lab edge page gained direct review links.
 - Micro-blog content can now be refreshed through the filesystem import loop.
 - Public Auzietek and BlackKnight content started using product screenshots as
@@ -71,6 +73,20 @@ the BKC UI showing the actual operating surface: resources, inventory,
 pipelines, integrations, evidence, and the relationships between them.
 
 ![BlackKnightController OpenStack pipeline workbench](/content-files/assets/bkc/openstack-bkc/bkc-pipelines.png)
+
+The local Ollama worker is part of that story. Auzietek is not trying to make a
+model secretly operate the lab. The useful version is more disciplined:
+
+```text
+BKC gathers state and evidence
+Ollama explains or proposes a layout
+Codex turns approved changes into files and pipelines
+Auzie reviews the result
+BKC executes the repeatable action path
+```
+
+That keeps the human in authority while still letting the system become more
+understandable.
 
 ## The business problem is usually not one command
 
@@ -128,6 +144,17 @@ That evidence is useful for operators, clients, junior engineers, and future
 assistants. It turns a one-time fix into an organizational memory.
 
 ![BlackKnightController inventory console](/content-files/assets/bkc/openstack-bkc/bkc-inventory.png)
+
+Even early diagram output becomes useful when it is honest about its maturity.
+This first-pass IONOS/lab-edge diagram is not final design collateral. It is
+editable operational evidence: a generated sketch that can be reviewed,
+corrected, and turned into documentation.
+
+![First-pass editable IONOS and lab edge diagram](/content-files/assets/bkc/diagrams/ionos-lab-edge-story-preview.png)
+
+That is the more interesting product pattern. A screenshot proves what the UI
+looked like. A diagram explains how the pieces relate. A fragment explains why
+the decision was made. A pipeline repeats the work.
 
 ## Website proof should be concise
 
