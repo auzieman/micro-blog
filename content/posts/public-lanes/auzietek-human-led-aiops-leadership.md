@@ -1,16 +1,37 @@
 ---
-title: Human-Led AIOps: Cleaner Operations Without Losing the Human
-slug: auzietek-human-led-aiops-leadership
-summary: Auzietek is shaping a practical operating model where AI assists engineering work, but humans keep judgment, approval, evidence, and purpose in the loop.
+title: This Week at Auzietek: Human-Led AIOps in the Lab
+slug: this-week-at-auzietek-human-led-aiops-in-the-lab
+summary: A weekly Auzietek field report showing how the lab used BlackKnightController, Codex, Astra, Ollama, screenshots, and pipelines to turn infrastructure work into reviewable evidence.
 tags: [services, aiops, leadership, blackknightcontroller, company-mind, evidence, principles]
 theme_variant: auzietek
 status: published
-seo_title: Human-led AIOps and practical infrastructure leadership
-seo_description: Auzietek's human-led AIOps model combines AI-assisted engineering, repeatable pipelines, evidence, documentation, and practical leadership without hiding human judgment.
+seo_title: This Week at Auzietek human-led AIOps lab report
+seo_description: A weekly Auzietek update showing human-led AIOps, BlackKnightController evidence, pipeline discipline, screenshots, and practical infrastructure leadership from the lab.
 hero_image_url: /content-files/assets/brand/auzietek-company-mind-concept.png
 ---
 
-Infrastructure work often fails in the same quiet way.
+This week at Auzietek, the lab crossed a useful line.
+
+The story was not only “we built another thing.” The story was that the work
+started to document itself: BlackKnightController views became screenshots,
+pipelines became explainable, lab content became reviewable, and the public
+site started carrying more of the evidence trail.
+
+![Auzietek weekly update page captured from the lab canary](/content-files/assets/bkc/lab-review-20260802/auzietek-weekly-update-article.png)
+
+## What changed this week
+
+The lab moved several threads forward at once:
+
+- BlackKnightController's resource workbench became the main `/resources` view.
+- Pipeline and latest-run pages gained local explainer paths.
+- Draw.io exports became useful enough for review and planning.
+- The lab edge page gained direct review links.
+- Micro-blog content can now be refreshed through the filesystem import loop.
+- Public Auzietek and BlackKnight content started using live lab screenshots as
+  proof instead of decorative filler.
+
+That matters because infrastructure work often fails in the same quiet way.
 
 The people involved are capable. The tools are powerful. The documentation
 exists somewhere. The dashboard has a lot of numbers. But the actual operating
@@ -28,6 +49,26 @@ evidence proves what happened
 
 That is human-led AIOps. Not magic. Not replacement. A cleaner partnership
 between people, tools, and operational memory.
+
+## The review loop is becoming a product feature
+
+The current lab loop looks like this:
+
+```text
+source content / pipeline change
+  -> deploy to lab canary
+  -> capture screenshots
+  -> review with Auzie, Codex, and Astra
+  -> update the article or pipeline
+  -> sync/import again
+  -> promote only after the evidence reads cleanly
+```
+
+The important part is that micro-blog can accept the same content update more
+than once. A revision is not a crisis. The lab can refresh, re-import, and show
+the new state without hand-editing the database.
+
+![Lab edge page with article review links](/content-files/assets/bkc/lab-review-20260802/lab-edge-review-links.png)
 
 ## The business problem is usually not one command
 
@@ -83,6 +124,18 @@ Trust comes from proof:
 
 That evidence is useful for operators, clients, junior engineers, and future
 assistants. It turns a one-time fix into an organizational memory.
+
+## Mobile and layout review are part of the evidence
+
+The public site is not “done” because it looks good on a wide monitor. This
+week also reinforced a practical front-end lesson: phone-width captures catch
+different problems than desktop review.
+
+![Auzietek weekly update mobile capture](/content-files/assets/bkc/lab-review-20260802/auzietek-weekly-update-mobile.png)
+
+The goal is not to chase every pixel forever. The goal is to keep the page
+honest enough that a real visitor can read it and a real operator can trust the
+review path.
 
 ## Cleaner operations are a leadership choice
 

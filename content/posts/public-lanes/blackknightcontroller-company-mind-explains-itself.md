@@ -23,6 +23,12 @@ trust the story.
 
 ![BlackKnightController Company Mind resource workbench](/content-files/assets/bkc/bkc-company-mind-resources.png)
 
+The public review page below was captured from the lab canary after the article
+and edge links were refreshed. The screenshot is not decoration; it is proof
+that the publishing loop can show the current operational story.
+
+![BlackKnightController Company Mind article captured from the lab canary](/content-files/assets/bkc/lab-review-20260802/bkc-company-mind-article.png)
+
 ## The loop that matters
 
 The core operating loop is still deliberately simple:
@@ -60,6 +66,12 @@ The pipeline cockpit now has enough structure to support an operator brief. A
 local Ollama model can summarize what a pipeline is intended to do, what is
 risky, what should be ready before running, and what proof should exist after.
 BKC still owns the action boundary. The model helps explain the terrain.
+
+On a phone-width capture, the same article has to stay readable. That is part
+of the evidence too: the public story should not only work on the operator's
+big monitor.
+
+![BlackKnightController Company Mind mobile capture](/content-files/assets/bkc/lab-review-20260802/bkc-company-mind-mobile.png)
 
 ## Latest runs should teach too
 
