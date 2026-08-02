@@ -139,6 +139,19 @@ That gives an engineer a clean handoff:
 BKC view -> generated diagram -> human polish -> docs / article / video
 ```
 
+The pipeline explainer already follows that path. BKC can generate a Draw.io
+scene from a pipeline definition, open it in a normal editor, and let the human
+make the first cleanup pass. That matters because the artifact does not end as a
+flat screenshot. The screenshot is proof for the article; the `.drawio` file is
+the thing an engineer can keep editing.
+
+![Human-polished Draw.io pipeline explainer output](/content-files/assets/bkc/diagrams/pipeline-drawio-human-polished-20260802.png)
+
+This is still an early pass: spacing, font binding, lane grouping, and visual
+hierarchy can all improve. But the important product behavior is already there:
+a pipeline can explain itself, become a diagram, and then become reviewable
+documentation.
+
 Here is a first-pass example from the IONOS and lab-edge work. It is not meant
 to be a final architecture poster. It is a proof that BKC can take inventory,
 relationships, operator notes, and model guidance, then produce an editable
