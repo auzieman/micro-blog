@@ -574,6 +574,88 @@ Mounted body from private content payload.
         self.assertIn("<loc>https://beta.auzietek.com/thinktank</loc>", sitemap)
         self.assertIn("<loc>https://beta.auzietek.com/business-case</loc>", sitemap)
 
+    def test_ads_txt_uses_adsense_publisher(self):
+        response = self.client.get("/ads.txt", headers={"Host": "linux-users.auzietek.com"})
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertIn("google.com, pub-1591072092053145, DIRECT, f08c47fec0942fa0", body)
+
+    def test_public_blog_host_includes_adsense_and_skips_lab_hosts(self):
+        payload = {"items": [], "total": 1, "page": 1, "page_size": 10}
+        selected = {
+            "slug": "when-the-map-is-not-fhs-llms-custom-layouts",
+            "title": "When the map is not FHS",
+            "summary": "Summary",
+            "html_body": "<p>Body</p>",
+            "theme_variant": "linux-pro",
+            "tags": ["linux"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [selected], selected, None)):
+            public_response = self.client.get(
+                "/post/when-the-map-is-not-fhs-llms-custom-layouts",
+                headers={"Host": "linux-users.auzietek.com"},
+            )
+            lab_response = self.client.get(
+                "/post/when-the-map-is-not-fhs-llms-custom-layouts",
+                headers={"Host": "linux-users.lab.auzietek.com"},
+            )
+        blackknight_selected = {
+            **selected,
+            "slug": "blackknightcontroller-prompt-to-pipeline",
+            "theme_variant": "midnight",
+            "tags": ["blackknightcontroller"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [blackknight_selected], blackknight_selected, None)):
+            blackknight_response = self.client.get(
+                "/post/blackknightcontroller-prompt-to-pipeline",
+                headers={"Host": "www.blackknightcontroller.com"},
+            )
+        auzietek_selected = {
+            **selected,
+            "slug": "this-week-at-auzietek-human-led-aiops-in-the-lab",
+            "theme_variant": "auzietek",
+            "tags": ["services"],
+        }
+        with mock.patch.object(ui_app, "fetch_public_payload", return_value=(payload, [auzietek_selected], auzietek_selected, None)):
+            auzietek_response = self.client.get(
+                "/post/this-week-at-auzietek-human-led-aiops-in-the-lab",
+                headers={"Host": "beta.auzietek.com"},
+            )
+        public_body = public_response.get_data(as_text=True)
+        blackknight_body = blackknight_response.get_data(as_text=True)
+        auzietek_body = auzietek_response.get_data(as_text=True)
+        lab_body = lab_response.get_data(as_text=True)
+        self.assertEqual(public_response.status_code, 200)
+        self.assertEqual(blackknight_response.status_code, 200)
+        self.assertEqual(auzietek_response.status_code, 200)
+        self.assertTrue(ui_app.is_public_adsense_host("linux-users.auzietek.com"))
+        self.assertTrue(ui_app.is_public_adsense_host("retro-users.auzietek.com"))
+        self.assertFalse(ui_app.is_public_adsense_host("beta.auzietek.com"))
+        self.assertFalse(ui_app.is_public_adsense_host("www.blackknightcontroller.com"))
+        self.assertEqual(ui_app.gtm_container_for_host("linux-users.auzietek.com"), "GTM-TRK7JDZ")
+        self.assertEqual(ui_app.gtm_container_for_host("auzietek.com"), "GTM-TRK7JDZ")
+        self.assertEqual(ui_app.gtm_container_for_host("www.blackknightcontroller.com"), "GTM-KXQJ9B42")
+        self.assertEqual(ui_app.gtm_container_for_host("linux-users.lab.auzietek.com"), "")
+        self.assertEqual(ui_app.gtm_container_for_host("legacy.auzietek.com"), "")
+        self.assertIn("ca-pub-1591072092053145", public_body)
+        self.assertIn("data-ad-slot=\"6975157585\"", public_body)
+        self.assertIn("ad-column", public_body)
+        self.assertIn("GTM-TRK7JDZ", public_body)
+        self.assertNotIn("GTM-KXQJ9B42", public_body)
+        self.assertIn("GTM-KXQJ9B42", blackknight_body)
+        self.assertNotIn("GTM-TRK7JDZ", blackknight_body)
+        self.assertNotIn("adsbygoogle.js?client=", blackknight_body)
+        self.assertNotIn("data-ad-slot=", blackknight_body)
+        self.assertIn("GTM-TRK7JDZ", auzietek_body)
+        self.assertNotIn("adsbygoogle.js?client=", auzietek_body)
+        self.assertNotIn("data-ad-slot=", auzietek_body)
+        self.assertIn("googleads.g.doubleclick.net", public_response.headers.get("Content-Security-Policy", ""))
+        self.assertIn("www.googletagmanager.com", public_response.headers.get("Content-Security-Policy", ""))
+        self.assertNotIn("adsbygoogle.js?client=", lab_body)
+        self.assertNotIn("data-ad-slot=", lab_body)
+        self.assertNotIn("GTM-TRK7JDZ", lab_body)
+        self.assertNotIn("GTM-KXQJ9B42", lab_body)
+
     def test_google_oauth_guardrail_redirects_when_not_configured(self):
         with mock.patch.object(ui_app, "GOOGLE_CLIENT_ID", ""), mock.patch.object(ui_app, "GOOGLE_CLIENT_SECRET", ""):
             response = self.client.get("/admin/login/google")

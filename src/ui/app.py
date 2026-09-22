@@ -89,6 +89,11 @@ STATIC_PAGE_OVERRIDES_SUBDIR = os.getenv("STATIC_PAGE_OVERRIDES_SUBDIR", "site/p
 ADMIN_LOGIN_WINDOW_SECONDS = int(os.getenv("ADMIN_LOGIN_WINDOW_SECONDS", "900"))
 ADMIN_LOGIN_MAX_ATTEMPTS = int(os.getenv("ADMIN_LOGIN_MAX_ATTEMPTS", "5"))
 ENABLE_HSTS = coerce_bool(os.getenv("ENABLE_HSTS"), False)
+ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "ca-pub-1591072092053145").strip()
+ADSENSE_SLOT = os.getenv("ADSENSE_SLOT", "6975157585").strip()
+GTM_CONTAINER_ID_AUZIETEK = os.getenv("GTM_CONTAINER_ID_AUZIETEK", "GTM-TRK7JDZ").strip()
+GTM_CONTAINER_ID_BLACKKNIGHT = os.getenv("GTM_CONTAINER_ID_BLACKKNIGHT", "GTM-KXQJ9B42").strip()
+GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "").strip()
 VISITOR_HASH_SALT = os.getenv("VISITOR_HASH_SALT", app.secret_key)
 GEOIP_LOOKUP_URL = os.getenv("GEOIP_LOOKUP_URL", "").strip()
 GEOIP_TIMEOUT_SECONDS = float(os.getenv("GEOIP_TIMEOUT_SECONDS", "0.75"))
@@ -99,11 +104,11 @@ _ADMIN_LOGIN_ATTEMPTS: dict[str, list[float]] = {}
 _GEOIP_CACHE: dict[str, tuple[float, dict[str, str]]] = {}
 
 DEFAULT_SITE_NAV_LINKS = [
-    {"label": "Services", "href": "/blog?tag=services"},
+    {"label": "Services", "href": "/services"},
     {"label": "BlackKnight", "href": "https://www.blackknightcontroller.com"},
     {"label": "Linux Users", "href": "https://linux-users.auzietek.com"},
     {"label": "Retro Users", "href": "https://retro-users.auzietek.com"},
-    {"label": "Labs", "href": "/blog?tag=lab"},
+    {"label": "Articles", "href": "/articles"},
     {"label": "RSS", "href": "/rss.xml"},
 ]
 
@@ -113,10 +118,10 @@ DEFAULT_MICROSITES = [
         "label": "Auzietek",
         "role": "Business front door",
         "summary": "Services, product direction, client-fit proof, and polished public articles.",
-        "href": "https://beta.auzietek.com/",
+        "href": "https://www.auzietek.com/",
     },
     {
-        "name": "blackknight.auzietek.com",
+        "name": "www.blackknightcontroller.com",
         "label": "BlackKnight",
         "role": "Product and platform journal",
         "summary": "BKC demos, hardware automation, pipeline evidence, and operator-facing patterns.",
@@ -146,7 +151,7 @@ LANE_CONFIG = {
         "site_section": "business",
         "theme": "auzietek",
         "tag": "services",
-        "featured_slug": "infrastructure-automation-that-stays-repeatable",
+        "featured_slug": "this-week-at-auzietek-human-led-aiops-in-the-lab",
         "headline": "Human-first engineering for cleaner systems.",
         "description": "Auzietek helps small teams and practical operators make technology more natural, predictable, and clean through repeatable automation, clear evidence, and human-led AI operations.",
         "positioning": "Simpler solutions, practical automation, and human-first AIOps.",
@@ -168,12 +173,12 @@ LANE_CONFIG = {
                 "Convert tribal knowledge into reusable runbooks, pipelines, training material, and opportunities for more people to learn.",
             ],
             "links": [
-                {"label": "BlackKnightController", "href": "/blog?lane=blackknight"},
-                {"label": "ThinkTank notes", "href": "/blog?tag=thinktank&lane=auzietek"},
-                {"label": "AIOps direction", "href": "/blog?tag=aiops&lane=auzietek"},
+                {"label": "BlackKnightController", "href": "https://www.blackknightcontroller.com/"},
+                {"label": "ThinkTank notes", "href": "/thinktank"},
+                {"label": "AIOps direction", "href": "/aiops"},
                 {"label": "Garland Computers", "href": "https://www.garlandcomputers.com/"},
-                {"label": "Linux Users", "href": "/blog?lane=linux"},
-                {"label": "Retro Users", "href": "/blog?lane=retro"},
+                {"label": "Linux Users", "href": "https://linux-users.auzietek.com/blog"},
+                {"label": "Retro Users", "href": "https://retro-users.auzietek.com/blog"},
             ],
             "sections": [
                 {
@@ -202,7 +207,7 @@ LANE_CONFIG = {
         "site_section": "product journal",
         "theme": "midnight",
         "tag": "blackknightcontroller",
-        "featured_slug": "blackknightcontroller-recovery-weekend-repeatable-lab",
+        "featured_slug": "blackknightcontroller-company-mind-explains-itself",
         "headline": "Rebuild real infrastructure from power button to running service.",
         "description": "BlackKnightController automates the work engineers normally do by hand: power control, PXE, SSH, templates, APIs, validation, and evidence capture.",
         "positioning": "A lab-proven infrastructure automation control plane.",
@@ -882,8 +887,8 @@ LAB_HOST_BY_LANE = {
 }
 
 PUBLIC_HOST_BY_LANE = {
-    "auzietek": "beta.auzietek.com",
-    "blackknight": "blackknight.auzietek.com",
+    "auzietek": "www.auzietek.com",
+    "blackknight": "www.blackknightcontroller.com",
     "linux": "linux-users.auzietek.com",
     "retro": "retro-users.auzietek.com",
 }
@@ -896,6 +901,8 @@ MICROSITE_LANE_BY_NAME = {
     "auzietek.lab.auzietek.com": "auzietek",
     "auzietek": "auzietek",
     "blackknight.auzietek.com": "blackknight",
+    "www.blackknightcontroller.com": "blackknight",
+    "blackknightcontroller.com": "blackknight",
     "beta.blackknightcontroller.com": "blackknight",
     "blackknight.lab.auzietek.com": "blackknight",
     "blackknight": "blackknight",
@@ -987,6 +994,64 @@ def _load_json_object(raw_value: str, fallback: dict) -> dict:
 
 def request_host() -> str:
     return request.host.split(":", 1)[0].strip().lower()
+
+
+def is_lab_host(host: str | None = None) -> bool:
+    value = (host or request_host()).strip().lower()
+    return value.endswith(".lab.auzietek.com") or ".lab." in value
+
+
+def is_blackknight_public_host(host: str | None = None) -> bool:
+    value = (host or request_host()).strip().lower()
+    if is_lab_host(value):
+        return False
+    if configured_host_lane_map().get(value) == "blackknight":
+        return True
+    return value.endswith("blackknightcontroller.com") or value.endswith("blackknightcontrollerweb.online")
+
+
+def is_legacy_archive_host(host: str | None = None) -> bool:
+    value = (host or request_host()).strip().lower()
+    return value == "legacy.auzietek.com" or value.startswith("legacy.")
+
+
+def is_public_analytics_host(host: str | None = None) -> bool:
+    value = (host or request_host()).strip().lower()
+    if is_lab_host(value) or is_legacy_archive_host(value):
+        return False
+    if value == "auzietek.com" or value.endswith(".auzietek.com"):
+        return True
+    if is_blackknight_public_host(value):
+        return True
+    return configured_host_lane_map().get(value) in {"auzietek", "linux", "retro", "blackknight"}
+
+
+def is_public_adsense_host(host: str | None = None) -> bool:
+    value = (host or request_host()).strip().lower()
+    if is_lab_host(value) or is_legacy_archive_host(value):
+        return False
+    return value in {"linux-users.auzietek.com", "retro-users.auzietek.com"}
+
+
+def is_public_monetized_host(host: str | None = None) -> bool:
+    return is_public_analytics_host(host)
+
+
+def gtm_container_for_host(host: str | None = None) -> str:
+    if not is_public_analytics_host(host):
+        return ""
+    if is_blackknight_public_host(host):
+        return GTM_CONTAINER_ID_BLACKKNIGHT
+    return GTM_CONTAINER_ID_AUZIETEK
+
+
+def adsense_publisher_id() -> str:
+    client = ADSENSE_CLIENT
+    if client.startswith("ca-pub-"):
+        return client[len("ca-") :]
+    if client.startswith("pub-"):
+        return client
+    return f"pub-{client}" if client else ""
 
 
 def configured_host_lane_map() -> dict:
@@ -1284,16 +1349,25 @@ def href_for_lane(lane_key: str, host_lane_selected: bool = False) -> str:
     return f"/blog?{urlencode({'lane': lane_key})}"
 
 
+def public_site_nav_tail() -> list[dict]:
+    return [
+        {"label": "AUZiX", "href": "https://auzix.auzietek.com/", "active": False},
+        {"label": "Community", "href": "https://www.auzietek.com/friends", "active": False},
+        {"label": "LinkedIn", "href": "https://www.linkedin.com/in/auzieman", "active": False},
+    ]
+
+
 def lane_nav_links(active_lane: str | None, active_theme: str | None, active_page: str | None = None, host_lane_selected: bool = False) -> list[dict]:
     if active_lane == "auzietek":
         return [
             {"label": page["label"], "href": page["path"], "active": key == active_page}
             for key, page in AUZIETEK_PAGES.items()
-        ] + [{"label": "RSS", "href": "/rss.xml", "active": False}]
+        ] + public_site_nav_tail() + [{"label": "RSS", "href": "/rss.xml", "active": False}]
     links = []
     for key, lane in LANE_CONFIG.items():
         href = href_for_lane(key, host_lane_selected)
         links.append({"label": lane["label"], "href": href, "active": key == active_lane})
+    links.extend(public_site_nav_tail())
     links.append({"label": "All Posts", "href": f"/blog?{urlencode({'theme': active_theme})}" if active_theme else "/blog", "active": active_lane is None})
     links.append({"label": "RSS", "href": "/rss.xml", "active": False})
     return links
@@ -1584,6 +1658,15 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "meta_og_type": metadata["og_type"],
         "json_ld": json_ld,
         "preview_mode": preview_mode,
+        "enable_adsense": (not preview_mode) and is_public_adsense_host() and bool(ADSENSE_CLIENT),
+        "adsense_client": ADSENSE_CLIENT if ADSENSE_CLIENT.startswith("ca-pub-") else (f"ca-{adsense_publisher_id()}" if adsense_publisher_id() else ""),
+        "adsense_slot": ADSENSE_SLOT,
+        "gtm_container_id": gtm_container_for_host() if not preview_mode else "",
+        "ga_measurement_id": (
+            GA_MEASUREMENT_ID
+            if (not preview_mode) and is_public_analytics_host() and GA_MEASUREMENT_ID and not gtm_container_for_host()
+            else ""
+        ),
         "tag": tag,
         "query": query,
         "previous_post": previous_post,
@@ -1604,7 +1687,10 @@ def apply_security_headers(response):
         "script-src 'self' 'unsafe-inline' https:; "
         "font-src 'self' https: data:; "
         "connect-src 'self' http: https:; "
-        "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; "
+        "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com "
+        "https://googleads.g.doubleclick.net https://tpc.googlesyndication.com "
+        "https://pagead2.googlesyndication.com https://www.google.com "
+        "https://www.googletagmanager.com; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self' https://accounts.google.com"
@@ -1612,7 +1698,7 @@ def apply_security_headers(response):
     if ENABLE_HSTS:
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Cache-Control"] = "no-store" if request.path.startswith("/admin") else "public, max-age=60"
-    ignored_public_metric_paths = {"/favicon.ico", "/robots.txt"}
+    ignored_public_metric_paths = {"/favicon.ico", "/robots.txt", "/ads.txt"}
     if (
         request.method == "GET"
         and request.path not in ignored_public_metric_paths
@@ -1794,6 +1880,14 @@ def robots():
     site_url = current_request_site_url()
     text = f"User-agent: *\nAllow: /\nSitemap: {site_url}/sitemap.xml\n"
     return Response(text, mimetype="text/plain")
+
+
+@app.get("/ads.txt")
+def ads_txt():
+    publisher = adsense_publisher_id()
+    if not publisher:
+        abort(404)
+    return Response(f"google.com, {publisher}, DIRECT, f08c47fec0942fa0\n", mimetype="text/plain")
 
 
 @app.get("/rss.xml")

@@ -17,6 +17,25 @@
   {% if meta_og_image %}<meta name="twitter:image" content="{{ meta_og_image }}" />{% endif %}
   {% if preview_mode %}<meta name="robots" content="noindex,nofollow" />{% endif %}
   {% if json_ld %}<script type="application/ld+json">{{ json_ld|safe }}</script>{% endif %}
+  {% if gtm_container_id %}
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','{{ gtm_container_id }}');</script>
+  {% endif %}
+  {% if ga_measurement_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_measurement_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ ga_measurement_id }}');
+  </script>
+  {% endif %}
+  {% if enable_adsense %}
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_client }}" crossorigin="anonymous"></script>
+  {% endif %}
   <style>
     :root {
       color-scheme: light;
@@ -309,6 +328,35 @@
       background: linear-gradient(135deg, rgba(27, 167, 166, 0.32), rgba(185, 121, 63, 0.18));
       border-color: rgba(27, 167, 166, 0.58);
       box-shadow: 0 14px 26px rgba(0, 0, 0, 0.12);
+    }
+    .rail-social {
+      display: grid;
+      gap: 0.42rem;
+      padding-top: 0.35rem;
+    }
+    .rail-social-label {
+      color: rgba(239, 250, 249, 0.62);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .rail-social a {
+      color: #effaf9;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0.58rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(27, 167, 166, 0.18);
+      border: 1px solid rgba(123, 231, 255, 0.28);
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .rail-social a:hover {
+      background: rgba(27, 167, 166, 0.3);
+      border-color: rgba(123, 231, 255, 0.5);
     }
     .rail-note {
       margin-top: auto;
@@ -1980,6 +2028,56 @@
       word-break: normal;
       max-width: var(--reading-width);
     }
+    .article-with-ad {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(160px, 180px);
+      gap: 1rem 1.15rem;
+      align-items: start;
+      max-width: none;
+    }
+    .article-with-ad .article-body {
+      max-width: none;
+    }
+    .ad-column {
+      position: sticky;
+      top: 1rem;
+      width: 100%;
+      max-width: 180px;
+      justify-self: end;
+    }
+    .ad-slot {
+      margin: 0;
+      min-height: 250px;
+      max-width: 180px;
+      overflow: hidden;
+      border-radius: 12px;
+      background: rgba(23, 45, 56, 0.04);
+      border: 1px solid rgba(23, 45, 56, 0.08);
+    }
+    .ad-slot .adsbygoogle {
+      display: block;
+      width: 160px;
+      min-height: 600px;
+    }
+    @media (max-width: 1100px) {
+      .article-with-ad {
+        grid-template-columns: 1fr;
+      }
+      .ad-column {
+        position: static;
+        order: -1;
+        max-width: 300px;
+        justify-self: start;
+      }
+      .ad-slot {
+        max-width: 300px;
+        min-height: 90px;
+      }
+      .ad-slot .adsbygoogle {
+        width: 100%;
+        min-height: 250px;
+      }
+    }
     .article-body > * {
       max-width: 100%;
     }
@@ -2589,6 +2687,10 @@
   </style>
 </head>
 <body class="theme-{{ active_theme }}">
+  {% if gtm_container_id %}
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ gtm_container_id }}"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  {% endif %}
   <main class="frame">
     <aside class="brand-rail">
       <div>
@@ -2598,9 +2700,15 @@
       </div>
       <nav class="rail-nav" aria-label="Auzietek sections">
         {% for nav_item in site_nav_links %}
-        <a href="{{ nav_item.href }}" class="{% if nav_item.active %}active{% endif %}">{{ nav_item.label }}</a>
+        {% set nav_external = nav_item.href.startswith('http') %}
+        <a href="{{ nav_item.href }}" class="{% if nav_item.active %}active{% endif %}"{% if nav_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ nav_item.label }}</a>
         {% endfor %}
       </nav>
+      <div class="rail-social" aria-label="Auzietek community links">
+        <span class="rail-social-label">Connect</span>
+        <a href="https://discord.gg/zZh9XuDt9" target="_blank" rel="noopener noreferrer">Discord</a>
+        <a href="https://www.linkedin.com/in/auzieman" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
       <p class="rail-note"><strong>Emerging venture</strong><span>Auzietek is being shaped from field-tested lab work, public writing, and practical operator tools.</span></p>
     </aside>
     <div class="page-column">
@@ -2631,8 +2739,11 @@
         <a href="/blog?tag=docker&lane=linux">Containers</a>
         <a href="/blog?tag=ansible&lane=linux">DevOps</a>
         <a href="/blog?tag=observability&lane=linux">Observability</a>
-        <a href="https://www.blackknightcontroller.com/">BKC Proof</a>
-        <a href="https://beta.auzietek.com/">Auzietek</a>
+        <a href="https://www.blackknightcontroller.com/" target="_blank" rel="noopener noreferrer">BKC Proof</a>
+        <a href="https://www.auzietek.com/" target="_blank" rel="noopener noreferrer">Auzietek</a>
+        <a href="https://auzix.auzietek.com/" target="_blank" rel="noopener noreferrer">AUZiX</a>
+        <a href="https://discord.gg/zZh9XuDt9" target="_blank" rel="noopener noreferrer">Discord</a>
+        <a href="https://www.linkedin.com/in/auzieman" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       </div>
     </nav>
     {% endif %}
@@ -2652,8 +2763,11 @@
         <a href="/blog?tag=emulation&lane=retro">Emulation</a>
         <a href="/blog?tag=preservation&lane=retro">Preservation</a>
         <a href="/blog?tag=retro&lane=retro">Retro Lab</a>
-        <a href="https://linux-users.auzietek.com/blog">Linux Users</a>
-        <a href="https://beta.auzietek.com/">Auzietek</a>
+        <a href="https://linux-users.auzietek.com/blog" target="_blank" rel="noopener noreferrer">Linux Users</a>
+        <a href="https://www.auzietek.com/" target="_blank" rel="noopener noreferrer">Auzietek</a>
+        <a href="https://auzix.auzietek.com/" target="_blank" rel="noopener noreferrer">AUZiX</a>
+        <a href="https://discord.gg/zZh9XuDt9" target="_blank" rel="noopener noreferrer">Discord</a>
+        <a href="https://www.linkedin.com/in/auzieman" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       </div>
     </nav>
     {% endif %}
@@ -2662,7 +2776,7 @@
       <div class="beta-strip"><span class="beta-badge">Lab proven</span><span>Auzietek is an emerging venture with LLC formation pending; the work shown here is real lab evidence, writing, and product direction.</span></div>
       {% if show_article_section and not static_page and not is_homepage %}
       <div class="section-heading">
-        <h1>{{ active_lane_label }} Articles</h1>
+        <h1>{% if active_lane == 'blackknight' %}Featured BlackKnightController proof{% else %}{{ active_lane_label }} Articles{% endif %}</h1>
         <p>{{ site_positioning }}</p>
       </div>
       {% endif %}
@@ -2695,7 +2809,7 @@
         {% endif %}
         <div class="mast-actions">
           <a class="button-link" href="/blog{% if active_lane %}?lane={{ active_lane }}{% endif %}">Latest Posts</a>
-          <a class="button-link" href="/blog?tag=services{% if active_theme %}&theme={{ active_theme }}{% endif %}{% if active_lane %}&lane={{ active_lane }}{% endif %}">Client Fit</a>
+          <a class="button-link" href="/services">Client Fit</a>
           {% if is_admin_authenticated %}
           <a class="button-link primary" href="/admin">Author Console</a>
           {% endif %}
@@ -3050,7 +3164,22 @@
             <span class="pill">{{ tag_name }}</span>
             {% endfor %}
           </div>
+          {% if enable_adsense and adsense_slot %}
+          <div class="article-with-ad">
+            <div class="article-body">{{ selected.html_body|safe }}</div>
+            <aside class="ad-column" aria-label="Advertisement">
+              <div class="ad-slot">
+                <ins class="adsbygoogle"
+                     data-ad-client="{{ adsense_client }}"
+                     data-ad-slot="{{ adsense_slot }}"
+                     data-ad-format="vertical"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+              </div>
+            </aside>
+          </div>
+          {% else %}
           <div class="article-body">{{ selected.html_body|safe }}</div>
+          {% endif %}
           {% else %}
           <h2>Feature Article</h2>
           <p class="summary">Articles for this section are being prepared. Explore the other Auzietek lanes or check back as lab work is promoted into published guidance.</p>
