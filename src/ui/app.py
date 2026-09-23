@@ -93,6 +93,8 @@ ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "ca-pub-1591072092053145").strip()
 ADSENSE_SLOT = os.getenv("ADSENSE_SLOT", "6975157585").strip()
 GTM_CONTAINER_ID_AUZIETEK = os.getenv("GTM_CONTAINER_ID_AUZIETEK", "GTM-TRK7JDZ").strip()
 GTM_CONTAINER_ID_BLACKKNIGHT = os.getenv("GTM_CONTAINER_ID_BLACKKNIGHT", "GTM-KXQJ9B42").strip()
+GA_MEASUREMENT_ID_BLACKKNIGHT = os.getenv("GA_MEASUREMENT_ID_BLACKKNIGHT", "G-SLDFDNQC98").strip()
+GA_MEASUREMENT_ID_AUZIETEK = os.getenv("GA_MEASUREMENT_ID_AUZIETEK", "").strip()
 GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "").strip()
 VISITOR_HASH_SALT = os.getenv("VISITOR_HASH_SALT", app.secret_key)
 GEOIP_LOOKUP_URL = os.getenv("GEOIP_LOOKUP_URL", "").strip()
@@ -1045,6 +1047,14 @@ def gtm_container_for_host(host: str | None = None) -> str:
     return GTM_CONTAINER_ID_AUZIETEK
 
 
+def ga_measurement_for_host(host: str | None = None) -> str:
+    if not is_public_analytics_host(host):
+        return ""
+    if is_blackknight_public_host(host):
+        return GA_MEASUREMENT_ID_BLACKKNIGHT
+    return GA_MEASUREMENT_ID_AUZIETEK or GA_MEASUREMENT_ID
+
+
 def adsense_publisher_id() -> str:
     client = ADSENSE_CLIENT
     if client.startswith("ca-pub-"):
@@ -1662,11 +1672,7 @@ def build_public_context(selected, posts, payload, message=None, active_theme=No
         "adsense_client": ADSENSE_CLIENT if ADSENSE_CLIENT.startswith("ca-pub-") else (f"ca-{adsense_publisher_id()}" if adsense_publisher_id() else ""),
         "adsense_slot": ADSENSE_SLOT,
         "gtm_container_id": gtm_container_for_host() if not preview_mode else "",
-        "ga_measurement_id": (
-            GA_MEASUREMENT_ID
-            if (not preview_mode) and is_public_analytics_host() and GA_MEASUREMENT_ID and not gtm_container_for_host()
-            else ""
-        ),
+        "ga_measurement_id": ga_measurement_for_host() if not preview_mode else "",
         "tag": tag,
         "query": query,
         "previous_post": previous_post,
