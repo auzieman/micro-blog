@@ -668,6 +668,22 @@ Mounted body from private content payload.
         self.assertNotIn("GTM-TRK7JDZ", lab_body)
         self.assertNotIn("GTM-KXQJ9B42", lab_body)
 
+    def test_geoip_prefers_nginx_country_headers(self):
+        with ui_app.app.test_request_context(
+            "/",
+            headers={"X-Country-Code": "US", "X-Country-Name": "United States"},
+        ):
+            geo = ui_app.geoip_for_ip("8.8.8.8")
+        self.assertEqual(geo["country"], "us")
+        self.assertEqual(geo["region"], "united states")
+        self.assertEqual(geo["source"], "nginx-geoip")
+
+    def test_geoip_ignores_empty_nginx_country(self):
+        with ui_app.app.test_request_context("/", headers={"X-Country-Code": "-"}):
+            geo = ui_app.geoip_for_ip("8.8.8.8")
+        self.assertEqual(geo["country"], "unknown")
+        self.assertEqual(geo["source"], "none")
+
     def test_google_oauth_guardrail_redirects_when_not_configured(self):
         with mock.patch.object(ui_app, "GOOGLE_CLIENT_ID", ""), mock.patch.object(ui_app, "GOOGLE_CLIENT_SECRET", ""):
             response = self.client.get("/admin/login/google")

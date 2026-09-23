@@ -10,7 +10,7 @@ from urllib.parse import urlencode
 
 import markdown
 import requests
-from flask import Flask, abort, redirect, render_template, request, send_from_directory, session, url_for, Response
+from flask import Flask, abort, has_request_context, redirect, render_template, request, send_from_directory, session, url_for, Response
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -1099,8 +1099,25 @@ def private_or_invalid_ip(ip_value: str) -> bool:
     return parsed.is_private or parsed.is_loopback or parsed.is_link_local or parsed.is_multicast or parsed.is_reserved
 
 
+def geo_from_nginx_headers() -> dict[str, str] | None:
+    if not has_request_context():
+        return None
+    code = (request.headers.get("X-Country-Code") or "").strip().lower()
+    name = (request.headers.get("X-Country-Name") or "").strip().lower()
+    if code in {"", "-", "none", "unknown"}:
+        return None
+    return {
+        "country": code,
+        "region": name or "unknown",
+        "source": "nginx-geoip",
+    }
+
+
 def geoip_for_ip(ip_value: str) -> dict[str, str]:
     unknown = {"country": "unknown", "region": "unknown", "source": "none"}
+    header_geo = geo_from_nginx_headers()
+    if header_geo:
+        return header_geo
     if not ip_value:
         return unknown
     if private_or_invalid_ip(ip_value):
