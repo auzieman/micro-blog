@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: Micro Blog public
+    orgId: 1
+    folder: Micro Blog
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
+      foldersFromFilesStructure: false

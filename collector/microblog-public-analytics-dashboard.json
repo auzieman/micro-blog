@@ -1,0 +1,303 @@
+{
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "description": "Page views (hits) from Flask. Not distinct viewers. sitemap/robots excluded via page_kind!=system.",
+      "fieldConfig": {
+        "defaults": { "decimals": 0, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(increase(blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}[$__range]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Page views",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "fieldConfig": {
+        "defaults": { "decimals": 0, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "count(count by (host) (blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Domains with views",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "fieldConfig": {
+        "defaults": { "decimals": 0, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "count(count by (route) (blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Pages with views",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "description": "GeoIP is unset today, so country/region are unknown. Not an IP list.",
+      "fieldConfig": {
+        "defaults": { "decimals": 0, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "count(count by (country, region) (blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Regions in the series",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "fieldConfig": {
+        "defaults": { "custom": { "fillOpacity": 15, "lineWidth": 2 }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "id": 5,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["sum"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (host) (increase(blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}[$__rate_interval]))",
+          "legendFormat": "{{host}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Views by domain",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "fieldConfig": {
+        "defaults": { "custom": { "fillOpacity": 15, "lineWidth": 2 }, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "id": 6,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["sum"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (page_kind) (increase(blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}[$__rate_interval]))",
+          "legendFormat": "{{page_kind}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Views by page kind",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "fieldConfig": {
+        "defaults": { "decimals": 0, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 10, "w": 14, "x": 0, "y": 12 },
+      "id": 7,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "Views" }]
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (host, route, page_kind, lane) (increase(blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}[$__range]))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Domain + page",
+      "transformations": [
+        { "id": "labelsToFields", "options": { "mode": "columns" } },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "job": true,
+              "instance": true,
+              "exported_job": true
+            },
+            "renameByName": {
+              "host": "Domain",
+              "route": "Page",
+              "page_kind": "Kind",
+              "lane": "Lane",
+              "Value": "Views"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${ds}" },
+      "description": "Will stay unknown until GEOIP_LOOKUP_URL is set on blog-ui. Still not IPs.",
+      "fieldConfig": {
+        "defaults": { "decimals": 0, "unit": "short" },
+        "overrides": []
+      },
+      "gridPos": { "h": 10, "w": 10, "x": 14, "y": 12 },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "Views" }]
+      },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (country, region, host) (increase(blog_page_views_total{page_kind!=\"system\", host=~\"$host\", lane=~\"$lane\"}[$__range]))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Region + domain",
+      "transformations": [
+        { "id": "labelsToFields", "options": { "mode": "columns" } },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "job": true,
+              "instance": true,
+              "exported_job": true
+            },
+            "renameByName": {
+              "country": "Country",
+              "region": "Region",
+              "host": "Domain",
+              "Value": "Views"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": ["microblog", "analytics", "public"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "label": "Prometheus",
+        "name": "ds",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "allValue": ".*",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "${ds}" },
+        "includeAll": true,
+        "label": "Domain",
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": "label_values(blog_page_views_total, host)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "${ds}" },
+        "includeAll": true,
+        "label": "Lane",
+        "multi": true,
+        "name": "lane",
+        "options": [],
+        "query": "label_values(blog_page_views_total, lane)",
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-7d", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Public site views",
+  "uid": "microblog-public-analytics",
+  "version": 1
+}
